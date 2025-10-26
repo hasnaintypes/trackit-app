@@ -1,6 +1,14 @@
 name: 🧪 CI
 
 on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feat/**'
+      - 'fix/**'
+      - 'refactor/**'
+      - 'hotfix/**'
   pull_request:
     branches:
       - main
@@ -8,6 +16,7 @@ on:
       - 'feat/**'
       - 'fix/**'
       - 'refactor/**'
+      - 'hotfix/**'
 
 jobs:
   build-and-test:
