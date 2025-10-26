@@ -1,3 +1,9 @@
+## [1.2.1](https://github.com/hasnaintypes/cashio-saas/compare/v1.2.0...v1.2.1) (2025-10-26)
+
+### Bug Fixes
+
+- **e2e:** add fallback to localhost for BETTER_AUTH_URL and PLAYWRIGHT_BASE_URL ([a7c5603](https://github.com/hasnaintypes/cashio-saas/commit/a7c5603929814f2336274774b5d186a3b5f38659))
+
 # [1.2.0](https://github.com/hasnaintypes/cashio-saas/compare/v1.1.0...v1.2.0) (2025-10-26)
 
 ### Features
