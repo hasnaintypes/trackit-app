@@ -1,6 +1,16 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
+// Detect common CLI contexts where strict runtime env validation is undesirable.
+// This helps avoid failing during linting or test runs (which often run without secrets,
+// e.g. from forked PRs or CI jobs that intentionally don't expose secrets).
+const argv = process.argv.join(" ");
+const isLinting = /\b(eslint|next-lint|lint)\b/.test(argv);
+const isTest =
+  process.env.NODE_ENV === "test" || /\b(vitest|jest|mocha)\b/.test(argv);
+const skipValidationFlag =
+  !!process.env.SKIP_ENV_VALIDATION || isLinting || isTest;
+
 export const env = createEnv({
   /**
    * Specify your server-side environment variables schema here. This way you can ensure the app
@@ -52,7 +62,8 @@ export const env = createEnv({
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
    * useful for Docker builds.
    */
-  skipValidation: !!process.env.SKIP_ENV_VALIDATION,
+  // Skip strict validation when running lint/tests or when SKIP_ENV_VALIDATION is set.
+  skipValidation: skipValidationFlag,
   /**
    * Makes it so that empty strings are treated as undefined. `SOME_VAR: z.string()` and
    * `SOME_VAR=''` will throw an error.
