@@ -29,3 +29,19 @@ vi.mock("next/navigation", () => ({
   // expose the sharedRouter for tests that need direct access to the spy
   __sharedRouter: sharedRouter,
 }));
+
+// Mock next/link to render a plain anchor element in tests. Some components
+// import the default Link from next/link; providing a lightweight mock
+// prevents "Element type is invalid" errors in unit tests.
+vi.mock("next/link", () => {
+  return {
+    __esModule: true,
+    default: ({
+      children,
+      href,
+      ...props
+    }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+      return React.createElement("a", { href, ...props }, children);
+    },
+  };
+});
