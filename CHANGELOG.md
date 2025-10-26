@@ -1,3 +1,9 @@
+# [1.2.0](https://github.com/hasnaintypes/cashio-saas/compare/v1.1.0...v1.2.0) (2025-10-26)
+
+### Features
+
+- **e2e:** add environment variables for E2E tests in workflow ([3d891c7](https://github.com/hasnaintypes/cashio-saas/commit/3d891c7e142f65b00fdd8761356b2e0206508f71))
+
 # [1.1.0](https://github.com/hasnaintypes/cashio-saas/compare/v1.0.0...v1.1.0) (2025-10-26)
 
 ### Bug Fixes
