@@ -131,7 +131,7 @@ describe("LoginForm", () => {
     await waitFor(() => {
       expect(signIn).toHaveBeenCalled();
       expect(toastMock.success).toHaveBeenCalled();
-      expect(router.push).toHaveBeenCalledWith("/dashboard");
+      expect(router.push).toHaveBeenCalledWith("/overview");
     });
   });
 });
