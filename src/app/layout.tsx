@@ -1,7 +1,7 @@
 import "@/styles/globals.css";
 
 import { type Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Host_Grotesk, Work_Sans, JetBrains_Mono } from "next/font/google";
 
 import { TRPCReactProvider } from "@/trpc/react";
 
@@ -58,16 +58,31 @@ export const metadata: Metadata = {
   },
 };
 
-const geist = Geist({
+const host_grotesk = Host_Grotesk({
   subsets: ["latin"],
-  variable: "--font-geist-sans",
+  weight: ["600"],
+  variable: "--display-family",
+});
+const work_sans = Work_Sans({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--body-family",
+});
+const jetbrains_mono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-mono",
 });
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${geist.variable}`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${host_grotesk.variable} ${work_sans.variable} ${jetbrains_mono.variable}`}
+      suppressHydrationWarning
+    >
       <body>
         <BetterStackWebVitals />
         <TRPCReactProvider>
