@@ -5,3 +5,6 @@ export { Header } from "./header";
 export { Logo } from "./logo";
 export { default as ThemeSwitcher } from "./theme-toggle";
 export { WaitlistSection } from "./waitlist-section";
+export { default as InfoMenu } from "./info-menu";
+export { default as NotificationMenu } from "./notification-menu";
+export { default as UserMenu } from "./user-menu";
