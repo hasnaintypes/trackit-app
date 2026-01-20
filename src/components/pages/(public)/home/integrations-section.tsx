@@ -81,7 +81,7 @@ export default function IntegrationsSection() {
                   asChild
                   className="cursor-pointer"
                 >
-                  <Link href="/auth/sign-in">Get Started</Link>
+                  <Link href="/sign-in">Get Started</Link>
                 </Button>
               )}
             </div>

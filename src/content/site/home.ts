@@ -81,7 +81,7 @@ export const hero: HeroContent = {
   title: "Your Smartest Way to Manage Money, Together",
   description:
     "Cashio unifies personal and group finance in one intelligent dashboard. Track spending, split bills, set goals, and let AI guide your next move all in real time.",
-  primaryCta: { href: "/auth/sign-in", text: "Get Started Free" },
+  primaryCta: { href: "/sign-in", text: "Get Started Free" },
   secondaryCta: { text: "See How It Works" },
 };
 
@@ -107,7 +107,7 @@ export const integrations: IntegrationContent = {
   heading: "Connect Cashio with your favorite tools",
   description:
     "Integrate with Plaid, Notion, Google Sheets, and Stripe to automate your workflow. Build custom extensions and automate reports with our API and webhooks.",
-  cta: { href: "/auth/sign-in", text: "Get Started Free" },
+  cta: { href: "/sign-in", text: "Get Started Free" },
 };
 
 export const pricing = {
