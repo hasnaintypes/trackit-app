@@ -12,7 +12,7 @@ describe("getAvatarUrl function", () => {
 
   test("returns girl avatar when gender is FEMALE and no image", () => {
     const res = getAvatarUrl({ gender: "FEMALE" });
-    expect(res).toContain("female"); // Using contains since URL might change
+    expect(res).toContain("girl"); // Using contains since URL might change
   });
 
   test("returns boy/default avatar when gender is MALE or unspecified and no image", () => {
