@@ -21,6 +21,8 @@ function logHandlerWrapper<
   }) as T;
 }
 
-const handlers = toNextJsHandler(auth);
+// Per Better Auth docs, pass the `auth.handler` into `toNextJsHandler` so the
+// Next.js adapter receives the internal handler functions it expects.
+const handlers = toNextJsHandler(auth.handler);
 export const POST = logHandlerWrapper(handlers.POST);
 export const GET = logHandlerWrapper(handlers.GET);

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { authClient } from "@/lib/auth/client";
 import type { User } from "@/types/user";
+import { useUserStore } from "@/store/userStore";
 import { toError } from "@/lib/shared/error";
 import { isUser } from "@/lib/utils";
 import { createLogger } from "@/lib/logging";
@@ -12,13 +13,19 @@ export function useAuth() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
+  const setPersistedUser = useUserStore((s) => s.setUser);
+  const clearPersistedUser = useUserStore((s) => s.clear);
+
   const fetchUser = useCallback(async () => {
     setLoading(true);
     try {
       const { data: session, error } = await authClient.getSession();
       if (error) throw toError(error);
       const maybeUser = session?.user ?? null;
-      setUser(isUser(maybeUser) ? maybeUser : null);
+      const finalUser = isUser(maybeUser) ? maybeUser : null;
+      setUser(finalUser);
+      // Mirror into persisted user store for fast startup/refresh UI.
+      setPersistedUser(finalUser);
       logger.info("Fetched user session", { user: maybeUser });
     } catch (err) {
       setError(toError(err));
@@ -28,7 +35,7 @@ export function useAuth() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [setPersistedUser]);
 
   useEffect(() => {
     void fetchUser();
@@ -59,6 +66,8 @@ export function useAuth() {
       if (result.error) throw toError(result.error);
       await fetchUser();
       const maybeUser = "user" in result ? result.user : null;
+      // ensure persisted store reflects new session
+      setPersistedUser(isUser(maybeUser) ? maybeUser : null);
       logger.info("User signed up", { user: maybeUser });
       return isUser(maybeUser) ? maybeUser : null;
     } catch (err) {
@@ -101,6 +110,8 @@ export function useAuth() {
       if (result.error) throw toError(result.error);
       await fetchUser();
       const maybeUser = "user" in result ? result.user : null;
+      // ensure persisted store reflects new session
+      setPersistedUser(isUser(maybeUser) ? maybeUser : null);
       logger.info("User signed in", { user: maybeUser });
       return isUser(maybeUser) ? maybeUser : null;
     } catch (err) {
@@ -121,6 +132,9 @@ export function useAuth() {
       await authClient.signOut({
         fetchOptions: { onSuccess: () => setUser(null) },
       });
+      // Clear persisted user data
+      clearPersistedUser();
+      setUser(null);
       logger.info("User signed out");
     } catch (err) {
       const errorObj = toError(err);
@@ -179,8 +193,13 @@ export function useAuth() {
     newPassword: string,
   ): Promise<void> => {
     try {
-      await authClient.resetPassword({ token, newPassword });
-      logger.info("Password reset", { token });
+      const result = await authClient.resetPassword({ token, newPassword });
+      if (result.error) {
+        throw new Error(result.error.message ?? "Password reset failed");
+      }
+      logger.info("Password reset successfully");
+      // Optionally refetch user session if needed
+      await fetchUser();
     } catch (err) {
       const errorObj = toError(err);
       setError(errorObj);

@@ -16,31 +16,27 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { getAvatarUrl } from "@/lib/shared/avatar";
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
-  const [showPassword, setShowPassword] = useState<boolean>(() => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  useEffect(() => {
     try {
-      return (
-        typeof window !== "undefined" &&
-        localStorage.getItem("showPassword_signup") === "1"
-      );
+      const savedShowPassword =
+        localStorage.getItem("showPassword_signup") === "1";
+      const savedShowConfirm =
+        localStorage.getItem("showConfirm_signup") === "1";
+      setShowPassword(savedShowPassword);
+      setShowConfirm(savedShowConfirm);
     } catch {
-      return false;
+      // Ignore localStorage errors
     }
-  });
-  const [showConfirm, setShowConfirm] = useState<boolean>(() => {
-    try {
-      return (
-        typeof window !== "undefined" &&
-        localStorage.getItem("showConfirm_signup") === "1"
-      );
-    } catch {
-      return false;
-    }
-  });
+  }, []);
 
   useEffect(() => {
     try {
@@ -63,18 +59,36 @@ export function SignupForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Validate name
+    if (!name.trim()) {
+      toast.error("Name is required");
+      return;
+    }
+
+    // Validate password match
     if (password !== confirmPassword) {
       toast.error("Passwords do not match");
       return;
     }
+
+    // Validate password strength
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters long");
+      return;
+    }
+
     setLoading(true);
     const loadingToastId = toast.loading("Creating account...");
     try {
+      const defaultAvatar = getAvatarUrl({ gender: "MALE" });
+
       await signUp({
         name,
         email,
         password,
         role: "user",
+        image: defaultAvatar,
         callbackURL: "/", // or router.asPath
       });
       await sendVerificationEmail(email, "/");

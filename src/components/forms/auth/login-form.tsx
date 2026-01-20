@@ -17,6 +17,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useUserStore } from "@/store/userStore";
+import { logger } from "better-auth";
 
 export function LoginForm({
   className,
@@ -24,16 +26,15 @@ export function LoginForm({
 }: React.ComponentProps<"form">) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState<boolean>(() => {
+
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  useEffect(() => {
     try {
-      return (
-        typeof window !== "undefined" &&
-        localStorage.getItem("showPassword_login") === "1"
-      );
-    } catch {
-      return false;
-    }
-  });
+      const v = localStorage.getItem("showPassword_login");
+      if (v === "1") setShowPassword(true);
+    } catch {}
+  }, []);
 
   useEffect(() => {
     try {
@@ -43,7 +44,8 @@ export function LoginForm({
 
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
-  const { signIn, requestPasswordReset } = useAuth();
+  const { signIn, requestPasswordReset, refetch: authRefetch } = useAuth();
+  const setUser = useUserStore((s) => s.setUser);
 
   const handleForgotPassword = async () => {
     if (!email) {
@@ -76,14 +78,27 @@ export function LoginForm({
     setLoading(true);
     const loadingToastId = toast.loading("Logging in...");
     try {
-      await signIn({
+      const returnedUser = await signIn({
         email,
         password,
         rememberMe,
-        callbackURL: "/",
+        callbackURL: "/overview",
       });
+
+      if (returnedUser) {
+        setUser(returnedUser);
+      } else {
+        try {
+          await authRefetch();
+        } catch {
+          logger.error("Failed to refetch auth state after login.");
+        }
+        const persisted = useUserStore.getState().user;
+        if (persisted) setUser(persisted);
+      }
+
       toast.success("Logged in successfully");
-      router.push("/dashboard");
+      router.push("/overview");
     } catch (err) {
       let errorMsg = "Login failed";
       if (err && typeof err === "object" && "message" in err) {

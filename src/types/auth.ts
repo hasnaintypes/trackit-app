@@ -34,3 +34,21 @@ export interface Verification {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export interface ResetPasswordPayload {
+  user: {
+    id: string;
+    email: string;
+    name?: string;
+  };
+  url: string;
+  token: string;
+}
+
+export interface OnPasswordResetPayload {
+  user: {
+    id: string;
+    email: string;
+    name?: string;
+  };
+}

@@ -21,7 +21,7 @@ export default function VerifySuccessPage() {
       </p>
 
       <Button
-        onClick={() => router.push("/dashboard")}
+        onClick={() => router.push("/overview")}
         className="px-6 py-2"
         variant="default"
       >
