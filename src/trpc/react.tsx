@@ -57,6 +57,16 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
             headers.set("x-trpc-source", "nextjs-react");
             return headers;
           },
+          // Ensure fetch includes credentials so browser cookies (session)
+          // are sent to the tRPC API. Use globalThis.fetch explicitly to avoid
+          // accidentally calling a server-side (node) fetch implementation.
+          fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+            // Preserve any provided init while forcing credentials to 'include'
+            // Use globalThis.fetch and coerce the input to RequestInfo for TS.
+            globalThis.fetch(input as RequestInfo, {
+              ...(init ?? {}),
+              credentials: "include",
+            }),
         }),
       ],
     }),
