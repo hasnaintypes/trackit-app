@@ -1,56 +1,111 @@
-
 generator client {
   provider = "prisma-client-js"
+  // Use the default binary engine for local/standard deployments.
+  // The previous `client` engineType requires either an `adapter` or
+  // `accelerateUrl` to be provided when constructing `PrismaClient`.
+  // Switching to `binary` ensures the runtime can create the client
+  // without additional constructor options in local/dev setups.
+  engineType = "binary"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-model Post {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([name])
 }
 
 model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean
-  image         String?
-  role          String
-  createdAt     DateTime
-  updatedAt     DateTime
-  sessions      Session[]
-  accounts      Account[]
+  id                String                   @id
+  name              String
+  email             String                   @unique
+  emailVerified     Boolean
+  image             String?
+  createdAt         DateTime
+  updatedAt         DateTime
+  banExpires        DateTime?
+  banReason         String?
+  banned            Boolean?                 @default(false)
+  gender            Gender?
+  country           Country?
+  timezone          Timezone?
+  role              String                   @default("user")
+  accounts          Account[]
+  displaySettings   DisplaySettings?
+  notificationPrefs NotificationPreferences?
+  sessions          Session[]
+  userPreferences   UserPreferences?
+  
+  // Relations for financial models
+  bankAccounts      BankAccount[]
+  categories        Category[]
+  budgets           Budget[]
+  transactions      Transaction[]
+  recurringRules    RecurringRule[]
 
-  banned     Boolean?  @default(false)
-  banReason  String?
-  banExpires DateTime?
-
-  @@unique([email])
   @@map("user")
 }
 
+model UserPreferences {
+  id              String     @id @default(cuid())
+  userId          String     @unique
+  defaultCurrency Currency   @default(USD)
+  language        Language   @default(EN)
+  dateFormat      DateFormat @default(MM_DD_YYYY)
+  timeFormat      TimeFormat @default(H12)
+  weekStartsOn    WeekDay    @default(SUNDAY)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
+
+model DisplaySettings {
+  id                String            @id @default(cuid())
+  userId            String            @unique
+  defaultView       DefaultView       @default(OVERVIEW)
+  decimalPlaces     Int               @default(2)
+  currencyPosition  CurrencyPosition  @default(BEFORE)
+  thousandSeparator ThousandSeparator @default(COMMA)
+  colorScheme       ColorScheme       @default(SYSTEM)
+  compactNumbers    Boolean           @default(false)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("display_settings")
+}
+
+model NotificationPreferences {
+  id                        String   @id @default(cuid())
+  userId                    String   @unique
+  emailTransactions         Boolean  @default(true)
+  emailBalanceAlerts        Boolean  @default(true)
+  emailSecurity             Boolean  @default(true)
+  emailMarketing            Boolean  @default(false)
+  pushTransactions          Boolean  @default(true)
+  pushBalanceAlerts         Boolean  @default(true)
+  smsLargeTransactions      Boolean  @default(true)
+  smsSecurity               Boolean  @default(true)
+  lowBalanceThreshold       Decimal? @db.Decimal(10, 2)
+  largeTransactionThreshold Decimal? @db.Decimal(10, 2)
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+  user                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
+}
+
 model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String
-  createdAt DateTime
-  updatedAt DateTime
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  id             String   @id
+  expiresAt      DateTime
+  token          String   @unique
+  createdAt      DateTime
+  updatedAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  userId         String
   impersonatedBy String?
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([token])
   @@map("session")
 }
 
@@ -59,7 +114,6 @@ model Account {
   accountId             String
   providerId            String
   userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
   idToken               String?
@@ -69,6 +123,7 @@ model Account {
   password              String?
   createdAt             DateTime
   updatedAt             DateTime
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("account")
 }
@@ -82,4 +137,309 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model BankAccount {
+  // TODO: Review table naming: currently the DB contains both an `account`
+  // table (used for OAuth/session providers) and an `accounts` table which
+  // maps to this `BankAccount` model. At present `@@map("accounts")` is
+  // used so the BankAccount model stores rows in `accounts`. In a later
+  // migration we should consider renaming the physical table to a clearer
+  // name (for example `bank_accounts`) or remapping models to avoid the
+  // confusing `account` vs `accounts` names. Create a safe migration that
+  // preserves existing rows and updates application code accordingly.
+
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  type      AccountType
+  currency  Currency @default(USD)
+  balance   Decimal  @db.Decimal(18, 2) @default("0")
+  color     String?
+  icon      String?
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  transactions Transaction[]
+
+  @@map("accounts")
+  recurringRules   RecurringRule[]
+}
+
+model Category {
+  id               String     @id @default(cuid())
+  userId           String
+  parentCategoryId String?
+  name             String
+  color            String?
+  icon             String?
+  type             CategoryType
+  sortOrder        Int?       @default(0)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Self-referencing relation for parent/children categories
+  parent   Category?   @relation("CategoryToParent", fields: [parentCategoryId], references: [id])
+  children Category[]  @relation("CategoryToParent")
+
+  transactions Transaction[]
+  budgets      Budget[]
+
+  @@map("categories")
+  recurringRules   RecurringRule[]
+}
+
+model Budget {
+  id                        String   @id @default(cuid())
+  userId                    String
+  categoryId                String
+  amount                    Decimal  @db.Decimal(18, 2)
+  period                    BudgetPeriod
+  startDate                 DateTime
+  endDate                   DateTime?
+  spentAmount               Decimal  @db.Decimal(18, 2) @default("0")
+  threshold_70_alert_sent   Boolean  @default(false)
+  threshold_90_alert_sent   Boolean  @default(false)
+  threshold_100_alert_sent  Boolean  @default(false)
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@map("budgets")
+}
+
+model Transaction {
+  id                     String   @id @default(cuid())
+  userId                 String
+  accountId              String
+  categoryId             String?
+  contactId              String?
+  groupId                String?
+  amount                 Decimal  @db.Decimal(18, 2)
+  type                   TransactionType
+  description            String?
+  notes                  String?
+  date                   DateTime
+  isRecurring            Boolean  @default(false)
+  recurringRuleId        String?      @map("recurring_rule_id")
+  receipt_url            String?
+  receipt_extracted_text String?
+  ai_category_suggestion String?
+  ai_notes               String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  paymentMethod          PaymentMethod? 
+  
+  // TODO: Add the following fields in future migrations:
+  // - paymentMethod String? (e.g., "Card", "Cash", "Bank Transfer", "Auto Debit", "UPI", etc.)
+  // - recurringFrequency String? (e.g., "Daily", "Weekly", "Monthly", "Yearly")
+  // - nextRecurringDate DateTime?
+  // - tags String[] (for flexible categorization)
+  // - location String? (transaction location)
+  // - merchant String? (merchant/vendor name)
+  // - status String? @default("completed") (e.g., "pending", "completed", "failed", "cancelled")
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account       BankAccount    @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category      Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  recurringRule RecurringRule? @relation(fields: [recurringRuleId], references: [id], onDelete: SetNull)
+
+  @@map("transactions")
+}
+
+model RecurringRule {
+  id                String            @id @default(cuid())
+  userId            String
+  accountId         String
+  categoryId        String?
+  amount            Decimal           @db.Decimal(18, 2)
+  type              TransactionType
+  description       String?
+  notes             String?
+  startDate         DateTime
+  endDate           DateTime?
+  timezone          String            @default("UTC")
+  frequency         RecurringFrequency
+  interval          Int               @default(1)
+  dayOfMonth        Int?
+  dayOfWeek         Int?
+  nextRunAt         DateTime
+  lastRunAt         DateTime?
+  status            RecurringStatus   @default(ACTIVE)
+  lastTransactionId String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account     BankAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category    Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  transactions Transaction[]
+
+  @@map("recurring_rules")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum CurrencyPosition {
+  BEFORE
+  AFTER
+}
+
+enum ThousandSeparator {
+  COMMA
+  SPACE
+  NONE
+}
+
+enum ColorScheme {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+enum DefaultView {
+  OVERVIEW
+  TRANSACTIONS
+  NETWORTH
+  PORTFOLIO
+}
+
+enum TimeFormat {
+  H12
+  H24
+}
+
+enum Currency {
+  USD
+  EUR
+  GBP
+  JPY
+  AUD
+  CAD
+  CHF
+  CNY
+  INR
+  SGD
+  PKR
+}
+
+enum Language {
+  EN
+  ES
+  FR
+  DE
+  IT
+  PT
+  JA
+  ZH
+  KO
+  AR
+}
+
+enum WeekDay {
+  SUNDAY
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+}
+
+enum Timezone {
+  UTC
+  EST
+  CST
+  MST
+  PST
+  GMT
+  CET
+  JST
+  AEST
+  IST
+}
+
+enum Country {
+  US
+  GB
+  CA
+  AU
+  DE
+  FR
+  JP
+  SG
+  IN
+  AE
+  PK
+}
+
+enum DateFormat {
+  MM_DD_YYYY
+  DD_MM_YYYY
+  YYYY_MM_DD
+}
+
+// Financial models: bank accounts, categories, budgets, transactions
+
+enum AccountType {
+  BANK
+  CASH
+  CREDIT
+  INVESTMENT
+  LOAN
+  OTHER
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
+  TRANSFER
+}
+
+enum BudgetPeriod {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+  CUSTOM
+}
+
+enum TransactionType {
+  DEBIT
+  CREDIT
+  TRANSFER
+}
+
+enum RecurringFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum RecurringStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+  ENDED
+}
+
+enum PaymentMethod {
+  CARD
+  CASH
+  BANK_TRANSFER
+  AUTO_DEBIT
+  UPI
+  OTHER
 }
