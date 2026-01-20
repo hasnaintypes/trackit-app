@@ -72,6 +72,18 @@ config.images = {
       port: "",
       pathname: "/**",
     },
+    {
+      protocol: "https",
+      hostname: "avatar.iran.liara.run",
+      port: "",
+      pathname: "/**",
+    },
+    {
+      protocol: "https",
+      hostname: "ik.imagekit.io",
+      port: "",
+      pathname: "/**",
+    },
   ],
 };
 

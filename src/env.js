@@ -17,12 +17,20 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
+    GEMINI_API_KEY: z.string(),
+    GEMINI_MODEL: z.string().default("gemini-pro"),
+    GEMINI_MAX_ROWS: z.coerce.number().default(50),
     DATABASE_URL: z.string().url(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
     BETTER_AUTH_SECRET: z.string(),
     BETTER_AUTH_URL: z.string().url(),
+    INNGEST_EVENT_KEY: z.string().optional(),
+    INNGEST_SIGNING_KEY: z.string().optional(),
+    PRISMA_ACCELERATE_URL: z.string().url().optional(),
+    IMAGEKIT_PRIVATE_KEY: z.string().optional(),
+    IMAGEKIT_URL_ENDPOINT: z.string().url().optional(),
     RESEND_API_KEY: z.string(),
     EMAIL_FROM: z.string().email(),
   },
@@ -36,6 +44,9 @@ export const env = createEnv({
     NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: z.string(),
     NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: z.string().url(),
     NEXT_PUBLIC_BETTER_STACK_LOG_LEVEL: z.string(),
+    NEXT_PUBLIC_GEMINI_MAX_ROWS: z.string().optional(),
+    NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY: z.string().optional(),
+    NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT: z.string().url().optional(),
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
   },
 
@@ -44,18 +55,31 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+    GEMINI_MODEL: process.env.GEMINI_MODEL,
+    GEMINI_MAX_ROWS: process.env.GEMINI_MAX_ROWS,
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
     BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
+    INNGEST_EVENT_KEY: process.env.INNGEST_EVENT_KEY,
+    INNGEST_SIGNING_KEY: process.env.INNGEST_SIGNING_KEY,
+    PRISMA_ACCELERATE_URL: process.env.PRISMA_ACCELERATE_URL,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     EMAIL_FROM: process.env.EMAIL_FROM,
+    IMAGEKIT_PRIVATE_KEY: process.env.IMAGEKIT_PRIVATE_KEY,
+    IMAGEKIT_URL_ENDPOINT: process.env.IMAGEKIT_URL_ENDPOINT,
+    NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY:
+      process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY,
+    NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT:
+      process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT,
     NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN:
       process.env.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN,
     NEXT_PUBLIC_BETTER_STACK_INGESTING_URL:
       process.env.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL,
     NEXT_PUBLIC_BETTER_STACK_LOG_LEVEL:
       process.env.NEXT_PUBLIC_BETTER_STACK_LOG_LEVEL,
+    NEXT_PUBLIC_GEMINI_MAX_ROWS: process.env.NEXT_PUBLIC_GEMINI_MAX_ROWS,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
