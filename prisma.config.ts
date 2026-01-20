@@ -5,8 +5,11 @@ import { defineConfig } from "prisma/config";
 // calling the `env()` helper at module-eval time which ESLint may flag as an
 // unsafe call in some type configurations. We still fail fast if the value
 // is missing so migrations and CLI commands don't run with an invalid config.
-const databaseUrl = process.env.DATABASE_URL;
-if (!databaseUrl) {
+// In CI environments during install, we allow a placeholder URL for type generation.
+const databaseUrl =
+  process.env.DATABASE_URL ??
+  "postgresql://placeholder:placeholder@localhost:5432/placeholder";
+if (!process.env.DATABASE_URL && process.env.CI !== "true") {
   throw new Error("Missing required environment variable: DATABASE_URL");
 }
 
