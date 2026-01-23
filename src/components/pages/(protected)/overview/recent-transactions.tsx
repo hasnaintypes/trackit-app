@@ -1,0 +1,48 @@
+"use client";
+
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TransactionsTable } from "@/components/common/transactions-table";
+import type { Transaction } from "@/types/transaction";
+
+interface RecentTransactionsProps {
+  transactions: Transaction[];
+  isLoading?: boolean;
+  onEdit?: (transaction: Transaction) => void;
+  onDelete?: (ids: string[]) => Promise<void>;
+  onView?: (transaction: Transaction) => void;
+}
+
+export function RecentTransactions({
+  transactions,
+  isLoading,
+  onEdit,
+  onDelete,
+  onView,
+}: RecentTransactionsProps) {
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>Recent Transactions</CardTitle>
+        <Button variant="ghost" size="sm" asChild className="gap-1">
+          <Link href="/transactions">
+            See all
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </Button>
+      </CardHeader>
+      <CardContent className="p-0 sm:p-0">
+        <TransactionsTable
+          transactions={transactions.slice(0, 10)}
+          isLoading={isLoading}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onView={onView}
+          className="border-none shadow-none"
+        />
+      </CardContent>
+    </Card>
+  );
+}

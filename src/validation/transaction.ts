@@ -18,6 +18,7 @@ export const createTransactionSchema = z.object({
   contactId: z.string().nullable().optional(),
   groupId: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
+  notes: z.string().nullable().optional(),
   date: z.string().optional(),
   isRecurring: z.boolean().optional(),
   recurrence: recurrenceSchema.optional(),
@@ -37,6 +38,7 @@ export const updateTransactionSchema = z.object({
   contactId: z.string().nullable().optional(),
   groupId: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
+  notes: z.string().nullable().optional(),
   date: z.string().optional(),
   isRecurring: z.boolean().optional(),
   recurrence: recurrenceSchema.optional(),
@@ -49,7 +51,7 @@ export const updateTransactionSchema = z.object({
 
 export const transactionListInput = z.object({
   accountId: z.string().optional(),
-  limit: z.number().int().min(1).max(100).default(20),
+  limit: z.number().int().min(1).max(1000).default(20),
   cursor: z.string().optional(),
   page: z.number().int().min(1).optional(),
   q: z.string().optional(),

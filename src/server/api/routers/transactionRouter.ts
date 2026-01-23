@@ -38,7 +38,7 @@ export const transactionRouter = createTRPCRouter({
     .input(
       z.object({
         accountId: z.string().optional(),
-        limit: z.number().int().min(1).max(100).default(20),
+        limit: z.number().int().min(1).max(1000).default(20),
         cursor: z.string().optional(),
         page: z.number().int().min(1).optional(),
         q: z.string().optional(),
