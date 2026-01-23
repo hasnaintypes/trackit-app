@@ -24,8 +24,9 @@ export function RecentTransactions({
 }: RecentTransactionsProps) {
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-row items-center justify-between px-6">
         <CardTitle>Recent Transactions</CardTitle>
+
         <Button variant="ghost" size="sm" asChild className="gap-1">
           <Link href="/transactions">
             See all
@@ -33,7 +34,8 @@ export function RecentTransactions({
           </Link>
         </Button>
       </CardHeader>
-      <CardContent className="p-0 sm:p-0">
+
+      <CardContent className="px-6 pb-4">
         <TransactionsTable
           transactions={transactions.slice(0, 10)}
           isLoading={isLoading}

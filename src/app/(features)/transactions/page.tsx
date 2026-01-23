@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { useTransactions } from "@/hooks/use-transactions";
 import TransactionForm from "@/components/forms/transaction/transaction-form";
-import { BulkImportDialog } from "@/components/dialogs/bulk-import/bulk-import-dialog";
+import { BulkImportDialog } from "@/components/pages/(protected)/transactions/bulk-import/bulk-import-dialog";
 import { TransactionsHeader } from "@/components/pages/(protected)/transactions/transactions-header";
 import { TransactionsAnalytics } from "@/components/pages/(protected)/transactions/transactions-analytics";
 import { TransactionsList } from "@/components/pages/(protected)/transactions/transactions-list";

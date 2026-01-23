@@ -13,7 +13,14 @@ import { BarChart } from "@/components/charts/bar-chart";
 import { PieChart } from "@/components/charts/pie-chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import TransactionForm from "@/components/forms/transaction/transaction-form";
-import { subDays, subMonths, format, startOfDay, endOfDay } from "date-fns";
+import {
+  subDays,
+  subMonths,
+  format,
+  startOfDay,
+  endOfDay,
+  startOfHour,
+} from "date-fns";
 import type { ChartConfig } from "@/components/ui/chart";
 import type { Transaction } from "@/types/transaction";
 
@@ -49,9 +56,9 @@ export default function OverviewPage() {
     }
   };
 
-  // Calculate date range based on period
+  // Calculate date range based on period - stabilize with startOfHour
   const dateRange = useMemo(() => {
-    const end = endOfDay(new Date());
+    const end = startOfHour(new Date());
     let start;
     switch (period) {
       case "last7":
@@ -196,7 +203,7 @@ export default function OverviewPage() {
   }, [pieChartData]);
 
   return (
-    <div className="flex-1 space-y-8 p-8 pt-6">
+    <div className="container mx-auto max-w-7xl flex-1 space-y-8 px-4 py-8 pt-6 sm:px-6 lg:px-8">
       <OverviewHeader
         userName={user?.name}
         period={period}

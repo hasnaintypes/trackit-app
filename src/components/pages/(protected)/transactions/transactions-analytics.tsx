@@ -28,18 +28,54 @@ export function TransactionsAnalytics({
   chartData,
   chartConfig,
 }: TransactionsAnalyticsProps) {
-  // 1. Calculate totals dynamically so the UI isn't fake
-  const totals = useMemo(() => {
-    return chartData.reduce(
-      (acc, curr) => ({
-        income: acc.income + curr.income,
-        expense: acc.expense + curr.expense,
-      }),
-      { income: 0, expense: 0 },
+  // 1. Calculate totals and trends
+  const analytics = useMemo(() => {
+    const totalIncome = chartData.reduce((acc, curr) => acc + curr.income, 0);
+    const totalExpense = chartData.reduce((acc, curr) => acc + curr.expense, 0);
+
+    // Split data in half to calculate a trend if we don't have previous month data
+    const midPoint = Math.floor(chartData.length / 2);
+    const firstHalf = chartData.slice(0, midPoint);
+    const secondHalf = chartData.slice(midPoint);
+
+    const firstHalfIncome = firstHalf.reduce(
+      (acc, curr) => acc + curr.income,
+      0,
     );
+    const secondHalfIncome = secondHalf.reduce(
+      (acc, curr) => acc + curr.income,
+      0,
+    );
+    const incomeTrend =
+      firstHalfIncome > 0
+        ? ((secondHalfIncome - firstHalfIncome) / firstHalfIncome) * 100
+        : 0;
+
+    const firstHalfExpense = firstHalf.reduce(
+      (acc, curr) => acc + curr.expense,
+      0,
+    );
+    const secondHalfExpense = secondHalf.reduce(
+      (acc, curr) => acc + curr.expense,
+      0,
+    );
+    const expenseTrend =
+      firstHalfExpense > 0
+        ? ((secondHalfExpense - firstHalfExpense) / firstHalfExpense) * 100
+        : 0;
+
+    const netTrend = (incomeTrend + expenseTrend) / 2;
+
+    return {
+      totals: { income: totalIncome, expense: totalExpense },
+      incomeTrend,
+      expenseTrend,
+      netTrend,
+      netBalance: totalIncome - totalExpense,
+    };
   }, [chartData]);
 
-  const netBalance = totals.income - totals.expense;
+  const { totals, incomeTrend, expenseTrend, netTrend, netBalance } = analytics;
 
   return (
     <Card className="border-border/50 bg-card/50 overflow-hidden shadow-sm backdrop-blur-sm">
@@ -84,11 +120,17 @@ export function TransactionsAnalytics({
               ${totals.income.toLocaleString()}
             </div>
             <div className="flex items-center text-xs text-emerald-600/80">
-              <ArrowUpRight className="mr-1 h-3 w-3" />
-              <span className="font-medium">+4.5%</span>{" "}
-              {/* You can calculate this real-time if you have prev data */}
+              {incomeTrend >= 0 ? (
+                <ArrowUpRight className="mr-1 h-3 w-3 text-emerald-500" />
+              ) : (
+                <ArrowDownRight className="mr-1 h-3 w-3 text-rose-500" />
+              )}
+              <span className="font-medium">
+                {incomeTrend >= 0 ? "+" : ""}
+                {incomeTrend.toFixed(1)}%
+              </span>
               <span className="text-muted-foreground ml-1">
-                from last month
+                vs previous period
               </span>
             </div>
           </div>
@@ -103,10 +145,17 @@ export function TransactionsAnalytics({
               ${totals.expense.toLocaleString()}
             </div>
             <div className="flex items-center text-xs text-rose-600/80">
-              <ArrowDownRight className="mr-1 h-3 w-3" />
-              <span className="font-medium">-1.2%</span>
+              {expenseTrend >= 0 ? (
+                <ArrowUpRight className="mr-1 h-3 w-3 text-rose-500" />
+              ) : (
+                <ArrowDownRight className="mr-1 h-3 w-3 text-rose-500" />
+              )}
+              <span className="font-medium">
+                {expenseTrend >= 0 ? "+" : ""}
+                {expenseTrend.toFixed(1)}%
+              </span>
               <span className="text-muted-foreground ml-1">
-                from last month
+                vs previous period
               </span>
             </div>
           </div>
@@ -124,15 +173,20 @@ export function TransactionsAnalytics({
         </div>
       </CardContent>
 
-      {/* Optional Footer for extra context */}
       <CardFooter>
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
             <div className="flex items-center gap-2 leading-none font-medium">
-              Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+              {netTrend >= 0 ? "Income trending up" : "Spending trend shifting"}{" "}
+              by {Math.abs(netTrend).toFixed(1)}% this period{" "}
+              {netTrend >= 0 ? (
+                <TrendingUp className="h-4 w-4" />
+              ) : (
+                <TrendingDown className="h-4 w-4" />
+              )}
             </div>
             <div className="text-muted-foreground flex items-center gap-2 leading-none">
-              Showing total visitors for the last 6 months
+              Showing total volume for the last {chartData.length} days
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Pie, PieChart as RechartsPieChart } from "recharts";
+import { Pie, PieChart as RechartsPieChart, Label } from "recharts";
 import {
   type ChartConfig,
   ChartContainer,
@@ -39,18 +39,45 @@ export function PieChart({
           cornerRadius={8}
           paddingAngle={4}
         >
-          {/* <LabelList
-            dataKey={nameKey}
-            stroke="none"
-            fontSize={12}
-            fontWeight={500}
-            fill="currentColor"
-            // Only show labels for slices that have a value
-            formatter={(value: string) => {
-              const item = data.find((d) => d[nameKey] === value);
-              return item && item[dataKey] > 0 ? value : "";
+          <Label
+            content={({ viewBox }) => {
+              if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                // Find top category
+                const topCategory = [...data].sort(
+                  (a, b) => (b[dataKey] as number) - (a[dataKey] as number),
+                )[0];
+                if (!topCategory) return null;
+
+                return (
+                  <text
+                    x={viewBox.cx}
+                    y={viewBox.cy}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                  >
+                    <tspan
+                      x={viewBox.cx}
+                      y={viewBox.cy}
+                      className="fill-foreground text-xl font-bold"
+                    >
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                        maximumFractionDigits: 0,
+                      }).format(topCategory[dataKey] as number)}
+                    </tspan>
+                    <tspan
+                      x={viewBox.cx}
+                      y={(viewBox.cy ?? 0) + 20}
+                      className="fill-muted-foreground text-xs"
+                    >
+                      {topCategory[nameKey] as string}
+                    </tspan>
+                  </text>
+                );
+              }
             }}
-          /> */}
+          />
         </Pie>
       </RechartsPieChart>
     </ChartContainer>

@@ -74,6 +74,9 @@ const jetbrains_mono = JetBrains_Mono({
   variable: "--font-mono",
 });
 
+import { PageLoader } from "@/components/common/page-loader";
+import { Suspense } from "react";
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -92,6 +95,9 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <Suspense fallback={null}>
+              <PageLoader />
+            </Suspense>
             {children}
           </ThemeProvider>
         </TRPCReactProvider>

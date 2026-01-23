@@ -48,12 +48,19 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="bg-background flex min-h-screen">
+    // Changed: flex-col for mobile, md:flex-row for tablet/desktop
+    <div className="bg-background flex min-h-screen w-full flex-col md:flex-row">
+      {/* Sidebar Component */}
       <SettingsSidebar
         activeSection={activeSection}
         onSectionChange={setActiveSection}
       />
-      <main className="flex-1">{renderContent()}</main>
+
+      {/* Main Content Area */}
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 lg:p-10">
+        {/* Optional: Add a max-width container to prevent content from stretching too wide on 4k screens */}
+        <div className="mx-auto max-w-4xl space-y-6">{renderContent()}</div>
+      </main>
     </div>
   );
 }

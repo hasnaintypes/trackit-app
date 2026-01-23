@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils"; // Assuming you have this util from shadcn, otherwise remove cn usage
 import {
   User,
   Wallet,
@@ -43,15 +44,19 @@ export default function SettingsSidebar({
   onSectionChange,
 }: SettingsSidebarProps) {
   return (
-    <aside className="border-border bg-card w-64 border-r p-6">
-      <div className="mb-8">
-        <h2 className="text-foreground text-2xl font-bold">Settings</h2>
-        <p className="text-muted-foreground mt-1 text-sm">
+    <aside className="bg-card border-border flex w-full flex-col border-b md:w-64 md:border-r md:border-b-0">
+      {/* Header - Hidden on very small screens to save space, or styled differently */}
+      <div className="p-4 pb-2 md:p-6 md:pb-8">
+        <h2 className="text-foreground text-xl font-bold md:text-2xl">
+          Settings
+        </h2>
+        <p className="text-muted-foreground mt-1 hidden text-sm md:block">
           Manage your account and preferences
         </p>
       </div>
 
-      <nav className="space-y-2">
+      {/* Navigation - Horizontal scroll on mobile, Vertical list on Desktop */}
+      <nav className="flex gap-2 overflow-x-auto px-4 pb-4 md:flex-col md:space-y-1 md:overflow-visible md:px-6 md:pb-6">
         {sections.map((section) => {
           const Icon = section.icon;
           const isActive = activeSection === section.id;
@@ -59,12 +64,17 @@ export default function SettingsSidebar({
           return (
             <Button
               key={section.id}
-              variant={isActive ? "default" : "ghost"}
-              className="w-full cursor-pointer justify-start gap-3"
+              variant={isActive ? "secondary" : "ghost"}
+              className={cn(
+                "justify-start gap-3 whitespace-nowrap",
+                isActive ? "bg-secondary text-secondary-foreground" : "",
+                // Mobile specific styles: Compact, auto width
+                "h-10 px-4 md:h-10 md:w-full",
+              )}
               onClick={() => onSectionChange(section.id)}
             >
-              <Icon className="h-4 w-4" />
-              <span>{section.label}</span>
+              <Icon className="h-4 w-4 shrink-0" />
+              <span className="text-sm font-medium">{section.label}</span>
             </Button>
           );
         })}
