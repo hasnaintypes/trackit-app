@@ -3,14 +3,28 @@
 import { api } from "@/trpc/react";
 
 export function useTransactions() {
-  // Expose tRPC hooks directly so consumers can call them with React lifecycle
-  // semantics (useQuery/useMutation) as in other hooks in this repo.
+  const utils = api.useUtils();
   const listQuery = api.transaction.list.useQuery;
   const getByIdQuery = api.transaction.getById.useQuery;
 
-  const create = api.transaction.create.useMutation();
-  const update = api.transaction.update.useMutation();
-  const remove = api.transaction.delete.useMutation();
+  const invalidateAll = async () => {
+    await Promise.all([
+      utils.transaction.list.invalidate(),
+      utils.account.list.invalidate(),
+    ]);
+  };
+
+  const create = api.transaction.create.useMutation({
+    onSuccess: invalidateAll,
+  });
+
+  const update = api.transaction.update.useMutation({
+    onSuccess: invalidateAll,
+  });
+
+  const remove = api.transaction.delete.useMutation({
+    onSuccess: invalidateAll,
+  });
 
   return {
     listQuery,

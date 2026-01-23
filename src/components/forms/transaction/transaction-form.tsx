@@ -116,7 +116,6 @@ export function TransactionForm({
   const { accounts } = useAccounts();
   const { categories } = useCategories();
   const { create, update } = useTransactions();
-  const utils = api.useContext();
   const defaultTimezone = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC",
     [],
@@ -176,6 +175,7 @@ export function TransactionForm({
         type: vals?.type ?? "DEBIT",
         categoryId: vals?.categoryId ?? undefined,
         description: vals?.description ?? undefined,
+        notes: vals?.notes ?? undefined,
         paymentMethod: vals?.paymentMethod ?? undefined,
         receipt_url: vals?.receipt_url ?? undefined,
         receipt_extracted_text: vals?.receipt_extracted_text ?? undefined,
@@ -280,7 +280,7 @@ export function TransactionForm({
         toast.success("Transaction created");
         if (onSubmit) onSubmit(finalValues);
       }
-      await utils.transaction.list.invalidate();
+      // Invalidation is handled by useTransactions onSuccess hooks
       onOpenChange(false);
     } catch (err) {
       console.error(err);
@@ -1038,6 +1038,27 @@ export function TransactionForm({
                       <FormControl>
                         <Input
                           placeholder="Add a note about this transaction..."
+                          {...field}
+                          value={field.value ?? ""}
+                          className="bg-card h-10 border font-normal shadow-sm transition-shadow hover:shadow"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name="notes"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                        Notes
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Internal notes or additional details..."
                           {...field}
                           value={field.value ?? ""}
                           className="bg-card h-10 border font-normal shadow-sm transition-shadow hover:shadow"
