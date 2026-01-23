@@ -1,10 +1,14 @@
 import type { Transaction } from "@/types/transaction";
 
+export interface ImportTransaction extends Partial<Transaction> {
+  categoryName?: string;
+}
+
 export interface BulkImportState {
   file: File | null;
   csvData: Record<string, unknown>[];
   columnMapping: Record<string, string>;
-  parsedTransactions: Partial<Transaction>[];
+  parsedTransactions: ImportTransaction[];
   selectedAccountId: string | null;
   importProgress: number;
   totalToImport: number;
