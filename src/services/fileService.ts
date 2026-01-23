@@ -3,7 +3,11 @@
  * Handles CSV parsing and transaction validation
  */
 
-import type { ColumnMapping, ImportError } from "@/types/bulk-import";
+import type {
+  ColumnMapping,
+  ImportError,
+  ImportTransaction,
+} from "@/types/bulk-import";
 import type { Transaction } from "@/types/transaction";
 
 const TRANSACTION_TYPE_MAP: Record<string, "DEBIT" | "CREDIT" | "TRANSFER"> = {
@@ -17,7 +21,7 @@ const TRANSACTION_TYPE_MAP: Record<string, "DEBIT" | "CREDIT" | "TRANSFER"> = {
 };
 
 interface ParseResult {
-  transactions: Partial<Transaction>[];
+  transactions: ImportTransaction[];
   errors: ImportError[];
 }
 
@@ -113,11 +117,11 @@ export function validateAndParseTransactions(
   csvData: Record<string, unknown>[],
   mapping: ColumnMapping,
 ): ParseResult {
-  const transactions: Partial<Transaction>[] = [];
+  const transactions: ImportTransaction[] = [];
   const errors: ImportError[] = [];
 
   csvData.forEach((row, rowIndex) => {
-    const transaction: Partial<Transaction> = {};
+    const transaction: ImportTransaction = {};
     const rowErrors: Omit<ImportError, "rowIndex">[] = [];
 
     // Parse each mapped field
@@ -188,8 +192,7 @@ export function validateAndParseTransactions(
           case "category":
             if (value && typeof value === "string" && value.trim() !== "") {
               // Store the category name, will be resolved to ID later
-              (transaction as Record<string, unknown>).categoryName =
-                value.trim();
+              transaction.categoryName = value.trim();
             }
             break;
 
