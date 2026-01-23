@@ -86,6 +86,7 @@ import { api } from "@/trpc/react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useCategories } from "@/hooks/use-categories";
 import { useTransactions } from "@/hooks/use-transactions";
+import { useAccounts } from "@/hooks/use-accounts";
 
 import { createTransactionSchema } from "@/validation/transaction";
 import type {
@@ -112,6 +113,7 @@ export function TransactionForm({
   className,
 }: TransactionFormProps) {
   const isMobile = useIsMobile();
+  const { accounts } = useAccounts();
   const { categories } = useCategories();
   const { create, update } = useTransactions();
   const utils = api.useContext();
@@ -143,6 +145,12 @@ export function TransactionForm({
     return null;
   };
 
+  const defaultAccountId = useMemo(() => {
+    if (accountId) return accountId;
+    const preferred = accounts?.find((a) => a.isDefault);
+    return preferred?.id ?? accounts?.[0]?.id ?? "";
+  }, [accountId, accounts]);
+
   const normalize = React.useCallback(
     (
       vals?: TransactionFormProps["initialValues"],
@@ -163,7 +171,7 @@ export function TransactionForm({
           : undefined);
 
       return {
-        accountId: vals?.accountId ?? accountId ?? "",
+        accountId: vals?.accountId ?? defaultAccountId,
         amount: vals?.amount ?? "",
         type: vals?.type ?? "DEBIT",
         categoryId: vals?.categoryId ?? undefined,
@@ -176,7 +184,7 @@ export function TransactionForm({
         recurrence,
       };
     },
-    [accountId, defaultTimezone],
+    [defaultAccountId, defaultTimezone],
   );
 
   const form = useForm<CreateTransactionInput>({
@@ -378,7 +386,39 @@ export function TransactionForm({
 
             <div className="flex-1 overflow-y-auto px-6 py-6">
               <div className={cn("space-y-5", className)}>
-                <input type="hidden" {...form.register("accountId")} />
+                {accountId ? (
+                  <input type="hidden" {...form.register("accountId")} />
+                ) : (
+                  <FormField
+                    name="accountId"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                          Account
+                        </FormLabel>
+                        <FormControl>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value ?? defaultAccountId}
+                          >
+                            <SelectTrigger className="bg-card h-11 w-full border px-4 font-medium shadow-sm transition-shadow hover:shadow">
+                              <SelectValue placeholder="Select account" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {(accounts ?? []).map((acct) => (
+                                <SelectItem key={acct.id} value={acct.id}>
+                                  {acct.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
                 <input type="hidden" {...form.register("receipt_url")} />
 
                 <div className="group border-border from-primary/5 via-primary/3 hover:border-primary/30 relative overflow-hidden rounded-xl border bg-gradient-to-br to-transparent p-4 transition-all">

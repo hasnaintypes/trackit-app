@@ -83,7 +83,7 @@ export default function RootLayout({
       className={`${host_grotesk.variable} ${work_sans.variable} ${jetbrains_mono.variable}`}
       suppressHydrationWarning
     >
-      <body>
+      <body suppressHydrationWarning>
         <BetterStackWebVitals />
         <TRPCReactProvider>
           <ThemeProvider
