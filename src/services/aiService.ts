@@ -14,10 +14,6 @@ import {
   type GenerativeModel,
 } from "@google/generative-ai";
 
-// ============================================================================
-// Types
-// ============================================================================
-
 export interface CategoryForAI {
   id: string;
   name: string;
@@ -46,7 +42,6 @@ export interface CategorizationResponse {
   errors?: Array<{ index: number; error: string }>;
 }
 
-// Receipt scanning result
 export interface ReceiptScanResult {
   description?: string | null;
   merchant?: string | null;

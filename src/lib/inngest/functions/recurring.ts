@@ -17,7 +17,6 @@ export const processRecurringTransaction = inngest.createFunction(
     const ruleId = (event.data as { ruleId?: string } | undefined)?.ruleId;
     if (!ruleId) return;
 
-    // Load the rule directly from the DB (avoid step.run wrapper which can widen types)
     const rawRule = await db.recurringRule.findUnique({
       where: { id: ruleId },
       include: { user: true },
@@ -29,8 +28,6 @@ export const processRecurringTransaction = inngest.createFunction(
       user?: { email?: string | null } | null;
     };
 
-    // If the rule is scheduled for the future, don't run it yet.
-    // This prevents duplicate executions if multiple events are queued.
     if (rule.nextRunAt > new Date()) {
       return;
     }

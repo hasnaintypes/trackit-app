@@ -5,10 +5,6 @@
  * Each template should be well-structured with clear instructions and examples.
  */
 
-// ============================================================================
-// Transaction Categorization Prompt
-// ============================================================================
-
 export const CATEGORY_PROMPT_TEMPLATE = `You are an expert financial transaction categorization AI. Your task is to analyze transactions and assign the most appropriate category ID from the provided category list.
 
 ## Instructions:
@@ -51,10 +47,6 @@ Example:
 \`\`\`
 
 **Now categorize all transactions and return the JSON array:**`;
-
-// ============================================================================
-// Future AI Prompt Templates
-// ============================================================================
 
 // TODO: Add more AI prompt templates as features are developed
 // Examples:

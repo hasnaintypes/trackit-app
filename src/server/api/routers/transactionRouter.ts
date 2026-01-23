@@ -625,6 +625,150 @@ export const transactionRouter = createTRPCRouter({
 
       return { success: true, count: result.count };
     }),
+
+  bulkCreate: protectedProcedure
+    .input(
+      z.object({
+        accountId: z.string().min(1),
+        transactions: z.array(
+          z.object({
+            amount: z.string().min(1),
+            type: z.enum(["DEBIT", "CREDIT", "TRANSFER"]),
+            description: z.string().nullable().optional(),
+            notes: z.string().nullable().optional(),
+            date: z.string().optional(),
+            categoryId: z.string().nullable().optional(),
+            categoryName: z.string().nullable().optional(),
+            paymentMethod: z
+              .enum([
+                "CARD",
+                "CASH",
+                "BANK_TRANSFER",
+                "AUTO_DEBIT",
+                "UPI",
+                "OTHER",
+              ])
+              .optional(),
+          }),
+        ),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.user.id;
+      const prisma = ctx.db;
+
+      // Verify account ownership
+      const account = await prisma.bankAccount.findUnique({
+        where: { id: input.accountId, userId },
+      });
+
+      if (!account) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Account not found or access denied",
+        });
+      }
+
+      const transactionsToProcess = [...input.transactions];
+
+      // Identify transactions that need AI categorization
+      const needsCategorizationIndices = transactionsToProcess
+        .map((tx, idx) => (tx.categoryId ? null : idx))
+        .filter((idx): idx is number => idx !== null);
+
+      if (needsCategorizationIndices.length > 0) {
+        const categories = await prisma.category.findMany({
+          where: { userId },
+          include: { children: true },
+        });
+
+        if (categories.length > 0) {
+          const { categorizeTransactionsWithAI } = await import(
+            "@/services/aiService"
+          );
+
+          const categoriesForAI = categories.flatMap((cat) => [
+            {
+              id: cat.id,
+              name: cat.name,
+              type: cat.type as "INCOME" | "EXPENSE" | "TRANSFER",
+            },
+            ...(cat.children?.map((sub) => ({
+              id: sub.id,
+              name: sub.name,
+              type: sub.type as "INCOME" | "EXPENSE" | "TRANSFER",
+              parentCategoryId: cat.id,
+            })) ?? []),
+          ]);
+
+          const BATCH_SIZE = 50;
+          for (
+            let i = 0;
+            i < needsCategorizationIndices.length;
+            i += BATCH_SIZE
+          ) {
+            const batchIndices = needsCategorizationIndices.slice(
+              i,
+              i + BATCH_SIZE,
+            );
+            const batchTransactions = batchIndices.map((idx) => {
+              const tx = transactionsToProcess[idx]!;
+              return {
+                index: idx,
+                description: tx.description ?? "Untitled",
+                amount: tx.amount,
+                type: tx.type,
+                date: tx.date,
+                notes: tx.categoryName
+                  ? tx.notes
+                    ? `${tx.notes} (Category: ${tx.categoryName})`
+                    : `Category: ${tx.categoryName}`
+                  : (tx.notes ?? undefined),
+              };
+            });
+
+            try {
+              const aiResult = await categorizeTransactionsWithAI(
+                batchTransactions,
+                categoriesForAI,
+              );
+
+              aiResult.results.forEach((res) => {
+                const tx = transactionsToProcess[res.index];
+                if (tx) {
+                  tx.categoryId = res.categoryId;
+                }
+              });
+            } catch (err) {
+              console.error("AI Categorization batch error:", err);
+            }
+          }
+        }
+      }
+
+      const created = await prisma.$transaction(
+        transactionsToProcess.map((tx) =>
+          prisma.transaction.create({
+            data: {
+              userId,
+              accountId: input.accountId,
+              amount: tx.amount,
+              type: tx.type,
+              description: tx.description ?? null,
+              notes: tx.notes ?? null,
+              date: tx.date ? new Date(tx.date) : new Date(),
+              categoryId: tx.categoryId ?? null,
+              paymentMethod: tx.paymentMethod ?? null,
+            },
+          }),
+        ),
+      );
+
+      return {
+        success: true,
+        count: created.length,
+      };
+    }),
 });
 
 export default transactionRouter;

@@ -26,12 +26,17 @@ export function useTransactions() {
     onSuccess: invalidateAll,
   });
 
+  const bulkCreate = api.transaction.bulkCreate.useMutation({
+    onSuccess: invalidateAll,
+  });
+
   return {
     listQuery,
     getByIdQuery,
     create,
     update,
     remove,
+    bulkCreate,
   } as const;
 }
 

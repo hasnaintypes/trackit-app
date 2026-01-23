@@ -37,10 +37,6 @@ export function useAuth() {
     }
   }, [setPersistedUser]);
 
-  useEffect(() => {
-    void fetchUser();
-  }, [fetchUser]);
-
   interface SignUpPayload {
     name?: string;
     email: string;

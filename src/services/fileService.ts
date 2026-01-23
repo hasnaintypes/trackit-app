@@ -3,10 +3,7 @@
  * Handles CSV parsing and transaction validation
  */
 
-import type {
-  ColumnMapping,
-  ImportError,
-} from "../components/dialogs/bulk-import/types";
+import type { ColumnMapping, ImportError } from "@/types/bulk-import";
 import type { Transaction } from "@/types/transaction";
 
 const TRANSACTION_TYPE_MAP: Record<string, "DEBIT" | "CREDIT" | "TRANSFER"> = {
@@ -23,10 +20,6 @@ interface ParseResult {
   transactions: Partial<Transaction>[];
   errors: ImportError[];
 }
-
-// ============================================================================
-// CSV PARSING FUNCTIONS
-// ============================================================================
 
 export async function parseCSV(file: File): Promise<Record<string, unknown>[]> {
   const text = await file.text();
@@ -115,10 +108,6 @@ function parseCSVLine(line: string): string[] {
 
   return result;
 }
-
-// ============================================================================
-// TRANSACTION VALIDATION FUNCTIONS
-// ============================================================================
 
 export function validateAndParseTransactions(
   csvData: Record<string, unknown>[],
