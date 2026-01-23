@@ -354,6 +354,10 @@ export async function scanReceiptWithAI(options: {
         JSON.stringify(options.categories, null, 2),
       );
     } catch (e) {
+      console.error(
+        "Failed to stringify categories for receipt scan prompt",
+        e,
+      );
       prompt = prompt.replace("{{categories}}", "[]");
     }
   } else {
@@ -548,6 +552,10 @@ function parseReceiptAIResponse(text: string): ReceiptScanResult {
           description = candidate ?? null;
         }
       } catch (e) {
+        console.error(
+          "Failed to synthesize description from extracted text",
+          e,
+        );
         description = null;
       }
     }

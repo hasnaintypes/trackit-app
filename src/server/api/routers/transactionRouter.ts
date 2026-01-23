@@ -5,7 +5,6 @@ import type {
   Prisma,
   Transaction as TxModel,
   RecurringRule as RecurringRuleModel,
-  BankAccount as BankAccountModel,
 } from "@prisma/client";
 import { RecurringStatus, type RecurringFrequency } from "@prisma/client";
 import { calculateNextRunAt } from "@/lib/recurrence";
