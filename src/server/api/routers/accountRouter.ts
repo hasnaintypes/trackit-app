@@ -81,7 +81,7 @@ export const accountRouter = createTRPCRouter({
         },
       });
       const a = aRaw as RawAccount | null;
-      if (!a || a.userId !== userId) return null;
+      if (a?.userId !== userId) return null;
       return {
         id: a.id,
         name: a.name,
@@ -223,7 +223,7 @@ export const accountRouter = createTRPCRouter({
         where: { id: input.id },
       });
       const existing = existingRaw as RawAccount | null;
-      if (!existing || existing.userId !== userId)
+      if (existing?.userId !== userId)
         throw new Error("Account not found or not owned by user");
 
       if (input.isDefault) {
@@ -286,7 +286,7 @@ export const accountRouter = createTRPCRouter({
       const existing = await prisma.bankAccount.findUnique({
         where: { id: input.id },
       });
-      if (!existing || existing.userId !== userId)
+      if (existing?.userId !== userId)
         throw new Error("Account not found or not owned by user");
 
       await prisma.bankAccount.delete({ where: { id: input.id } });

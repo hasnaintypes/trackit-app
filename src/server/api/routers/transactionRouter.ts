@@ -184,7 +184,7 @@ export const transactionRouter = createTRPCRouter({
           },
         },
       });
-      if (!t || t.userId !== ctx.user.id) return null;
+      if (t?.userId !== ctx.user.id) return null;
       return {
         ...t,
         amount: String(t.amount),
@@ -231,7 +231,7 @@ export const transactionRouter = createTRPCRouter({
       const account = await prisma.bankAccount.findUnique({
         where: { id: input.accountId },
       });
-      if (!account || account.userId !== userId)
+      if (account?.userId !== userId)
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Account not found",
@@ -353,7 +353,7 @@ export const transactionRouter = createTRPCRouter({
       const existing = await prisma.transaction.findUnique({
         where: { id: input.id },
       });
-      if (!existing || existing.userId !== ctx.user.id)
+      if (existing?.userId !== ctx.user.id)
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Transaction not found",
@@ -363,7 +363,7 @@ export const transactionRouter = createTRPCRouter({
         const account = await prisma.bankAccount.findUnique({
           where: { id: input.accountId },
         });
-        if (!account || account.userId !== ctx.user.id)
+        if (account?.userId !== ctx.user.id)
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Account not found",
@@ -569,7 +569,7 @@ export const transactionRouter = createTRPCRouter({
         const existing = await prisma.transaction.findUnique({
           where: { id: input.transactionId },
         });
-        if (!existing || existing.userId !== userId)
+        if (existing?.userId !== userId)
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Transaction not found",
@@ -590,7 +590,7 @@ export const transactionRouter = createTRPCRouter({
       const existing = await prisma.transaction.findUnique({
         where: { id: input.id },
       });
-      if (!existing || existing.userId !== ctx.user.id)
+      if (existing?.userId !== ctx.user.id)
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Transaction not found",

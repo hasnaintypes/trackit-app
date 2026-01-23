@@ -15,7 +15,7 @@ export const categoryRouter = createTRPCRouter({
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       const cat = await ctx.db.category.findUnique({ where: { id: input.id } });
-      if (!cat || cat.userId !== ctx.user.id) {
+      if (cat?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Category not found",
@@ -65,7 +65,7 @@ export const categoryRouter = createTRPCRouter({
       const exists = await ctx.db.category.findUnique({
         where: { id: input.id },
       });
-      if (!exists || exists.userId !== ctx.user.id) {
+      if (exists?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Category not found",
@@ -98,7 +98,7 @@ export const categoryRouter = createTRPCRouter({
       const exists = await ctx.db.category.findUnique({
         where: { id: input.id },
       });
-      if (!exists || exists.userId !== ctx.user.id) {
+      if (exists?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Category not found",
@@ -137,7 +137,7 @@ export const categoryRouter = createTRPCRouter({
         const parent = await ctx.db.category.findUnique({
           where: { id: input.parentId },
         });
-        if (!parent || parent.userId !== ctx.user.id) {
+        if (parent?.userId !== ctx.user.id) {
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Parent category not found",
@@ -172,7 +172,7 @@ export const categoryRouter = createTRPCRouter({
         const exists = await ctx.db.category.findUnique({
           where: { id: input.id },
         });
-        if (!exists || exists.userId !== ctx.user.id) {
+        if (exists?.userId !== ctx.user.id) {
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Subcategory not found",
@@ -183,7 +183,7 @@ export const categoryRouter = createTRPCRouter({
           const newParent = await ctx.db.category.findUnique({
             where: { id: input.parentId },
           });
-          if (!newParent || newParent.userId !== ctx.user.id) {
+          if (newParent?.userId !== ctx.user.id) {
             throw new TRPCError({
               code: "NOT_FOUND",
               message: "New parent not found",
@@ -214,7 +214,7 @@ export const categoryRouter = createTRPCRouter({
         const exists = await ctx.db.category.findUnique({
           where: { id: input.id },
         });
-        if (!exists || exists.userId !== ctx.user.id) {
+        if (exists?.userId !== ctx.user.id) {
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Subcategory not found",
