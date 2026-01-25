@@ -27,8 +27,31 @@ export const createAccountSchema = z.object({
   isDefault: z.boolean().optional(),
 });
 
-export const updateAccountSchema = createAccountSchema.extend({
+export const updateAccountSchema = z.object({
   id: z.string().min(1),
+  name: z.string().min(1).optional(),
+  type: z
+    .enum(["BANK", "CASH", "CREDIT", "INVESTMENT", "LOAN", "OTHER"])
+    .optional(),
+  currency: z
+    .enum([
+      "USD",
+      "EUR",
+      "GBP",
+      "JPY",
+      "AUD",
+      "CAD",
+      "CHF",
+      "CNY",
+      "INR",
+      "SGD",
+      "PKR",
+    ])
+    .optional(),
+  balance: z.string().optional(),
+  color: z.string().optional(),
+  icon: z.string().optional(),
+  isDefault: z.boolean().optional(),
 });
 
 export const accountIdParam = z.object({ id: z.string().min(1) });
