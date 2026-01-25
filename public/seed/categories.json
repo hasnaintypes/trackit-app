@@ -1,0 +1,830 @@
+[
+  {
+    "name": "Food & Dining",
+    "color": "#FF6B6B",
+    "icon": "utensils",
+    "type": "EXPENSE",
+    "sortOrder": 0,
+    "subcategories": [
+      {
+        "name": "Restaurants",
+        "color": "#FF6B6B",
+        "icon": "utensils",
+        "type": "EXPENSE",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Groceries",
+        "color": "#FF8787",
+        "icon": "shopping-cart",
+        "type": "EXPENSE",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Coffee Shops",
+        "color": "#FFA5A5",
+        "icon": "coffee",
+        "type": "EXPENSE",
+        "sortOrder": 2,
+        "subcategories": []
+      },
+      {
+        "name": "Fast Food",
+        "color": "#FFC2C2",
+        "icon": "hamburger",
+        "type": "EXPENSE",
+        "sortOrder": 3,
+        "subcategories": []
+      },
+      {
+        "name": "Delivery",
+        "color": "#FFD4D4",
+        "icon": "truck",
+        "type": "EXPENSE",
+        "sortOrder": 4,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Transportation",
+    "color": "#4ECDC4",
+    "icon": "car",
+    "type": "EXPENSE",
+    "sortOrder": 1,
+    "subcategories": [
+      {
+        "name": "Gas",
+        "color": "#4ECDC4",
+        "icon": "fuel",
+        "type": "EXPENSE",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Public Transit",
+        "color": "#6FD9D1",
+        "icon": "bus",
+        "type": "EXPENSE",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Parking",
+        "color": "#8FE5DE",
+        "icon": "circle-parking",
+        "type": "EXPENSE",
+        "sortOrder": 2,
+        "subcategories": []
+      },
+      {
+        "name": "Car Maintenance",
+        "color": "#AFF0EB",
+        "icon": "wrench",
+        "type": "EXPENSE",
+        "sortOrder": 3,
+        "subcategories": []
+      },
+      {
+        "name": "Ride Share",
+        "color": "#CFFAF8",
+        "icon": "car-taxi-front",
+        "type": "EXPENSE",
+        "sortOrder": 4,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Shopping",
+    "color": "#95E1D3",
+    "icon": "shopping-bag",
+    "type": "EXPENSE",
+    "sortOrder": 2,
+    "subcategories": [
+      {
+        "name": "Clothing",
+        "color": "#95E1D3",
+        "icon": "shirt",
+        "type": "EXPENSE",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Electronics",
+        "color": "#A8E8DC",
+        "icon": "laptop",
+        "type": "EXPENSE",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Home & Garden",
+        "color": "#BBEFE5",
+        "icon": "house",
+        "type": "EXPENSE",
+        "sortOrder": 2,
+        "subcategories": []
+      },
+      {
+        "name": "Gifts",
+        "color": "#CEF5EE",
+        "icon": "gift",
+        "type": "EXPENSE",
+        "sortOrder": 3,
+        "subcategories": []
+      },
+      {
+        "name": "Personal Care",
+        "color": "#E1FCF7",
+        "icon": "sparkles",
+        "type": "EXPENSE",
+        "sortOrder": 4,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Entertainment",
+    "color": "#F38181",
+    "icon": "film",
+    "type": "EXPENSE",
+    "sortOrder": 3,
+    "subcategories": [
+      {
+        "name": "Movies & Shows",
+        "color": "#F38181",
+        "icon": "film",
+        "type": "EXPENSE",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Music & Concerts",
+        "color": "#F59B9B",
+        "icon": "music",
+        "type": "EXPENSE",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Gaming",
+        "color": "#F7B5B5",
+        "icon": "gamepad",
+        "type": "EXPENSE",
+        "sortOrder": 2,
+        "subcategories": []
+      },
+      {
+        "name": "Sports & Recreation",
+        "color": "#F9CFCF",
+        "icon": "trophy",
+        "type": "EXPENSE",
+        "sortOrder": 3,
+        "subcategories": []
+      },
+      {
+        "name": "Books & Magazines",
+        "color": "#FBE9E9",
+        "icon": "book",
+        "type": "EXPENSE",
+        "sortOrder": 4,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Bills & Utilities",
+    "color": "#AA96DA",
+    "icon": "file-text",
+    "type": "EXPENSE",
+    "sortOrder": 4,
+    "subcategories": [
+      {
+        "name": "Electricity",
+        "color": "#AA96DA",
+        "icon": "zap",
+        "type": "EXPENSE",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Water",
+        "color": "#B8A7E0",
+        "icon": "droplet",
+        "type": "EXPENSE",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Internet",
+        "color": "#C6B8E6",
+        "icon": "wifi",
+        "type": "EXPENSE",
+        "sortOrder": 2,
+        "subcategories": []
+      },
+      {
+        "name": "Phone",
+        "color": "#D4C9EC",
+        "icon": "phone",
+        "type": "EXPENSE",
+        "sortOrder": 3,
+        "subcategories": []
+      },
+      {
+        "name": "Rent/Mortgage",
+        "color": "#E2DAF2",
+        "icon": "house",
+        "type": "EXPENSE",
+        "sortOrder": 4,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Healthcare",
+    "color": "#74B9FF",
+    "icon": "heart",
+    "type": "EXPENSE",
+    "sortOrder": 5,
+    "subcategories": [
+      {
+        "name": "Doctor Visits",
+        "color": "#74B9FF",
+        "icon": "stethoscope",
+        "type": "EXPENSE",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Pharmacy",
+        "color": "#8AC7FF",
+        "icon": "pill",
+        "type": "EXPENSE",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Dental",
+        "color": "#A0D5FF",
+        "icon": "activity",
+        "type": "EXPENSE",
+        "sortOrder": 2,
+        "subcategories": []
+      },
+      {
+        "name": "Vision",
+        "color": "#B6E3FF",
+        "icon": "eye",
+        "type": "EXPENSE",
+        "sortOrder": 3,
+        "subcategories": []
+      },
+      {
+        "name": "Insurance",
+        "color": "#CCF1FF",
+        "icon": "shield",
+        "type": "EXPENSE",
+        "sortOrder": 4,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Education",
+    "color": "#FDCB6E",
+    "icon": "book-open",
+    "type": "EXPENSE",
+    "sortOrder": 6,
+    "subcategories": [
+      {
+        "name": "Tuition",
+        "color": "#FDCB6E",
+        "icon": "graduation-cap",
+        "type": "EXPENSE",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Books & Supplies",
+        "color": "#FDD78E",
+        "icon": "book",
+        "type": "EXPENSE",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Online Courses",
+        "color": "#FDE3AE",
+        "icon": "monitor",
+        "type": "EXPENSE",
+        "sortOrder": 2,
+        "subcategories": []
+      },
+      {
+        "name": "Workshops",
+        "color": "#FDEFCE",
+        "icon": "users",
+        "type": "EXPENSE",
+        "sortOrder": 3,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Personal",
+    "color": "#FF7979",
+    "icon": "user",
+    "type": "EXPENSE",
+    "sortOrder": 7,
+    "subcategories": [
+      {
+        "name": "Haircut & Grooming",
+        "color": "#FF7979",
+        "icon": "scissors",
+        "type": "EXPENSE",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Gym & Fitness",
+        "color": "#FF9191",
+        "icon": "dumbbell",
+        "type": "EXPENSE",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Hobbies",
+        "color": "#FFA9A9",
+        "icon": "palette",
+        "type": "EXPENSE",
+        "sortOrder": 2,
+        "subcategories": []
+      },
+      {
+        "name": "Subscriptions",
+        "color": "#FFC1C1",
+        "icon": "credit-card",
+        "type": "EXPENSE",
+        "sortOrder": 3,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Travel",
+    "color": "#A29BFE",
+    "icon": "plane",
+    "type": "EXPENSE",
+    "sortOrder": 8,
+    "subcategories": [
+      {
+        "name": "Flights",
+        "color": "#A29BFE",
+        "icon": "plane",
+        "type": "EXPENSE",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Hotels",
+        "color": "#B4AFFE",
+        "icon": "hotel",
+        "type": "EXPENSE",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Vacation",
+        "color": "#C6C3FE",
+        "icon": "umbrella",
+        "type": "EXPENSE",
+        "sortOrder": 2,
+        "subcategories": []
+      },
+      {
+        "name": "Business Travel",
+        "color": "#D8D7FE",
+        "icon": "briefcase",
+        "type": "EXPENSE",
+        "sortOrder": 3,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Pets",
+    "color": "#FD79A8",
+    "icon": "paw-print",
+    "type": "EXPENSE",
+    "sortOrder": 9,
+    "subcategories": [
+      {
+        "name": "Pet Food",
+        "color": "#FD79A8",
+        "icon": "bone",
+        "type": "EXPENSE",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Veterinary",
+        "color": "#FD93B8",
+        "icon": "stethoscope",
+        "type": "EXPENSE",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Pet Supplies",
+        "color": "#FDADC8",
+        "icon": "shopping-bag",
+        "type": "EXPENSE",
+        "sortOrder": 2,
+        "subcategories": []
+      },
+      {
+        "name": "Grooming",
+        "color": "#FDC7D8",
+        "icon": "scissors",
+        "type": "EXPENSE",
+        "sortOrder": 3,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Financial",
+    "color": "#6C5CE7",
+    "icon": "trending-up",
+    "type": "EXPENSE",
+    "sortOrder": 10,
+    "subcategories": [
+      {
+        "name": "Bank Fees",
+        "color": "#6C5CE7",
+        "icon": "building",
+        "type": "EXPENSE",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Interest & Charges",
+        "color": "#8370EB",
+        "icon": "percent",
+        "type": "EXPENSE",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Taxes",
+        "color": "#9A84EF",
+        "icon": "file-text",
+        "type": "EXPENSE",
+        "sortOrder": 2,
+        "subcategories": []
+      },
+      {
+        "name": "Insurance Premiums",
+        "color": "#B198F3",
+        "icon": "shield",
+        "type": "EXPENSE",
+        "sortOrder": 3,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Other",
+    "color": "#A8A8A8",
+    "icon": "ellipsis",
+    "type": "EXPENSE",
+    "sortOrder": 11,
+    "subcategories": [
+      {
+        "name": "Miscellaneous",
+        "color": "#A8A8A8",
+        "icon": "circle",
+        "type": "EXPENSE",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Charity & Donations",
+        "color": "#B8B8B8",
+        "icon": "heart",
+        "type": "EXPENSE",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Gifts & Celebrations",
+        "color": "#C8C8C8",
+        "icon": "gift",
+        "type": "EXPENSE",
+        "sortOrder": 2,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Salary",
+    "color": "#55EFC4",
+    "icon": "briefcase",
+    "type": "INCOME",
+    "sortOrder": 12,
+    "subcategories": [
+      {
+        "name": "Base Salary",
+        "color": "#55EFC4",
+        "icon": "briefcase",
+        "type": "INCOME",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Bonus",
+        "color": "#7FF4D2",
+        "icon": "gift",
+        "type": "INCOME",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Overtime",
+        "color": "#A9F9E1",
+        "icon": "clock",
+        "type": "INCOME",
+        "sortOrder": 2,
+        "subcategories": []
+      },
+      {
+        "name": "Commission",
+        "color": "#D3FDF0",
+        "icon": "percent",
+        "type": "INCOME",
+        "sortOrder": 3,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Business",
+    "color": "#81ECEC",
+    "icon": "store",
+    "type": "INCOME",
+    "sortOrder": 13,
+    "subcategories": [
+      {
+        "name": "Sales Revenue",
+        "color": "#81ECEC",
+        "icon": "shopping-cart",
+        "type": "INCOME",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Service Income",
+        "color": "#9BF1F1",
+        "icon": "wrench",
+        "type": "INCOME",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Consulting",
+        "color": "#B5F6F6",
+        "icon": "users",
+        "type": "INCOME",
+        "sortOrder": 2,
+        "subcategories": []
+      },
+      {
+        "name": "Freelance",
+        "color": "#CFFBFB",
+        "icon": "feather",
+        "type": "INCOME",
+        "sortOrder": 3,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Investments",
+    "color": "#74B9FF",
+    "icon": "trending-up",
+    "type": "INCOME",
+    "sortOrder": 14,
+    "subcategories": [
+      {
+        "name": "Dividends",
+        "color": "#74B9FF",
+        "icon": "chart-pie",
+        "type": "INCOME",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Stock Profit",
+        "color": "#8EC7FF",
+        "icon": "arrow-up",
+        "type": "INCOME",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Crypto Gains",
+        "color": "#A8D5FF",
+        "icon": "cpu",
+        "type": "INCOME",
+        "sortOrder": 2,
+        "subcategories": []
+      },
+      {
+        "name": "Interest",
+        "color": "#C2E3FF",
+        "icon": "percent",
+        "type": "INCOME",
+        "sortOrder": 3,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Rental",
+    "color": "#FDCB6E",
+    "icon": "house",
+    "type": "INCOME",
+    "sortOrder": 15,
+    "subcategories": [
+      {
+        "name": "Property Rent",
+        "color": "#FDCB6E",
+        "icon": "house",
+        "type": "INCOME",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Airbnb",
+        "color": "#FDD78E",
+        "icon": "bed",
+        "type": "INCOME",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Commercial Rent",
+        "color": "#FDE3AE",
+        "icon": "building",
+        "type": "INCOME",
+        "sortOrder": 2,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Side Hustles",
+    "color": "#FF7675",
+    "icon": "zap",
+    "type": "INCOME",
+    "sortOrder": 16,
+    "subcategories": [
+      {
+        "name": "Part-Time Work",
+        "color": "#FF7675",
+        "icon": "briefcase",
+        "type": "INCOME",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Online Sales",
+        "color": "#FF8E8E",
+        "icon": "shopping-bag",
+        "type": "INCOME",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Content Creation",
+        "color": "#FFA6A6",
+        "icon": "video",
+        "type": "INCOME",
+        "sortOrder": 2,
+        "subcategories": []
+      },
+      {
+        "name": "Tutoring",
+        "color": "#FFBEBE",
+        "icon": "book-open",
+        "type": "INCOME",
+        "sortOrder": 3,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Gifts",
+    "color": "#A29BFE",
+    "icon": "gift",
+    "type": "INCOME",
+    "sortOrder": 17,
+    "subcategories": [
+      {
+        "name": "Cash Gifts",
+        "color": "#A29BFE",
+        "icon": "gift",
+        "type": "INCOME",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Family Support",
+        "color": "#B4AFFE",
+        "icon": "heart",
+        "type": "INCOME",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Occasion Money",
+        "color": "#C6C3FE",
+        "icon": "star",
+        "type": "INCOME",
+        "sortOrder": 2,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Refunds",
+    "color": "#FF9F43",
+    "icon": "rotate-ccw",
+    "type": "INCOME",
+    "sortOrder": 18,
+    "subcategories": [
+      {
+        "name": "Tax Refund",
+        "color": "#FF9F43",
+        "icon": "file-text",
+        "type": "INCOME",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Product Refund",
+        "color": "#FFB268",
+        "icon": "shopping-cart",
+        "type": "INCOME",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Service Refund",
+        "color": "#FFC48C",
+        "icon": "wrench",
+        "type": "INCOME",
+        "sortOrder": 2,
+        "subcategories": []
+      }
+    ]
+  },
+  {
+    "name": "Other Income",
+    "color": "#B2BEC3",
+    "icon": "ellipsis",
+    "type": "INCOME",
+    "sortOrder": 19,
+    "subcategories": [
+      {
+        "name": "Cashback",
+        "color": "#B2BEC3",
+        "icon": "credit-card",
+        "type": "INCOME",
+        "sortOrder": 0,
+        "subcategories": []
+      },
+      {
+        "name": "Lottery / Prizes",
+        "color": "#C6D2D6",
+        "icon": "award",
+        "type": "INCOME",
+        "sortOrder": 1,
+        "subcategories": []
+      },
+      {
+        "name": "Miscellaneous",
+        "color": "#D9E5E9",
+        "icon": "circle",
+        "type": "INCOME",
+        "sortOrder": 2,
+        "subcategories": []
+      }
+    ]
+  }
+]
