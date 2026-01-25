@@ -13,22 +13,42 @@ import { BarChart } from "@/components/charts/bar-chart";
 import { PieChart } from "@/components/charts/pie-chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import TransactionForm from "@/components/forms/transaction/transaction-form";
-import {
-  subDays,
-  subMonths,
-  format,
-  startOfDay,
-  endOfDay,
-  startOfHour,
-} from "date-fns";
+import { subDays, subMonths, format, startOfDay, startOfHour } from "date-fns";
 import type { ChartConfig } from "@/components/ui/chart";
 import type { Transaction } from "@/types/transaction";
 
+import { DefaultView } from "@prisma/client";
+import { useRouter } from "next/navigation";
+import { useSettings } from "@/hooks/use-settings";
+import { useEffect } from "react";
+
+import { useFormatter } from "@/hooks/use-formatter";
+
 export default function OverviewPage() {
+  const { formatAmount } = useFormatter();
+  const router = useRouter();
+  const { settings, isLoading: settingsLoading } = useSettings();
+
+  // Use effect for redirect logic to avoid "flash" if possible,
+  // or at least handle it before data loads
+  useEffect(() => {
+    if (!settingsLoading && settings?.display.defaultView) {
+      const defaultView = settings.display.defaultView;
+      if (defaultView === DefaultView.TRANSACTIONS) {
+        router.replace("/transactions");
+      } else if (defaultView === DefaultView.NETWORTH) {
+        router.replace("/reports"); // Assuming net worth is in reports
+      } else if (defaultView === DefaultView.PORTFOLIO) {
+        router.replace("/accounts"); // Fallback or portfolio if exists
+      }
+    }
+  }, [settings, settingsLoading, router]);
+
   const { user } = useUser();
   const { accounts, isLoading: accountsLoading } = useAccounts();
   const { listQuery } = useTransactions();
-  const { all: categoriesQuery } = useCategories();
+  const { allFlat, categoryMap } = useCategories();
+
   const utils = api.useUtils();
 
   const [period, setPeriod] = useState("last30");
@@ -163,24 +183,22 @@ export default function OverviewPage() {
 
   // 3. Prepare Pie Chart Data (Category breakdown)
   const pieChartData = useMemo(() => {
-    const categories: Record<string, number> = {};
-    const categoryNameMap = new Map(
-      categoriesQuery.data?.map((c) => [c.id, c.name]) ?? [],
-    );
+    const categories = allFlat.data ?? [];
+    const categoriesMap: Record<string, number> = {};
 
     transactions.forEach((tx) => {
       if (tx.type === "DEBIT") {
         const catName = tx.categoryId
-          ? (categoryNameMap.get(tx.categoryId) ?? "Other")
+          ? (categoryMap.get(tx.categoryId) ?? "Other")
           : "Uncategorized";
-        categories[catName] =
-          (categories[catName] ?? 0) + Math.abs(parseFloat(tx.amount));
+        categoriesMap[catName] =
+          (categoriesMap[catName] ?? 0) + Math.abs(parseFloat(tx.amount));
       }
     });
 
-    return Object.entries(categories).map(([name, value], index) => {
-      // Find the category object to get its color
-      const category = categoriesQuery.data?.find((c) => c.name === name);
+    return Object.entries(categoriesMap).map(([name, value], index) => {
+      // Find the category object to get its mapped color
+      const category = categories.find((c) => c.name === name);
       const fill = category?.color ?? `var(--chart-${(index % 5) + 1})`;
 
       return {
@@ -189,7 +207,7 @@ export default function OverviewPage() {
         fill,
       };
     });
-  }, [transactions, categoriesQuery.data]);
+  }, [transactions, allFlat.data, categoryMap]);
 
   const pieChartConfig = useMemo(() => {
     const config: ChartConfig = {};
@@ -230,6 +248,7 @@ export default function OverviewPage() {
               dataKey="amount"
               labelKey="date"
               className="h-[300px] w-full"
+              valueFormatter={(val) => formatAmount(val)}
             />
           </CardContent>
         </Card>
@@ -245,6 +264,7 @@ export default function OverviewPage() {
               dataKey="value"
               nameKey="name"
               className="mx-auto aspect-square max-h-[300px]"
+              valueFormatter={(val) => formatAmount(val)}
             />
           </CardContent>
         </Card>

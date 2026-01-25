@@ -1,4 +1,5 @@
 import NavBar from "@/components/layout/navbar";
+import { OnboardingGuard } from "@/components/auth/onboarding-guard";
 
 export default function FeaturesLayout({
   children,
@@ -8,7 +9,9 @@ export default function FeaturesLayout({
   return (
     <div className="bg-background min-h-screen">
       <NavBar />
-      <main className="mx-auto max-w-7xl px-4 py-8 md:px-6">{children}</main>
+      <OnboardingGuard>
+        <main className="mx-auto max-w-7xl px-4 py-8 md:px-6">{children}</main>
+      </OnboardingGuard>
     </div>
   );
 }
