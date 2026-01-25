@@ -5,7 +5,7 @@ import { calculateNextRunAt } from "@/lib/recurrence";
 import { sendEmail } from "@/lib/email";
 import type { RecurringRule } from "@prisma/client";
 import { RecurringStatus } from "@prisma/client";
-import type { RecurrenceConfig } from "@/lib/recurrence";
+import type { RecurrenceConfig } from "@/types/recurrence";
 
 export const processRecurringTransaction = inngest.createFunction(
   {
@@ -99,5 +99,77 @@ export const processRecurringTransaction = inngest.createFunction(
         html: `A recurring transaction for <strong>${rule.description ?? "Transaction"}</strong> was processed for ${String(rule.amount)} on ${runAt.toDateString()}.`,
       });
     }
+  },
+);
+
+/**
+ * Notify users about upcoming recurring transactions (1 day before)
+ * Runs daily at 8 AM
+ */
+export const notifyUpcomingRecurring = inngest.createFunction(
+  {
+    id: "notify-upcoming-recurring",
+    name: "Notify Upcoming Recurring",
+  },
+  { cron: "0 8 * * *" }, // At 8:00 AM every day
+  async ({ step }) => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(23, 59, 59, 999);
+
+    const rules = await step.run("fetch-upcoming-rules", async () => {
+      return db.recurringRule.findMany({
+        where: {
+          status: RecurringStatus.ACTIVE,
+          nextRunAt: {
+            gt: new Date(),
+            lte: tomorrow,
+          },
+        },
+        include: { user: true },
+      });
+    });
+
+    const results = [];
+    for (const rule of rules) {
+      try {
+        if (rule.user?.email) {
+          await step.run(`send-upcoming-email-${rule.id}`, async () => {
+            const { NotificationService } = await import(
+              "@/server/services/notificationService"
+            );
+            const { NotificationType } = await import("@prisma/client");
+
+            // 1. Send Email
+            await sendEmail({
+              to: rule.user.email,
+              subject: `Upcoming Bill Reminder: ${rule.description}`,
+              html: `
+                <div style="font-family: sans-serif; padding: 20px;">
+                  <h2>Upcoming Payment Reminder</h2>
+                  <p>This is a reminder that a recurring payment for <strong>${rule.description}</strong> of <strong>$${String(rule.amount)}</strong> is scheduled for tomorrow, ${new Date(rule.nextRunAt).toDateString()}.</p>
+                  <p>Please ensure you have sufficient funds in your account.</p>
+                </div>
+              `,
+            });
+
+            // 2. Create In-App Notification
+            await NotificationService.createNotification({
+              userId: rule.userId,
+              type: NotificationType.TRANSACTION_RECURRING,
+              title: "Upcoming Recurring Payment",
+              message: `Reminder: Your recurring payment for ${rule.description} ($${String(rule.amount)}) is scheduled for tomorrow.`,
+              metadata: { ruleId: rule.id },
+            });
+          });
+          results.push({ ruleId: rule.id, success: true });
+        }
+      } catch (error) {
+        console.error(`Failed to notify for rule ${rule.id}:`, error);
+        results.push({ ruleId: rule.id, success: false, error: String(error) });
+      }
+    }
+
+    return { processed: rules.length, results };
   },
 );

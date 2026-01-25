@@ -1,14 +1,5 @@
 import { addDays, addMonths, addWeeks, addYears } from "date-fns";
-
-export type RecurrenceConfig = {
-  frequency: "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
-  interval?: number | null;
-  dayOfMonth?: number | null;
-  dayOfWeek?: number | null;
-  startDate: Date;
-  endDate?: Date | null;
-  nextRunAt?: Date | null;
-};
+import type { RecurrenceConfig } from "@/types/recurrence";
 
 /**
  * Compute the next run time after the provided anchor (defaults to nextRunAt or startDate).
@@ -16,7 +7,7 @@ export type RecurrenceConfig = {
  */
 export function calculateNextRunAt(
   config: RecurrenceConfig,
-  anchor?: Date,
+  anchor?: Date | string,
 ): Date | null {
   const interval = config.interval && config.interval > 0 ? config.interval : 1;
   const base = anchor ?? config.nextRunAt ?? config.startDate;

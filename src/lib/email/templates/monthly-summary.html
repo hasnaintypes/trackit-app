@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monthly Summary</title>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      font-family:
+        -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto,
+        &quot;Helvetica Neue&quot;, Arial, sans-serif;
+      background-color: #f4f4f5;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="background-color: #f4f4f5; padding: 40px 20px"
+    >
+      <tr>
+        <td align="center">
+          <table
+            width="600"
+            cellpadding="0"
+            cellspacing="0"
+            style="
+              background-color: #ffffff;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                style="
+                  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                  padding: 30px;
+                  text-align: center;
+                "
+              >
+                <h1
+                  style="
+                    margin: 0;
+                    color: #ffffff;
+                    font-size: 24px;
+                    font-weight: 600;
+                  "
+                >
+                  📊 Monthly Summary
+                </h1>
+                <p style="margin: 10px 0 0; color: #eff6ff; font-size: 14px">
+                  {{period}}
+                </p>
+              </td>
+            </tr>
+
+            <!-- Content -->
+            <tr>
+              <td style="padding: 40px 30px">
+                <p
+                  style="
+                    margin: 0 0 30px;
+                    font-size: 16px;
+                    line-height: 1.6;
+                    color: #18181b;
+                  "
+                >
+                  Hi {{userName}},<br />
+                  Here's your financial summary for <strong>{{period}}</strong>.
+                </p>
+
+                <!-- Summary Stats -->
+                <table
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  style="margin-bottom: 30px"
+                >
+                  <tr>
+                    <td width="50%" style="padding-right: 10px">
+                      <table
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        style="
+                          background-color: #ecfdf5;
+                          border-radius: 6px;
+                          padding: 20px;
+                        "
+                      >
+                        <tr>
+                          <td
+                            style="
+                              font-size: 12px;
+                              color: #71717a;
+                              text-transform: uppercase;
+                              letter-spacing: 0.5px;
+                              padding-bottom: 8px;
+                            "
+                          >
+                            Income
+                          </td>
+                        </tr>
+                        <tr>
+                          <td
+                            style="
+                              font-size: 24px;
+                              font-weight: 700;
+                              color: #10b981;
+                            "
+                          >
+                            ${{totalIncome}}
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                    <td width="50%" style="padding-left: 10px">
+                      <table
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        style="
+                          background-color: #fef2f2;
+                          border-radius: 6px;
+                          padding: 20px;
+                        "
+                      >
+                        <tr>
+                          <td
+                            style="
+                              font-size: 12px;
+                              color: #71717a;
+                              text-transform: uppercase;
+                              letter-spacing: 0.5px;
+                              padding-bottom: 8px;
+                            "
+                          >
+                            Expenses
+                          </td>
+                        </tr>
+                        <tr>
+                          <td
+                            style="
+                              font-size: 24px;
+                              font-weight: 700;
+                              color: #ef4444;
+                            "
+                          >
+                            ${{totalExpenses}}
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+
+                <table
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  style="
+                    background-color: #f0f9ff;
+                    border-radius: 6px;
+                    padding: 20px;
+                    margin-bottom: 30px;
+                  "
+                >
+                  <tr>
+                    <td style="font-size: 14px; color: #71717a">Net Savings</td>
+                    <td
+                      style="font-size: 20px; font-weight: 600; text-align: right; color: {{netSavingsColor}};"
+                    >
+                      ${{netSavings}}
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Top Categories -->
+                <h2
+                  style="
+                    margin: 0 0 20px;
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #18181b;
+                  "
+                >
+                  Top Spending Categories
+                </h2>
+                <table
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  style="margin-bottom: 30px"
+                >
+                  {{#each topCategories}}
+                  <tr>
+                    <td
+                      style="padding: 12px 0; border-bottom: 1px solid #e4e4e7"
+                    >
+                      <span style="font-size: 14px; color: #18181b"
+                        >{{name}}</span
+                      >
+                    </td>
+                    <td
+                      style="
+                        padding: 12px 0;
+                        border-bottom: 1px solid #e4e4e7;
+                        text-align: right;
+                      "
+                    >
+                      <span
+                        style="
+                          font-size: 14px;
+                          font-weight: 500;
+                          color: #18181b;
+                        "
+                        >${{amount}}</span
+                      >
+                    </td>
+                  </tr>
+                  {{/each}}
+                </table>
+
+                <!-- CTA Button -->
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td align="center" style="padding: 20px 0">
+                      <a
+                        href="{{appUrl}}/reports"
+                        style="
+                          display: inline-block;
+                          background-color: #3b82f6;
+                          color: #ffffff;
+                          text-decoration: none;
+                          padding: 12px 30px;
+                          border-radius: 6px;
+                          font-size: 14px;
+                          font-weight: 500;
+                        "
+                        >View Full Report</a
+                      >
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                style="
+                  background-color: #f4f4f5;
+                  padding: 20px 30px;
+                  text-align: center;
+                  border-top: 1px solid #e4e4e7;
+                "
+              >
+                <p style="margin: 0; font-size: 12px; color: #71717a">
+                  <a
+                    href="{{appUrl}}/settings"
+                    style="color: #18181b; text-decoration: underline"
+                    >Manage notification preferences</a
+                  >
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

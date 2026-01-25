@@ -2,24 +2,25 @@
 
 import { useMemo } from "react";
 import { api } from "@/trpc/react";
-import type { Category } from "@/types/account";
+import type { CategoryWithChildren } from "@/types/category";
 
 export function useCategories() {
-  const all = api.category.all.useQuery();
+  const all = api.category.list.useQuery();
 
   const categories = useMemo(() => {
-    if (!all.data) return [] as Category[];
-    // Build tree grouping children under parentCategoryId
-    const map = new Map<string, Category & { children?: Category[] }>();
+    if (!all.data) return [] as CategoryWithChildren[];
+    const map = new Map<string, CategoryWithChildren>();
     all.data.forEach((c) => map.set(c.id, { ...c, children: [] }));
 
-    const roots: (Category & { children?: Category[] })[] = [];
+    const roots: CategoryWithChildren[] = [];
     map.forEach((c) => {
-      const parentId = c.parentCategoryId ?? null;
+      const parentId = c.parentCategoryId;
       if (parentId) {
         const parent = map.get(parentId);
-        if (parent) parent.children = parent.children ?? [];
-        parent?.children?.push(c as Category & { children?: Category[] });
+        if (parent) {
+          parent.children = parent.children ?? [];
+          parent.children.push(c);
+        }
       } else {
         roots.push(c);
       }
@@ -35,6 +36,14 @@ export function useCategories() {
   const deleteSubcategory = api.category.subcategory.delete.useMutation();
   const byId = api.category.byId.useQuery;
 
+  const allFlat = api.category.allFlat.useQuery();
+
+  const categoryMap = useMemo(() => {
+    const map = new Map<string, string>();
+    allFlat.data?.forEach((c) => map.set(c.id, c.name));
+    return map;
+  }, [allFlat.data]);
+
   return {
     all,
     categories,
@@ -45,5 +54,7 @@ export function useCategories() {
     createSubcategory,
     updateSubcategory,
     deleteSubcategory,
+    allFlat,
+    categoryMap,
   };
 }

@@ -1,39 +1,4 @@
-type Gender = "MALE" | "FEMALE" | "OTHER";
-type Currency =
-  | "PKR"
-  | "USD"
-  | "EUR"
-  | "GBP"
-  | "JPY"
-  | "AUD"
-  | "CAD"
-  | "CHF"
-  | "CNY"
-  | "INR"
-  | "SGD";
-type Country =
-  | "PK"
-  | "US"
-  | "GB"
-  | "CA"
-  | "AU"
-  | "DE"
-  | "FR"
-  | "JP"
-  | "SG"
-  | "IN"
-  | "AE";
-type Timezone =
-  | "UTC"
-  | "EST"
-  | "CST"
-  | "MST"
-  | "PST"
-  | "GMT"
-  | "CET"
-  | "JST"
-  | "AEST"
-  | "IST";
+import type { Gender, Currency, Country, Timezone } from "@prisma/client";
 
 export const GenderOptions = {
   MALE: "Male",

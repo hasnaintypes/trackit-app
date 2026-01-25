@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Budget Alert</title>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      font-family:
+        -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto,
+        &quot;Helvetica Neue&quot;, Arial, sans-serif;
+      background-color: #f4f4f5;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="background-color: #f4f4f5; padding: 40px 20px"
+    >
+      <tr>
+        <td align="center">
+          <table
+            width="600"
+            cellpadding="0"
+            cellspacing="0"
+            style="
+              background-color: #ffffff;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                style="
+                  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                  padding: 30px;
+                  text-align: center;
+                "
+              >
+                <h1
+                  style="
+                    margin: 0;
+                    color: #ffffff;
+                    font-size: 24px;
+                    font-weight: 600;
+                  "
+                >
+                  ⚠️ Budget Alert
+                </h1>
+              </td>
+            </tr>
+
+            <!-- Content -->
+            <tr>
+              <td style="padding: 40px 30px">
+                <p
+                  style="
+                    margin: 0 0 20px;
+                    font-size: 16px;
+                    line-height: 1.6;
+                    color: #18181b;
+                  "
+                >
+                  Hi {{userName}},
+                </p>
+
+                <p
+                  style="
+                    margin: 0 0 30px;
+                    font-size: 16px;
+                    line-height: 1.6;
+                    color: #18181b;
+                  "
+                >
+                  You've reached
+                  <strong style="color: #d97706">{{percentage}}%</strong> of
+                  your budget limit for <strong>{{categoryName}}</strong>.
+                </p>
+
+                <!-- Budget Info Card -->
+                <table
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  style="
+                    background-color: #fef3c7;
+                    border-radius: 6px;
+                    padding: 20px;
+                    margin-bottom: 30px;
+                  "
+                >
+                  <tr>
+                    <td>
+                      <table width="100%" cellpadding="0" cellspacing="0">
+                        <tr>
+                          <td
+                            style="
+                              padding-bottom: 10px;
+                              font-size: 14px;
+                              color: #71717a;
+                            "
+                          >
+                            Spent
+                          </td>
+                          <td
+                            style="
+                              padding-bottom: 10px;
+                              font-size: 18px;
+                              font-weight: 600;
+                              text-align: right;
+                              color: #d97706;
+                            "
+                          >
+                            ${{spent}}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td
+                            style="
+                              padding-bottom: 10px;
+                              font-size: 14px;
+                              color: #71717a;
+                            "
+                          >
+                            Budget Limit
+                          </td>
+                          <td
+                            style="
+                              padding-bottom: 10px;
+                              font-size: 16px;
+                              font-weight: 500;
+                              text-align: right;
+                              color: #18181b;
+                            "
+                          >
+                            ${{limit}}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="font-size: 14px; color: #71717a">
+                            Remaining
+                          </td>
+                          <td
+                            style="
+                              font-size: 16px;
+                              font-weight: 500;
+                              text-align: right;
+                              color: #10b981;
+                            "
+                          >
+                            ${{remaining}}
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+
+                <p
+                  style="
+                    margin: 0 0 20px;
+                    font-size: 14px;
+                    line-height: 1.6;
+                    color: #71717a;
+                  "
+                >
+                  Keep track of your spending to stay within your budget. You
+                  can review your transactions and adjust your budget in the
+                  app.
+                </p>
+
+                <!-- AI Recommendations -->
+                <div
+                  style="
+                    background-color: #f0f9ff;
+                    border-left: 4px solid #0ea5e9;
+                    padding: 15px;
+                    margin-bottom: 30px;
+                  "
+                >
+                  <h3
+                    style="
+                      margin: 0 0 10px;
+                      font-size: 14px;
+                      font-weight: 600;
+                      color: #0369a1;
+                    "
+                  >
+                    💡 AI Recommendations
+                  </h3>
+                  <p
+                    style="
+                      margin: 0;
+                      font-size: 13px;
+                      line-height: 1.5;
+                      color: #0c4a6e;
+                    "
+                  >
+                    {{aiRecommendations}}
+                  </p>
+                </div>
+
+                <!-- CTA Button -->
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td align="center" style="padding: 20px 0">
+                      <a
+                        href="{{appUrl}}/budget"
+                        style="
+                          display: inline-block;
+                          background-color: #18181b;
+                          color: #ffffff;
+                          text-decoration: none;
+                          padding: 12px 30px;
+                          border-radius: 6px;
+                          font-size: 14px;
+                          font-weight: 500;
+                        "
+                        >View Budget Details</a
+                      >
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                style="
+                  background-color: #f4f4f5;
+                  padding: 20px 30px;
+                  text-align: center;
+                  border-top: 1px solid #e4e4e7;
+                "
+              >
+                <p style="margin: 0; font-size: 12px; color: #71717a">
+                  You're receiving this because you have budget alerts
+                  enabled.<br />
+                  <a
+                    href="{{appUrl}}/settings"
+                    style="color: #18181b; text-decoration: underline"
+                    >Manage notification preferences</a
+                  >
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

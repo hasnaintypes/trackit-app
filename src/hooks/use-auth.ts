@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { authClient } from "@/lib/auth/client";
 import type { User } from "@/types/user";
 import { useUserStore } from "@/store/userStore";

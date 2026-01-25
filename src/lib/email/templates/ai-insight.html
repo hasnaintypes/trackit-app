@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Spending Insights</title>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      font-family:
+        -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto,
+        &quot;Helvetica Neue&quot;, Arial, sans-serif;
+      background-color: #f4f4f5;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="background-color: #f4f4f5; padding: 40px 20px"
+    >
+      <tr>
+        <td align="center">
+          <table
+            width="600"
+            cellpadding="0"
+            cellspacing="0"
+            style="
+              background-color: #ffffff;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <!-- Header -->
+            <tr>
+              <td
+                style="
+                  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+                  padding: 30px;
+                  text-align: center;
+                "
+              >
+                <h1
+                  style="
+                    margin: 0;
+                    color: #ffffff;
+                    font-size: 24px;
+                    font-weight: 600;
+                  "
+                >
+                  ✨ Smart Spending Insights
+                </h1>
+              </td>
+            </tr>
+
+            <!-- Content -->
+            <tr>
+              <td style="padding: 40px 30px">
+                <p
+                  style="
+                    margin: 0 0 20px;
+                    font-size: 16px;
+                    line-height: 1.6;
+                    color: #18181b;
+                  "
+                >
+                  Hi {{userName}},
+                </p>
+
+                <p
+                  style="
+                    margin: 0 0 24px;
+                    font-size: 16px;
+                    line-height: 1.6;
+                    color: #18181b;
+                  "
+                >
+                  Our AI has analyzed your recent financial activity. Here are
+                  some key highlights and suggestions:
+                </p>
+
+                <!-- Insights Box -->
+                <div
+                  style="
+                    background-color: #f5f3ff;
+                    border-radius: 8px;
+                    padding: 25px;
+                    margin-bottom: 30px;
+                    border: 1px solid #ddd6fe;
+                  "
+                >
+                  <p
+                    style="
+                      margin: 0;
+                      font-size: 15px;
+                      line-height: 1.7;
+                      color: #4c1d95;
+                      white-space: pre-line;
+                    "
+                  >
+                    {{aiContent}}
+                  </p>
+                </div>
+
+                <!-- Anomaly Box (Optional) -->
+                {{#if hasAnomalies}}
+                <div
+                  style="
+                    background-color: #fff7ed;
+                    border-radius: 8px;
+                    padding: 20px;
+                    margin-bottom: 30px;
+                    border: 1px solid #ffedd5;
+                  "
+                >
+                  <h3
+                    style="
+                      margin: 0 0 10px;
+                      font-size: 14px;
+                      font-weight: 600;
+                      color: #9a3412;
+                    "
+                  >
+                    ⚠️ Unusual Activity Detected
+                  </h3>
+                  <p
+                    style="
+                      margin: 0;
+                      font-size: 13px;
+                      line-height: 1.5;
+                      color: #7c2d12;
+                    "
+                  >
+                    We noticed some transactions that don't match your usual
+                    patterns. You might want to review them in the app.
+                  </p>
+                </div>
+                {{/if}}
+
+                <!-- CTA Button -->
+                <table width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td align="center" style="padding: 10px 0">
+                      <a
+                        href="{{appUrl}}/overview"
+                        style="
+                          display: inline-block;
+                          background-color: #18181b;
+                          color: #ffffff;
+                          text-decoration: none;
+                          padding: 12px 30px;
+                          border-radius: 6px;
+                          font-size: 14px;
+                          font-weight: 500;
+                        "
+                        >View Full Analysis</a
+                      >
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                style="
+                  background-color: #f4f4f5;
+                  padding: 20px 30px;
+                  text-align: center;
+                  border-top: 1px solid #e4e4e7;
+                "
+              >
+                <p style="margin: 0; font-size: 12px; color: #71717a">
+                  Powered by Gemini AI. These are suggestions based on your
+                  history.<br />
+                  <a
+                    href="{{appUrl}}/settings"
+                    style="color: #18181b; text-decoration: underline"
+                    >Control your alerts</a
+                  >
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

@@ -1,15 +1,6 @@
 import { useCallback } from "react";
 import { api } from "@/trpc/react";
-
-export type SessionItem = {
-  id: string;
-  device: string;
-  location?: string;
-  ip: string;
-  lastActivity: string;
-  expiresAt?: string | null;
-  token?: string;
-};
+import type { SessionItem } from "@/types/session";
 
 export function useSessions() {
   const listQuery = api.session.list.useQuery(undefined, {

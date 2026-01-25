@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { api } from "@/trpc/react";
-import type { BankAccount } from "@/types/account";
+import type { ApiBankAccount } from "@/types/account";
 
 /**
  * useAccounts hook
@@ -9,14 +9,13 @@ import type { BankAccount } from "@/types/account";
 export function useAccounts() {
   const utils = api.useContext();
 
-  // The tRPC query result includes error-typed fields that ESLint flags as unsafe.
-  // We only need the safe public properties (`data`, `isLoading`, `isFetched`, `refetch`).
   const listQuery = api.account.list.useQuery(undefined, {
     staleTime: 1000 * 60 * 2,
   });
-  const isLoading = listQuery.isLoading;
-  const isFetched = listQuery.isFetched;
-  const refetch = listQuery.refetch;
+
+  // Safe types inferred from tRPC — we cast only the return data structure
+  // if tRPC types are lost or overly broad.
+  const apiAccounts = (listQuery.data ?? []) as ApiBankAccount[];
 
   const createMutation = api.account.create.useMutation({
     async onSuccess() {
@@ -26,7 +25,7 @@ export function useAccounts() {
 
   const updateMutation = api.account.update.useMutation({
     async onSuccess() {
-      await Promise.all([utils.account.list.invalidate()]);
+      await utils.account.list.invalidate();
     },
   });
 
@@ -64,32 +63,21 @@ export function useAccounts() {
       try {
         await updateMutation.mutateAsync({ id, isDefault: true });
       } catch (err) {
-        // rollback on error — restore previous snapshot as-is
+        // rollback on error
         utils.account.list.setData(undefined, () => prev);
         throw err;
       } finally {
-        // ensure server state is reflected
         await utils.account.list.invalidate();
       }
     },
     [updateMutation, utils.account.list],
   );
 
-  // API returns the BankAccount shape but with date fields serialized to strings
-  type ApiBankAccount = Omit<BankAccount, "createdAt" | "updatedAt"> & {
-    createdAt: string;
-    updatedAt: string;
-  };
-
-  // Convert the possibly error-typed `accounts` array to a local API-safe type.
-  // Use an intermediate `unknown` cast to satisfy TypeScript when narrowing.
-  const apiAccounts = (listQuery.data ?? []) as unknown as ApiBankAccount[];
-
   return {
     accounts: apiAccounts,
-    isLoading,
-    isFetched,
-    refetch,
+    isLoading: listQuery.isLoading,
+    isFetched: listQuery.isFetched,
+    refetch: listQuery.refetch,
     createAccount,
     updateAccount,
     deleteAccount,
