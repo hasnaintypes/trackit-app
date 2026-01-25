@@ -22,8 +22,8 @@ const navigationLinks = [
   { href: "/overview", label: "Overview" },
   { href: "/accounts", label: "Accounts" },
   { href: "/transactions", label: "Transactions" },
+  { href: "/budget", label: "Budget" },
   { href: "/reports", label: "Reports" },
-  { href: "/contacts", label: "Contacts" },
 ];
 
 export default function NavBar() {

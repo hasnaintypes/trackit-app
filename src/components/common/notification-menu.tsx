@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { BellIcon } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { api } from "@/trpc/react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -9,57 +10,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-const initialNotifications = [
-  {
-    id: 1,
-    user: "Chris Tompson",
-    action: "requested review on",
-    target: "PR #42: Feature implementation",
-    timestamp: "15 minutes ago",
-    unread: true,
-  },
-  {
-    id: 2,
-    user: "Emma Davis",
-    action: "shared",
-    target: "New component library",
-    timestamp: "45 minutes ago",
-    unread: true,
-  },
-  {
-    id: 3,
-    user: "James Wilson",
-    action: "assigned you to",
-    target: "API integration task",
-    timestamp: "4 hours ago",
-    unread: false,
-  },
-  {
-    id: 4,
-    user: "Alex Morgan",
-    action: "replied to your comment in",
-    target: "Authentication flow",
-    timestamp: "12 hours ago",
-    unread: false,
-  },
-  {
-    id: 5,
-    user: "Sarah Chen",
-    action: "commented on",
-    target: "Dashboard redesign",
-    timestamp: "2 days ago",
-    unread: false,
-  },
-  {
-    id: 6,
-    user: "Miky Derya",
-    action: "mentioned you in",
-    target: "coss.com open graph image",
-    timestamp: "2 weeks ago",
-    unread: false,
-  },
-];
 
 function Dot({ className }: { className?: string }) {
   return (
@@ -78,27 +28,25 @@ function Dot({ className }: { className?: string }) {
 }
 
 export default function NotificationMenu() {
-  const [notifications, setNotifications] = useState(initialNotifications);
-  const unreadCount = notifications.filter((n) => n.unread).length;
+  const utils = api.useUtils();
+  const { data: notifications = [] } = api.notification.getLatest.useQuery({
+    limit: 10,
+  });
+  const { data: unreadCount = 0 } = api.notification.getUnreadCount.useQuery();
 
-  const handleMarkAllAsRead = () => {
-    setNotifications(
-      notifications.map((notification) => ({
-        ...notification,
-        unread: false,
-      })),
-    );
-  };
+  const markAsRead = api.notification.markAsRead.useMutation({
+    onSuccess: () => {
+      void utils.notification.getLatest.invalidate();
+      void utils.notification.getUnreadCount.invalidate();
+    },
+  });
 
-  const handleNotificationClick = (id: number) => {
-    setNotifications(
-      notifications.map((notification) =>
-        notification.id === id
-          ? { ...notification, unread: false }
-          : notification,
-      ),
-    );
-  };
+  const markAllAsRead = api.notification.markAllAsRead.useMutation({
+    onSuccess: () => {
+      void utils.notification.getLatest.invalidate();
+      void utils.notification.getUnreadCount.invalidate();
+    },
+  });
 
   return (
     <Popover>
@@ -127,7 +75,8 @@ export default function NotificationMenu() {
           {unreadCount > 0 && (
             <button
               className="text-xs font-medium hover:underline"
-              onClick={handleMarkAllAsRead}
+              onClick={() => markAllAsRead.mutate()}
+              disabled={markAllAsRead.isPending}
             >
               Mark all as read
             </button>
@@ -138,39 +87,47 @@ export default function NotificationMenu() {
           aria-orientation="horizontal"
           className="bg-border -mx-1 my-1 h-px"
         ></div>
-        {notifications.map((notification) => (
-          <div
-            key={notification.id}
-            className="hover:bg-accent/10 cursor-pointer rounded-md px-3 py-2 text-sm transition-colors"
-          >
-            <div className="relative flex items-start pe-3">
-              <div className="flex-1 space-y-1">
-                <button
-                  className="text-foreground/80 text-left after:absolute after:inset-0"
-                  onClick={() => handleNotificationClick(notification.id)}
-                >
-                  <span className="text-foreground font-medium hover:underline">
-                    {notification.user}
-                  </span>{" "}
-                  {notification.action}{" "}
-                  <span className="text-foreground font-medium hover:underline">
-                    {notification.target}
-                  </span>
-                  .
-                </button>
-                <div className="text-muted-foreground text-xs">
-                  {notification.timestamp}
+        <div className="max-h-[400px] overflow-y-auto">
+          {notifications.length === 0 ? (
+            <div className="text-muted-foreground p-4 text-center text-sm">
+              No notifications yet.
+            </div>
+          ) : (
+            notifications.map((notification) => (
+              <div
+                key={notification.id}
+                className="hover:bg-accent/10 cursor-pointer rounded-md px-3 py-2 text-sm transition-colors"
+              >
+                <div className="relative flex items-start pe-3">
+                  <div className="flex-1 space-y-1">
+                    <button
+                      className="text-foreground/80 text-left after:absolute after:inset-0"
+                      onClick={() => markAsRead.mutate({ id: notification.id })}
+                    >
+                      <span className="text-foreground font-medium">
+                        {notification.title}
+                      </span>
+                      <p className="text-muted-foreground line-clamp-2 text-xs">
+                        {notification.message}
+                      </p>
+                    </button>
+                    <div className="text-muted-foreground text-[10px]">
+                      {formatDistanceToNow(new Date(notification.createdAt), {
+                        addSuffix: true,
+                      })}
+                    </div>
+                  </div>
+                  {!notification.isRead && (
+                    <div className="absolute end-0 self-center">
+                      <span className="sr-only">Unread</span>
+                      <Dot className="text-accent cursor-pointer" />
+                    </div>
+                  )}
                 </div>
               </div>
-              {notification.unread && (
-                <div className="absolute end-0 self-center">
-                  <span className="sr-only">Unread</span>
-                  <Dot className="text-accent cursor-pointer" />
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
+            ))
+          )}
+        </div>
       </PopoverContent>
     </Popover>
   );

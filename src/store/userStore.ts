@@ -28,16 +28,19 @@ export const useUserStore = create<UserState>()(
       storage: createJSONStorage(() => {
         if (typeof window !== "undefined") return localStorage;
         return {
-          getItem(_key: string) {
-            return null;
+          getItem: (_key: string) => null,
+          setItem: (_key: string, _value: string) => {
+            /* noop */
           },
-          setItem(_key: string, _value: string) {
-            // noop
+          removeItem: (_key: string) => {
+            /* noop */
           },
-          removeItem(_key: string) {
-            // noop
+          clear: () => {
+            /* noop */
           },
-        } as unknown as Storage;
+          key: (_index: number) => null,
+          length: 0,
+        };
       }),
     },
   ),
