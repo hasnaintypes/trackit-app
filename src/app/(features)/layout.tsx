@@ -1,5 +1,5 @@
 import NavBar from "@/components/layout/navbar";
-import { OnboardingGuard } from "@/components/auth/onboarding-guard";
+import { OnboardingGuard } from "@/components/pages/(protected)/onboarding/onboarding-guard";
 
 export default function FeaturesLayout({
   children,

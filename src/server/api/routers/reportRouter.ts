@@ -48,7 +48,7 @@ export const reportRouter = createTRPCRouter({
         where: { id: input.id },
       });
 
-      if (!report || report.userId !== ctx.user.id) {
+      if (report?.userId !== ctx.user.id) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Report not found" });
       }
 
