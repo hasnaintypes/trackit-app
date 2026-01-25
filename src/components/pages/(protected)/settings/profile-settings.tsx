@@ -155,6 +155,7 @@ export default function ProfileSettings() {
               ? new Date(String(banExpiresVal))
               : null,
           role: (api.role as string) ?? "user",
+          hasCompletedOnboarding: Boolean(api.hasCompletedOnboarding ?? false),
           createdAt:
             typeof createdVal === "string" || typeof createdVal === "number"
               ? new Date(String(createdVal))

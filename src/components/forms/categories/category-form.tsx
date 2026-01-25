@@ -242,8 +242,11 @@ export function CategoryForm({
                       <SelectContent>
                         <SelectItem value="none">No Parent</SelectItem>
                         {(all.data ?? [])
-                          .filter((c) => c.id !== initialValues?.id) // Prevent self-parenting
-                          .map((c) => (
+                          .filter(
+                            (c: { id: string; name: string }) =>
+                              c.id !== initialValues?.id,
+                          ) // Prevent self-parenting
+                          .map((c: { id: string; name: string }) => (
                             <SelectItem key={c.id} value={c.id}>
                               {c.name}
                             </SelectItem>

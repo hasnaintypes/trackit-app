@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { ICONS } from "@/components/common/icon-picker";
 // toast removed (not used in this file)
-import type { Category } from "@/types/account";
+import type { Category } from "@/types/category";
 import type {
   CreateCategoryInput,
   CreateSubcategoryInput,
@@ -180,7 +180,7 @@ export default function CategoriesSettings() {
     useState<CategoryWithChildren | null>(null);
 
   const refresh = useCallback(() => {
-    void utils.category.all.invalidate();
+    void utils.category.list.invalidate();
   }, [utils]);
 
   // Use the tree built by the hook so `children` arrays are already attached
@@ -198,7 +198,7 @@ export default function CategoriesSettings() {
       children: (p.children ?? [])
         .slice()
         .sort(
-          (x, y) =>
+          (x: CategoryWithChildren, y: CategoryWithChildren) =>
             new Date(x.createdAt).getTime() - new Date(y.createdAt).getTime(),
         ),
     }));
@@ -436,7 +436,7 @@ export default function CategoriesSettings() {
                   <div className="mt-3 pl-12">
                     {p.children && p.children.length > 0 ? (
                       <div className="space-y-2">
-                        {p.children.map((sub) => (
+                        {p.children.map((sub: CategoryWithChildren) => (
                           <div
                             key={sub.id}
                             className="flex items-center justify-between"
@@ -649,7 +649,7 @@ function CategoryCard({
             </div>
 
             <div className="space-y-2 pt-2">
-              {visibleChildren.map((sub) => (
+              {visibleChildren.map((sub: CategoryWithChildren) => (
                 <CategoryItem
                   key={sub.id}
                   category={sub}

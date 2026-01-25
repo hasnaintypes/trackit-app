@@ -177,8 +177,11 @@ export function SubcategoryForm({
                     </FormControl>
                     <SelectContent>
                       {(all.data ?? [])
-                        .filter((c) => !c.parentCategoryId)
-                        .map((c) => (
+                        .filter(
+                          (c: { parentCategoryId: string | null }) =>
+                            !c.parentCategoryId,
+                        )
+                        .map((c: { id: string; name: string }) => (
                           <SelectItem key={c.id} value={c.id}>
                             {c.name}
                           </SelectItem>
