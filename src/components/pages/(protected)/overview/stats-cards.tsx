@@ -4,6 +4,8 @@ import { ArrowDownRight, ArrowUpRight, Wallet } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
+import { useFormatter } from "@/hooks/use-formatter";
+
 interface StatsCardsProps {
   totalBalance: string;
   totalIncome: string;
@@ -17,31 +19,26 @@ export function StatsCards({
   totalExpense,
   isLoading,
 }: StatsCardsProps) {
-  const formatCurrency = (amount: string) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(parseFloat(amount));
-  };
+  const { formatAmount } = useFormatter();
 
   const stats = [
     {
       title: "Total Balance",
-      value: formatCurrency(totalBalance),
+      value: formatAmount(totalBalance),
       icon: Wallet,
       description: "Across all accounts",
       color: "text-blue-600",
     },
     {
       title: "Income",
-      value: formatCurrency(totalIncome),
+      value: formatAmount(totalIncome),
       icon: ArrowUpRight,
       description: "In selected period",
       color: "text-green-600",
     },
     {
       title: "Expenses",
-      value: formatCurrency(totalExpense),
+      value: formatAmount(totalExpense),
       icon: ArrowDownRight,
       description: "In selected period",
       color: "text-red-600",
