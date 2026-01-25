@@ -20,6 +20,7 @@ interface BarChartProps {
   dataKey: string;
   labelKey: string;
   className?: string;
+  valueFormatter?: (value: number) => string;
 }
 
 export function BarChart({
@@ -28,6 +29,7 @@ export function BarChart({
   dataKey,
   labelKey,
   className,
+  valueFormatter,
 }: BarChartProps) {
   return (
     <ChartContainer config={config} className={className}>
@@ -44,7 +46,9 @@ export function BarChart({
           tickLine={false}
           axisLine={false}
           tickMargin={10}
-          tickFormatter={(value) => `$${value}`}
+          tickFormatter={(value: number) =>
+            valueFormatter ? valueFormatter(value) : `$${value}`
+          }
         />
         <ChartTooltip content={<ChartTooltipContent hideLabel />} />
         <Bar

@@ -14,6 +14,7 @@ interface PieChartProps {
   dataKey: string;
   nameKey: string;
   className?: string;
+  valueFormatter?: (value: number) => string;
 }
 
 export function PieChart({
@@ -22,6 +23,7 @@ export function PieChart({
   dataKey,
   nameKey,
   className,
+  valueFormatter,
 }: PieChartProps) {
   return (
     <ChartContainer config={config} className={className}>
@@ -60,11 +62,9 @@ export function PieChart({
                       y={viewBox.cy}
                       className="fill-foreground text-xl font-bold"
                     >
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                        maximumFractionDigits: 0,
-                      }).format(topCategory[dataKey] as number)}
+                      {valueFormatter
+                        ? valueFormatter(topCategory[dataKey] as number)
+                        : `$${(topCategory[dataKey] as number).toFixed(0)}`}
                     </tspan>
                     <tspan
                       x={viewBox.cx}
