@@ -48,12 +48,159 @@ Example:
 
 **Now categorize all transactions and return the JSON array:**`;
 
-// TODO: Add more AI prompt templates as features are developed
-// Examples:
-// - BUDGET_RECOMMENDATION_TEMPLATE: For AI budget suggestions
-// - SPENDING_INSIGHTS_TEMPLATE: For AI spending analysis
-// - ANOMALY_DETECTION_TEMPLATE: For unusual transaction detection
-// - FINANCIAL_ADVICE_TEMPLATE: For personalized financial tips
+// ============================================================================
+// Budget Recommendation Prompt
+// ============================================================================
+export const BUDGET_RECOMMENDATION_TEMPLATE = `You are an expert financial advisor AI specializing in budget planning and optimization.
+
+Analyze the following user's spending data and existing budgets, then provide personalized budget recommendations to help them manage their finances better.
+
+## Current Spending Data (last 100 transactions):
+{{categorySpending}}
+
+## Existing Budgets:
+{{existingBudgets}}
+
+## Instructions:
+1. Analyze spending patterns across all categories
+2. Identify categories where budgets should be created or adjusted
+3. Consider spending trends and variations
+4. Recommend realistic budget amounts based on actual spending
+5. Explain WHY each budget recommendation makes sense
+
+## Output Format:
+Return ONLY a valid JSON array (no markdown, no explanation) with 3-5 recommendations:
+
+\`\`\`json
+[
+  {
+    "category": "Category Name",
+    "amount": 500,
+    "period": "MONTHLY",
+    "reason": "Clear explanation of why this budget makes sense"
+  }
+]
+\`\`\`
+
+**Provide actionable, realistic budget recommendations:**`;
+
+// ============================================================================
+// Spending Insights Prompt
+// ============================================================================
+export const SPENDING_INSIGHTS_TEMPLATE = `You are a financial data analyst AI. Analyze the user's monthly spending and provide actionable insights.
+
+## Period: {{period}}
+## Total Spent: \${{totalSpent}}
+
+## Category Breakdown:
+{{categoryBreakdown}}
+
+## Instructions:
+1. Identify the top 3 spending categories with their percentages
+2. Detect notable spending patterns or trends
+3. Provide 2-3 specific, actionable suggestions to optimize spending
+4. Be concise but informative
+
+## Output Format:
+Return ONLY valid JSON (no markdown):
+
+\`\`\`json
+{
+  "topCategories": [
+    {
+      "name": "Category Name",
+      "amount": 1234.56,
+      "percentage": 45.2
+    }
+  ],
+  "patterns": [
+    "Notable pattern or trend observation",
+    "Another observation"
+  ],
+  "suggestions": [
+    "Specific actionable suggestion to reduce spending",
+    "Another practical tip"
+  ]
+}
+\`\`\`
+
+**Provide data-driven insights:**`;
+
+// ============================================================================
+// Anomaly Detection Prompt
+// ============================================================================
+export const ANOMALY_DETECTION_TEMPLATE = `You are a fraud detection and spending analysis AI. Identify unusual or anomalous transactions that deviate from normal spending patterns.
+
+## Recent Transactions (last 10):
+{{recentTransactions}}
+
+## Category Statistics (average and standard deviation):
+{{categoryStats}}
+
+## Instructions:
+1. Identify transactions that are significantly higher than usual for their category (>2 standard deviations)
+2. Look for duplicate transactions that might indicate errors
+3. Flag suspicious merchants or unusual spending patterns
+4. Assess severity: "low" (minor deviation), "medium" (notable anomaly), "high" (potential fraud)
+
+## Output Format:
+Return ONLY valid JSON (no markdown):
+
+\`\`\`json
+{
+  "anomalies": [
+    {
+      "transactionDate": "2026-01-24",
+      "category": "Category Name",
+      "amount": 500.00,
+      "reason": "Specific explanation of why this is unusual",
+      "severity": "high"
+    }
+  ],
+  "summary": "Overall assessment of spending anomalies"
+}
+\`\`\`
+
+**If no anomalies detected, return empty anomalies array with appropriate summary.**
+
+**Detect unusual spending:**`;
+
+// ============================================================================
+// Financial Advice Prompt
+// ============================================================================
+export const FINANCIAL_ADVICE_TEMPLATE = `You are a certified financial advisor AI providing personalized financial wellness tips.
+
+## User Financial Overview:
+- **Total Income (last 50 transactions):** \${{totalIncome}}
+- **Total Expenses (last 50 transactions):** \${{totalExpenses}}
+- **Savings Rate:** {{savingsRate}}%
+- **Active Budgets:** {{budgetCount}}
+
+## Instructions:
+1. Provide 3-5 personalized financial tips based on the data
+2. Focus on practical, actionable advice
+3. Prioritize recommendations (high/medium/low priority)
+4. Cover areas like:
+   - Savings optimization
+   - Budget adherence strategies
+   - Spending reduction opportunities
+   - Emergency fund building
+   - Investment opportunities (if savings rate is healthy)
+
+## Output Format:
+Return ONLY a valid JSON array (no markdown):
+
+\`\`\`json
+[
+  {
+    "tip": "Specific actionable financial advice",
+    "priority": "high",
+    "category": "Savings|Budgeting|Spending|Investment"
+  }
+]
+\`\`\`
+
+**Provide personalized financial guidance:**`;
 
 // ============================================================================
 // Receipt OCR / Autofill Prompt

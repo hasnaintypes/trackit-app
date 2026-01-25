@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
-import {
-  categorizeTransactionsWithAI,
-  type TransactionForAI,
-  type CategoryForAI,
-} from "@/services/aiService";
+import { AIService } from "@/server/services/aiService";
+import type { TransactionForAI } from "@/types/ai";
+import type { CategoryForAI } from "@/types/category";
 
 export async function POST(req: Request) {
   try {
@@ -27,7 +25,10 @@ export async function POST(req: Request) {
       );
     }
 
-    const result = await categorizeTransactionsWithAI(transactions, categories);
+    const result = await AIService.categorizeTransactionsWithAI(
+      transactions,
+      categories,
+    );
     return NextResponse.json({ result });
   } catch (err) {
     console.error("AI categorize route error:", err);

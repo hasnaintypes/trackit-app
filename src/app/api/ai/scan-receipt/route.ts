@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { NextResponse } from "next/server";
-import { scanReceiptWithAI } from "@/services/aiService";
+import { AIService } from "@/server/services/aiService";
+import type { CategoryForAI } from "@/types/category";
 
 export async function POST(req: Request) {
   try {
@@ -23,10 +23,11 @@ export async function POST(req: Request) {
     }
 
     // Pass categories through to AI if provided (client should sanitize)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const cats = Array.isArray(categories) ? (categories as any) : undefined;
+    const cats = Array.isArray(categories)
+      ? (categories as CategoryForAI[])
+      : undefined;
 
-    const result = await scanReceiptWithAI({
+    const result = await AIService.scanReceiptWithAI({
       extractedText: extractedText ?? null,
       imageUrl: imagePayload,
       categories: cats ?? null,

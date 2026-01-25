@@ -4,6 +4,11 @@ import { sessionRouter } from "@/server/api/routers/sessionRouter";
 import { accountRouter } from "@/server/api/routers/accountRouter";
 import { categoryRouter } from "@/server/api/routers/categoryRouter";
 import { transactionRouter } from "@/server/api/routers/transactionRouter";
+import { notificationRouter } from "@/server/api/routers/notificationRouter";
+import { budgetRouter } from "@/server/api/routers/budgetRouter";
+import { reportRouter } from "@/server/api/routers/reportRouter";
+import { aiRouter } from "@/server/api/routers/aiRouter";
+import { settingsRouter } from "@/server/api/routers/settingsRouter";
 
 /**
  * This is the primary router for your server.
@@ -16,6 +21,11 @@ export const appRouter = createTRPCRouter({
   account: accountRouter,
   category: categoryRouter,
   transaction: transactionRouter,
+  notification: notificationRouter,
+  budget: budgetRouter,
+  report: reportRouter,
+  ai: aiRouter,
+  settings: settingsRouter,
 });
 
 // export type definition of API

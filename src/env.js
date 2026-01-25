@@ -41,6 +41,7 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
+    NEXT_PUBLIC_APP_URL: z.string().url(),
     NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: z.string(),
     NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: z.string().url(),
     NEXT_PUBLIC_BETTER_STACK_LOG_LEVEL: z.string(),
@@ -55,6 +56,7 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
     GEMINI_MODEL: process.env.GEMINI_MODEL,
     GEMINI_MAX_ROWS: process.env.GEMINI_MAX_ROWS,
