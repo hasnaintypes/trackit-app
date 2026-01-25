@@ -68,6 +68,7 @@ import { cn } from "@/lib/utils";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useCategories } from "@/hooks/use-categories";
 import { DeleteDialog } from "@/components/common/delete-dialog";
+import { useFormatter } from "@/hooks/use-formatter";
 
 import type { Transaction } from "@/types/transaction";
 
@@ -117,38 +118,8 @@ function TransactionTypeBadge({ type }: { type: Transaction["type"] }) {
   );
 }
 
-// Amount formatter
-function formatAmount(amount: string, type: Transaction["type"]) {
-  const num = parseFloat(amount);
-  const formatted = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-  }).format(Math.abs(num));
-
-  const colorClass =
-    type === "CREDIT"
-      ? "text-green-600 font-semibold"
-      : type === "DEBIT"
-        ? "text-red-600 font-semibold"
-        : "text-blue-600 font-semibold";
-
-  return (
-    <span className={colorClass}>
-      {type === "CREDIT" ? "+" : "-"}
-      {formatted}
-    </span>
-  );
-}
-
-// Date formatter
-function formatDate(date: string | Date) {
-  return new Date(date).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
+// Amount formatter hook-based wrapper is handled inside the component
+// We will remove the static functions and use the hook inside TransactionsTable
 
 // Empty state component
 function EmptyState({
@@ -240,7 +211,8 @@ export function TransactionsTable({
   totalCount,
   onPageChange,
 }: TransactionsTableProps) {
-  const { all: categoriesQuery } = useCategories();
+  const { formatAmount, formatDate } = useFormatter();
+  const { categoryMap } = useCategories();
   const [sorting, setSorting] = useState<SortingState>([
     { id: "date", desc: true },
   ]);
@@ -327,7 +299,7 @@ export function TransactionsTable({
         accessorKey: "categoryId",
         header: "Category",
         cell: ({ row }) => {
-          const categoryId = row.getValue("categoryId");
+          const categoryId = row.original.categoryId;
 
           if (!categoryId) {
             return (
@@ -337,16 +309,14 @@ export function TransactionsTable({
             );
           }
 
-          // Find category name from the categories data
-          const category = categoriesQuery.data?.find(
-            (cat) => cat.id === categoryId,
-          );
+          // Find category name from the map for O(1) lookup
+          const categoryName = categoryMap.get(categoryId);
 
           return (
             <div className="text-sm">
-              {category ? (
+              {categoryName ? (
                 <Badge variant="secondary" className="font-normal">
-                  {category.name}
+                  {categoryName}
                 </Badge>
               ) : (
                 <Badge
@@ -385,8 +355,23 @@ export function TransactionsTable({
             </Button>
           );
         },
-        cell: ({ row }) =>
-          formatAmount(row.getValue("amount"), row.original.type),
+        cell: ({ row }) => {
+          const type = row.original.type;
+          const amount = formatAmount(row.getValue("amount"));
+          const colorClass =
+            type === "CREDIT"
+              ? "text-green-600 font-semibold"
+              : type === "DEBIT"
+                ? "text-red-600 font-semibold"
+                : "text-blue-600 font-semibold";
+
+          return (
+            <span className={colorClass}>
+              {type === "CREDIT" ? "+" : "-"}
+              {amount}
+            </span>
+          );
+        },
       },
       {
         accessorKey: "date",
@@ -512,7 +497,7 @@ export function TransactionsTable({
         },
       },
     ],
-    [onEdit, onView, categoriesQuery.data],
+    [onEdit, onView, categoryMap, formatAmount, formatDate],
   );
 
   // Filter transactions by type

@@ -13,7 +13,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAccounts } from "@/hooks/use-accounts";
-import type { Transaction } from "@/types/transaction";
 import type { ImportError, ImportTransaction } from "@/types/bulk-import";
 
 interface ConfirmImportStepProps {

@@ -3,11 +3,11 @@
 import React, { useRef, useState } from "react";
 import { Upload, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { parseCSV } from "@/services/fileService";
+import { parseCSV } from "@/server/services/fileService";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface FileUploadStepProps {
-  onNext: (file: File, csvData: Record<string, unknown>[]) => void;
+  onNext: (file: File, csvData: Record<string, string>[]) => void;
 }
 
 export function FileUploadStep({ onNext }: FileUploadStepProps) {
@@ -46,7 +46,7 @@ export function FileUploadStep({ onNext }: FileUploadStepProps) {
         );
       }
 
-      const firstRow = csvData[0] as Record<string, unknown> | undefined;
+      const firstRow = csvData[0];
       if (!firstRow || typeof firstRow !== "object") {
         throw new Error("Invalid CSV format");
       }

@@ -62,7 +62,7 @@ export function BulkImportDialog({
   const steps = {
     upload: (
       <FileUploadStep
-        onNext={(file, csvData) => {
+        onNext={(file, csvData: Record<string, string>[]) => {
           setImportState((prev) => ({
             ...prev,
             file,

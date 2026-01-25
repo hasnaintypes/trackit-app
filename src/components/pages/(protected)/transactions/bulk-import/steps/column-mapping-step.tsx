@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { validateAndParseTransactions } from "@/services/fileService";
+import { validateAndParseTransactions } from "@/server/services/fileService";
 import type {
   TransactionField,
   ColumnMapping,
@@ -34,7 +34,7 @@ const TRANSACTION_FIELDS: {
 ];
 
 interface ColumnMappingStepProps {
-  csvData: Record<string, unknown>[];
+  csvData: Record<string, string>[];
   onBack: () => void;
   onNext: (
     mapping: ColumnMapping,
