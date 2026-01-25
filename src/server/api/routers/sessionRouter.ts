@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { revokeSessionSchema } from "@/validation/session";
 
 /**
  * Session router: list current user's sessions and revoke them.
@@ -33,7 +33,7 @@ export const sessionRouter = createTRPCRouter({
   }),
 
   revoke: protectedProcedure
-    .input(z.object({ id: z.string().min(1) }))
+    .input(revokeSessionSchema)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.user.id;
       // Ensure the session belongs to the user

@@ -5,6 +5,12 @@ import {
   protectedProcedure,
 } from "@/server/api/trpc";
 import { uploadForProfile } from "@/lib/shared/imagekit";
+import type { Prisma } from "@prisma/client";
+import {
+  updateProfileSchema,
+  uploadProfileImageSchema,
+  searchUserSchema,
+} from "@/validation/user";
 
 /**
  * User router (user-facing).
@@ -97,47 +103,12 @@ export const userRouter = createTRPCRouter({
    * @returns {Promise<{id:string,name:string|null,image:string,role:string,gender:string|null,createdAt:string,updatedAt:string}>}
    */
   updateProfile: protectedProcedure
-    .input(
-      z.object({
-        name: z.string().min(1).optional(),
-        image: z.string().url().optional(),
-        gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
-        country: z
-          .enum([
-            "PK",
-            "US",
-            "GB",
-            "CA",
-            "AU",
-            "DE",
-            "FR",
-            "JP",
-            "SG",
-            "IN",
-            "AE",
-          ])
-          .optional(),
-        timezone: z
-          .enum([
-            "UTC",
-            "EST",
-            "CST",
-            "MST",
-            "PST",
-            "GMT",
-            "CET",
-            "JST",
-            "AEST",
-            "IST",
-          ])
-          .optional(),
-      }),
-    )
+    .input(updateProfileSchema)
     .mutation(async ({ ctx, input }) => {
       // ctx.user is guaranteed by protectedProcedure middleware
       const userId = ctx.user.id;
 
-      const data: Record<string, unknown> = {};
+      const data: Prisma.UserUpdateInput = {};
 
       if (typeof input.name !== "undefined") data.name = input.name;
       if (typeof input.image !== "undefined") data.image = input.image;
@@ -164,6 +135,7 @@ export const userRouter = createTRPCRouter({
           banned: true,
           banReason: true,
           banExpires: true,
+          hasCompletedOnboarding: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -182,6 +154,7 @@ export const userRouter = createTRPCRouter({
         banned: user.banned ?? false,
         banReason: user.banReason ?? null,
         banExpires: user.banExpires ? user.banExpires.toISOString() : null,
+        hasCompletedOnboarding: user.hasCompletedOnboarding,
         createdAt: user.createdAt.toISOString(),
         updatedAt: user.updatedAt.toISOString(),
       };
@@ -198,13 +171,7 @@ export const userRouter = createTRPCRouter({
    * @returns {Promise<{id:string,name:string|null,image:string,role:string,gender:string|null,createdAt:string,updatedAt:string}>}
    */
   uploadProfileImage: protectedProcedure
-    .input(
-      z.object({
-        file: z.string().min(1),
-        fileName: z.string().optional(),
-        folder: z.string().optional(),
-      }),
-    )
+    .input(uploadProfileImageSchema)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.user.id;
 
@@ -271,6 +238,7 @@ export const userRouter = createTRPCRouter({
         banned: true,
         banReason: true,
         banExpires: true,
+        hasCompletedOnboarding: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -291,6 +259,7 @@ export const userRouter = createTRPCRouter({
       banned: user.banned ?? false,
       banReason: user.banReason ?? null,
       banExpires: user.banExpires ? user.banExpires.toISOString() : null,
+      hasCompletedOnboarding: user.hasCompletedOnboarding,
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
     };
@@ -308,20 +277,9 @@ export const userRouter = createTRPCRouter({
    * @returns {Promise<{users:Array<object>,nextCursor?:string|undefined}>}
    */
   search: publicProcedure
-    .input(
-      z.object({
-        q: z.string().optional(),
-        limit: z.number().int().min(1).max(100).default(20),
-        cursor: z.string().optional(),
-      }),
-    )
+    .input(searchUserSchema)
     .query(async ({ ctx, input }) => {
-      const where = {
-        OR: [] as Array<
-          | { name: { contains: string; mode: "insensitive" } }
-          | { email: { contains: string; mode: "insensitive" } }
-        >,
-      };
+      const where: Prisma.UserWhereInput = {};
       if (input.q) {
         where.OR = [
           { name: { contains: input.q, mode: "insensitive" } },

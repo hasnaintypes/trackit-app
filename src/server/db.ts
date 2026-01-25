@@ -1,19 +1,11 @@
 import { env } from "@/env";
 import { createLogger } from "@/lib/logging";
 import { PrismaClient } from "@prisma/client";
-// Import the Postgres driver adapter so we can provide it to PrismaClient
-// when the generated client expects the `client` engine type.
 import { PrismaPg } from "@prisma/adapter-pg";
-// Importing PrismaPg adapter can complicate client typing in our strict setup.
-// Omit adapter usage to preserve narrow PrismaClient types.
 
 const logger = createLogger("db");
 
 const createPrismaClient = () => {
-  // Build Prisma client options. Prisma v7 introduced `adapter` and `accelerateUrl`.
-  // We augment the constructor options with `adapter` and `accelerateUrl` as
-  // `unknown` to avoid mismatching the library's internal adapter factory
-  // types while still avoiding `any` casts.
   type PrismaClientOptionsAug = ConstructorParameters<
     typeof PrismaClient
   >[0] & {
@@ -26,11 +18,7 @@ const createPrismaClient = () => {
       env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
   };
 
-  // If Prisma Accelerate URL is provided, include it so the client can
-  // construct successfully when the generator uses the `client` engineType.
-  // This is a noop when the env var is not set.
   if (env.PRISMA_ACCELERATE_URL) {
-    // Note: `accelerateUrl` is typed as unknown on `PrismaClientOptionsAug`.
     clientOptions.accelerateUrl = env.PRISMA_ACCELERATE_URL;
     logger.info("Using Prisma Accelerate URL from env for Prisma client");
   }
@@ -42,9 +30,6 @@ const createPrismaClient = () => {
     );
   }
 
-  // If a DATABASE_URL is available and no adapter/accelerateUrl was provided,
-  // create a Postgres driver adapter so PrismaClient can initialize when the
-  // generated client was created with engineType = "client".
   if (
     env.DATABASE_URL &&
     !clientOptions.adapter &&
@@ -63,10 +48,8 @@ const createPrismaClient = () => {
     }
   }
 
-  // Create Prisma client with standard options to preserve strict typing.
   const client = new PrismaClient(clientOptions);
 
-  // Provide a narrow `$on` view for the events we consume without using `any`.
   const clientWithTypedOn = client as unknown as {
     $on(
       event: "query",
@@ -87,9 +70,6 @@ const createPrismaClient = () => {
   });
 
   clientWithTypedOn.$on("error", (e) => {
-    // `e` is typed as an object with an optional `message` property in our
-    // local `$on` view. Prefer that message, falling back to a short
-    // literal to avoid unsafe assignment.
     const errMsg = e?.message ?? "Prisma error";
     logger.error("Prisma error", { error: errMsg });
   });

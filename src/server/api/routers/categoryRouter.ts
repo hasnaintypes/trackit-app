@@ -1,18 +1,32 @@
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import {
+  createCategorySchema,
+  updateCategorySchema,
+  createSubcategorySchema,
+  updateSubcategorySchema,
+  categoryIdParam,
+} from "@/validation/category";
 
 export const categoryRouter = createTRPCRouter({
-  all: protectedProcedure.query(async ({ ctx }) => {
+  list: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.category.findMany({
-      where: { userId: ctx.user.id },
+      where: { userId: ctx.user.id, parentCategoryId: null }, // Only top-level
+      include: { children: true },
       orderBy: { sortOrder: "asc" },
     });
   }),
 
+  allFlat: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.category.findMany({
+      where: { userId: ctx.user.id },
+      orderBy: { name: "asc" },
+    });
+  }),
+
   byId: protectedProcedure
-    .input(z.object({ id: z.string() }))
+    .input(categoryIdParam)
     .query(async ({ ctx, input }) => {
       const cat = await ctx.db.category.findUnique({ where: { id: input.id } });
       if (cat?.userId !== ctx.user.id) {
@@ -25,16 +39,7 @@ export const categoryRouter = createTRPCRouter({
     }),
 
   create: protectedProcedure
-    .input(
-      z.object({
-        name: z.string().min(1),
-        parentCategoryId: z.string().nullable().optional(),
-        type: z.enum(["INCOME", "EXPENSE", "TRANSFER"]),
-        color: z.string().nullable().optional(),
-        icon: z.string().nullable().optional(),
-        sortOrder: z.number().optional(),
-      }),
-    )
+    .input(createCategorySchema)
     .mutation(async ({ ctx, input }) => {
       return ctx.db.category.create({
         data: {
@@ -50,17 +55,7 @@ export const categoryRouter = createTRPCRouter({
     }),
 
   update: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        name: z.string().min(1).optional(),
-        parentCategoryId: z.string().nullable().optional(),
-        type: z.enum(["INCOME", "EXPENSE", "TRANSFER"]).optional(),
-        color: z.string().nullable().optional(),
-        icon: z.string().nullable().optional(),
-        sortOrder: z.number().optional(),
-      }),
-    )
+    .input(updateCategorySchema)
     .mutation(async ({ ctx, input }) => {
       const exists = await ctx.db.category.findUnique({
         where: { id: input.id },
@@ -93,7 +88,7 @@ export const categoryRouter = createTRPCRouter({
     }),
 
   delete: protectedProcedure
-    .input(z.object({ id: z.string() }))
+    .input(categoryIdParam)
     .mutation(async ({ ctx, input }) => {
       const exists = await ctx.db.category.findUnique({
         where: { id: input.id },
@@ -124,15 +119,7 @@ export const categoryRouter = createTRPCRouter({
   // directly with subcategories while reusing the same underlying model.
   subcategory: createTRPCRouter({
     create: protectedProcedure
-      .input(
-        z.object({
-          parentId: z.string(),
-          name: z.string().min(1),
-          color: z.string().nullable().optional(),
-          icon: z.string().nullable().optional(),
-          sortOrder: z.number().optional(),
-        }),
-      )
+      .input(createSubcategorySchema)
       .mutation(async ({ ctx, input }) => {
         const parent = await ctx.db.category.findUnique({
           where: { id: input.parentId },
@@ -158,16 +145,7 @@ export const categoryRouter = createTRPCRouter({
       }),
 
     update: protectedProcedure
-      .input(
-        z.object({
-          id: z.string(),
-          name: z.string().min(1).optional(),
-          parentId: z.string().nullable().optional(),
-          color: z.string().nullable().optional(),
-          icon: z.string().nullable().optional(),
-          sortOrder: z.number().optional(),
-        }),
-      )
+      .input(updateSubcategorySchema)
       .mutation(async ({ ctx, input }) => {
         const exists = await ctx.db.category.findUnique({
           where: { id: input.id },
@@ -209,7 +187,7 @@ export const categoryRouter = createTRPCRouter({
       }),
 
     delete: protectedProcedure
-      .input(z.object({ id: z.string() }))
+      .input(categoryIdParam)
       .mutation(async ({ ctx, input }) => {
         const exists = await ctx.db.category.findUnique({
           where: { id: input.id },

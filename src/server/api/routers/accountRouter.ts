@@ -1,29 +1,21 @@
-import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import type { PrismaClient } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
+import {
+  createAccountSchema,
+  updateAccountSchema,
+  accountIdParam,
+} from "@/validation/account";
+import type { RawAccount } from "@/types/account";
 
 /**
  * Account router
  * - CRUD for user bank accounts (BankAccount model)
  */
-export type RawAccount = {
-  id: string;
-  userId?: string | null;
-  name: string;
-  type: string;
-  currency: string;
-  balance: unknown;
-  color: string | null;
-  icon: string | null;
-  isDefault: boolean | null;
-  createdAt: Date;
-  updatedAt: Date;
-};
 
 export const accountRouter = createTRPCRouter({
   list: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.user.id;
-    const prisma = ctx.db as unknown as PrismaClient;
+    const prisma = ctx.db;
 
     const accountsRaw = await prisma.bankAccount.findMany({
       where: { userId },
@@ -59,10 +51,10 @@ export const accountRouter = createTRPCRouter({
   }),
 
   getById: protectedProcedure
-    .input(z.object({ id: z.string().min(1) }))
+    .input(accountIdParam)
     .query(async ({ ctx, input }) => {
       const userId = ctx.user.id;
-      const prisma = ctx.db as unknown as PrismaClient;
+      const prisma = ctx.db;
 
       const aRaw = await prisma.bankAccount.findUnique({
         where: { id: input.id },
@@ -97,36 +89,12 @@ export const accountRouter = createTRPCRouter({
     }),
 
   create: protectedProcedure
-    .input(
-      z.object({
-        name: z.string().min(1),
-        type: z.enum(["BANK", "CASH", "CREDIT", "INVESTMENT", "LOAN", "OTHER"]),
-        currency: z
-          .enum([
-            "USD",
-            "EUR",
-            "GBP",
-            "JPY",
-            "AUD",
-            "CAD",
-            "CHF",
-            "CNY",
-            "INR",
-            "SGD",
-            "PKR",
-          ])
-          .optional(),
-        balance: z.string().optional(),
-        color: z.string().optional(),
-        icon: z.string().optional(),
-        isDefault: z.boolean().optional(),
-      }),
-    )
+    .input(createAccountSchema)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.user.id;
       // Determine whether this account should be the default.
       // If the user has no accounts yet, the first created account becomes default.
-      const prisma = ctx.db as unknown as PrismaClient;
+      const prisma = ctx.db;
 
       const existingCount = await prisma.bankAccount.count({
         where: { userId },
@@ -188,37 +156,10 @@ export const accountRouter = createTRPCRouter({
     }),
 
   update: protectedProcedure
-    .input(
-      z.object({
-        id: z.string().min(1),
-        name: z.string().min(1).optional(),
-        type: z
-          .enum(["BANK", "CASH", "CREDIT", "INVESTMENT", "LOAN", "OTHER"])
-          .optional(),
-        currency: z
-          .enum([
-            "USD",
-            "EUR",
-            "GBP",
-            "JPY",
-            "AUD",
-            "CAD",
-            "CHF",
-            "CNY",
-            "INR",
-            "SGD",
-            "PKR",
-          ])
-          .optional(),
-        balance: z.string().optional(),
-        color: z.string().optional(),
-        icon: z.string().optional(),
-        isDefault: z.boolean().optional(),
-      }),
-    )
+    .input(updateAccountSchema)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.user.id;
-      const prisma = ctx.db as unknown as PrismaClient;
+      const prisma = ctx.db;
       const existingRaw = await prisma.bankAccount.findUnique({
         where: { id: input.id },
       });
@@ -235,7 +176,7 @@ export const accountRouter = createTRPCRouter({
         ]);
       }
 
-      const data: Record<string, unknown> = {};
+      const data: Prisma.BankAccountUpdateInput = {};
       if (typeof input.name !== "undefined") data.name = input.name;
       if (typeof input.type !== "undefined") data.type = input.type;
       if (typeof input.currency !== "undefined") data.currency = input.currency;
@@ -279,10 +220,10 @@ export const accountRouter = createTRPCRouter({
     }),
 
   delete: protectedProcedure
-    .input(z.object({ id: z.string().min(1) }))
+    .input(accountIdParam)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.user.id;
-      const prisma = ctx.db as unknown as PrismaClient;
+      const prisma = ctx.db;
       const existing = await prisma.bankAccount.findUnique({
         where: { id: input.id },
       });

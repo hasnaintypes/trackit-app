@@ -6,46 +6,22 @@ import type {
   Transaction as TxModel,
   RecurringRule as RecurringRuleModel,
 } from "@prisma/client";
-import { RecurringStatus, type RecurringFrequency } from "@prisma/client";
+import { RecurringStatus } from "@prisma/client";
 import { calculateNextRunAt } from "@/lib/recurrence";
-import { enqueueRecurringRun } from "@/lib/inngest/events";
-
-// Use the shared input type inferred from Zod schema to keep
-// router and UI aligned without unsafe casts.
-type RecurrenceInputStrict = {
-  frequency: "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
-  interval?: number;
-  startDate?: string;
-  endDate?: string;
-  timezone?: string;
-  dayOfMonth?: number;
-  dayOfWeek?: number;
-};
-
-// Local schema to avoid unsafe import typing from external module.
-const recurrenceInputSchema = z.object({
-  frequency: z.enum(["DAILY", "WEEKLY", "MONTHLY", "YEARLY"]),
-  interval: z.number().int().min(1).optional(),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
-  timezone: z.string().optional(),
-  dayOfMonth: z.number().int().min(1).max(31).optional(),
-  dayOfWeek: z.number().int().min(0).max(6).optional(),
-});
+import {
+  enqueueRecurringRun,
+  emitTransactionProcessed,
+} from "@/lib/inngest/events";
+import {
+  createTransactionSchema,
+  updateTransactionSchema,
+  transactionListInput,
+} from "@/validation/transaction";
+import type { RecurrenceInputStrict } from "@/types/transaction";
 
 export const transactionRouter = createTRPCRouter({
   list: protectedProcedure
-    .input(
-      z.object({
-        accountId: z.string().optional(),
-        limit: z.number().int().min(1).max(1000).default(20),
-        cursor: z.string().optional(),
-        page: z.number().int().min(1).optional(),
-        q: z.string().optional(),
-        startDate: z.string().optional(),
-        endDate: z.string().optional(),
-      }),
-    )
+    .input(transactionListInput)
     .query(async ({ ctx, input }) => {
       const userId = ctx.user.id;
       const prisma = ctx.db;
@@ -59,11 +35,10 @@ export const transactionRouter = createTRPCRouter({
         ];
       }
       if (input.startDate || input.endDate) {
-        where.date = {} as Prisma.DateTimeFilter;
-        if (input.startDate)
-          (where.date as Prisma.DateTimeFilter).gte = new Date(input.startDate);
-        if (input.endDate)
-          (where.date as Prisma.DateTimeFilter).lte = new Date(input.endDate);
+        const dateFilter: Prisma.DateTimeFilter = {};
+        if (input.startDate) dateFilter.gte = new Date(input.startDate);
+        if (input.endDate) dateFilter.lte = new Date(input.endDate);
+        where.date = dateFilter;
       }
 
       const take = input.limit + 1;
@@ -135,12 +110,8 @@ export const transactionRouter = createTRPCRouter({
           updatedAt: t.updatedAt.toISOString(),
           recurringRule: t.recurringRule
             ? {
-                frequency: (
-                  t.recurringRule as { frequency: RecurringFrequency }
-                ).frequency,
-                nextRunAt: (
-                  t.recurringRule as { nextRunAt: Date }
-                ).nextRunAt.toISOString(),
+                frequency: t.recurringRule.frequency,
+                nextRunAt: t.recurringRule.nextRunAt.toISOString(),
               }
             : null,
         })),
@@ -193,37 +164,15 @@ export const transactionRouter = createTRPCRouter({
         updatedAt: t.updatedAt.toISOString(),
         recurringRule: t.recurringRule
           ? {
-              frequency: (t.recurringRule as { frequency: RecurringFrequency })
-                .frequency,
-              nextRunAt: (
-                t.recurringRule as { nextRunAt: Date }
-              ).nextRunAt.toISOString(),
+              frequency: t.recurringRule.frequency,
+              nextRunAt: t.recurringRule.nextRunAt.toISOString(),
             }
           : null,
       };
     }),
 
   create: protectedProcedure
-    .input(
-      z.object({
-        accountId: z.string().min(1),
-        amount: z.string().min(1),
-        type: z.enum(["DEBIT", "CREDIT", "TRANSFER"]),
-        categoryId: z.string().nullable().optional(),
-        contactId: z.string().nullable().optional(),
-        groupId: z.string().nullable().optional(),
-        description: z.string().nullable().optional(),
-        notes: z.string().nullable().optional(),
-        date: z.string().optional(),
-        isRecurring: z.boolean().optional(),
-        recurrence: recurrenceInputSchema.optional(),
-        paymentMethod: z
-          .enum(["CARD", "CASH", "BANK_TRANSFER", "AUTO_DEBIT", "UPI", "OTHER"])
-          .optional(),
-        receipt_url: z.string().nullable().optional(),
-        receipt_extracted_text: z.string().nullable().optional(),
-      }),
-    )
+    .input(createTransactionSchema)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.user.id;
       const prisma = ctx.db;
@@ -317,6 +266,14 @@ export const transactionRouter = createTRPCRouter({
         await enqueueRecurringRun(rule.id, rule.nextRunAt);
       }
 
+      await emitTransactionProcessed({
+        userId,
+        transactionId: created.id,
+        accountId: created.accountId,
+        categoryId: input.categoryId ?? null,
+        date: initialDate,
+      });
+
       return {
         ...created,
         amount: String(created.amount),
@@ -327,27 +284,7 @@ export const transactionRouter = createTRPCRouter({
     }),
 
   update: protectedProcedure
-    .input(
-      z.object({
-        id: z.string().min(1),
-        accountId: z.string().optional(),
-        amount: z.string().optional(),
-        type: z.enum(["DEBIT", "CREDIT", "TRANSFER"]).optional(),
-        categoryId: z.string().nullable().optional(),
-        contactId: z.string().nullable().optional(),
-        groupId: z.string().nullable().optional(),
-        description: z.string().nullable().optional(),
-        notes: z.string().nullable().optional(),
-        paymentMethod: z
-          .enum(["CARD", "CASH", "BANK_TRANSFER", "AUTO_DEBIT", "UPI", "OTHER"])
-          .optional(),
-        receipt_url: z.string().nullable().optional(),
-        receipt_extracted_text: z.string().nullable().optional(),
-        date: z.string().optional(),
-        isRecurring: z.boolean().optional(),
-        recurrence: recurrenceInputSchema.optional(),
-      }),
-    )
+    .input(updateTransactionSchema)
     .mutation(async ({ ctx, input }) => {
       const prisma = ctx.db;
       const existing = await prisma.transaction.findUnique({
@@ -374,7 +311,7 @@ export const transactionRouter = createTRPCRouter({
 
       const result = await prisma.$transaction(
         async (tx: Prisma.TransactionClient) => {
-          const data: Record<string, unknown> = {};
+          const data: Prisma.TransactionUpdateInput = {};
           if (typeof input.accountId !== "undefined") {
             data.account = { connect: { id: input.accountId } };
           }
@@ -516,21 +453,25 @@ export const transactionRouter = createTRPCRouter({
             data.isRecurring = true;
           }
 
-          const updated: TxModel = await tx.transaction.update({
+          const updated = await tx.transaction.update({
             where: { id: input.id },
-            data: data as Prisma.TransactionUpdateInput,
+            data,
           });
-          return { updated, ruleId, nextRunAt } as {
-            updated: TxModel;
-            ruleId?: string | null;
-            nextRunAt?: Date | null;
-          };
+          return { updated, ruleId, nextRunAt };
         },
       );
 
       if (typeof result.ruleId === "string" && result.nextRunAt) {
         await enqueueRecurringRun(result.ruleId, result.nextRunAt);
       }
+
+      await emitTransactionProcessed({
+        userId: ctx.user.id,
+        transactionId: result.updated.id,
+        accountId: result.updated.accountId,
+        categoryId: result.updated.categoryId ?? null,
+        date: result.updated.date,
+      });
 
       const updated: TxModel = result.updated;
       return {
@@ -683,9 +624,7 @@ export const transactionRouter = createTRPCRouter({
         });
 
         if (categories.length > 0) {
-          const { categorizeTransactionsWithAI } = await import(
-            "@/services/aiService"
-          );
+          const { AIService } = await import("@/server/services/aiService");
 
           const categoriesForAI = categories.flatMap((cat) => [
             {
@@ -728,17 +667,19 @@ export const transactionRouter = createTRPCRouter({
             });
 
             try {
-              const aiResult = await categorizeTransactionsWithAI(
+              const aiResult = await AIService.categorizeTransactionsWithAI(
                 batchTransactions,
                 categoriesForAI,
               );
 
-              aiResult.results.forEach((res) => {
-                const tx = transactionsToProcess[res.index];
-                if (tx) {
-                  tx.categoryId = res.categoryId;
-                }
-              });
+              aiResult.results.forEach(
+                (res: { index: number; categoryId: string }) => {
+                  const tx = transactionsToProcess[res.index];
+                  if (tx) {
+                    tx.categoryId = res.categoryId;
+                  }
+                },
+              );
             } catch (err) {
               console.error("AI Categorization batch error:", err);
             }
@@ -763,6 +704,17 @@ export const transactionRouter = createTRPCRouter({
           }),
         ),
       );
+
+      // Trigger budget evaluation and threshold checks for all created transactions
+      for (const tx of created) {
+        await emitTransactionProcessed({
+          userId,
+          transactionId: tx.id,
+          accountId: tx.accountId,
+          categoryId: tx.categoryId ?? null,
+          date: tx.date,
+        });
+      }
 
       return {
         success: true,
