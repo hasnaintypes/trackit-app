@@ -59,6 +59,16 @@ export interface User {
   banReason: string | null;
   banExpires: Date | null;
   role: string;
+  hasCompletedOnboarding: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
+
+/**
+ * Serialized version of User for API responses (dates are strings)
+ */
+export type ApiUser = Omit<User, "createdAt" | "updatedAt" | "banExpires"> & {
+  createdAt: string;
+  updatedAt: string;
+  banExpires: string | null;
+};

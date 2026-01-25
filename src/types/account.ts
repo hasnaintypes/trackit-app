@@ -1,4 +1,5 @@
 import type { Currency } from "./user";
+import type { Prisma } from "@prisma/client";
 
 export type AccountType =
   | "BANK"
@@ -22,53 +23,27 @@ export interface BankAccount {
   updatedAt: Date;
 }
 
-export interface Category {
+/**
+ * Serialized version of BankAccount for API responses (dates are strings)
+ */
+export type ApiBankAccount = Omit<BankAccount, "createdAt" | "updatedAt"> & {
+  createdAt: string;
+  updatedAt: string;
+};
+
+/**
+ * Raw account data matched to Prisma schema for internal router use
+ */
+export interface RawAccount {
   id: string;
-  userId: string;
-  parentCategoryId?: string | null;
+  userId?: string | null;
   name: string;
-  color?: string | null;
-  icon?: string | null;
-  type: "INCOME" | "EXPENSE" | "TRANSFER";
-  sortOrder?: number | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface Budget {
-  id: string;
-  userId: string;
-  categoryId: string;
-  amount: string;
-  period: "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY" | "CUSTOM";
-  startDate: Date;
-  endDate?: Date | null;
-  spentAmount: string;
-  threshold_70_alert_sent: boolean;
-  threshold_90_alert_sent: boolean;
-  threshold_100_alert_sent: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface Transaction {
-  id: string;
-  userId: string;
-  accountId: string;
-  categoryId?: string | null;
-  contactId?: string | null;
-  groupId?: string | null;
-  amount: string;
-  type: "DEBIT" | "CREDIT" | "TRANSFER";
-  description?: string | null;
-  notes?: string | null;
-  date: Date;
-  isRecurring: boolean;
-  recurringRuleId?: string | null;
-  receipt_url?: string | null;
-  receipt_extracted_text?: string | null;
-  ai_category_suggestion?: string | null;
-  ai_notes?: string | null;
+  type: string;
+  currency: string;
+  balance: Prisma.Decimal | number | string;
+  color: string | null;
+  icon: string | null;
+  isDefault: boolean | null;
   createdAt: Date;
   updatedAt: Date;
 }

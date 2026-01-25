@@ -55,3 +55,16 @@ export interface RecurringRule {
   createdAt: string;
   updatedAt: string;
 }
+
+/**
+ * Strict recurrence input type for internal calculation logic
+ */
+export type RecurrenceInputStrict = {
+  frequency: "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
+  interval?: number;
+  startDate?: string;
+  endDate?: string;
+  timezone?: string;
+  dayOfMonth?: number;
+  dayOfWeek?: number;
+};

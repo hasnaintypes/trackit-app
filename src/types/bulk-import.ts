@@ -6,7 +6,7 @@ export interface ImportTransaction extends Partial<Transaction> {
 
 export interface BulkImportState {
   file: File | null;
-  csvData: Record<string, unknown>[];
+  csvData: Record<string, string>[];
   columnMapping: Record<string, string>;
   parsedTransactions: ImportTransaction[];
   selectedAccountId: string | null;
@@ -25,7 +25,7 @@ export interface ImportError {
 
 export interface CSVColumn {
   name: string;
-  sampleValue: unknown;
+  sampleValue: string;
 }
 
 export type TransactionField =
