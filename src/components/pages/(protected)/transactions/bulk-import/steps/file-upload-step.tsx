@@ -3,7 +3,7 @@
 import React, { useRef, useState } from "react";
 import { Upload, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { parseCSV } from "@/server/services/fileService";
+import { parseCSV } from "@/lib/shared/file-parser";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface FileUploadStepProps {

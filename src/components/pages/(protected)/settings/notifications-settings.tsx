@@ -1,5 +1,6 @@
 "use client";
 
+import { createLogger } from "@/lib/logging";
 import { useSettings } from "@/hooks/use-settings";
 import {
   Card,
@@ -13,6 +14,8 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import type { NotificationPreferences } from "@prisma/client";
+
+const logger = createLogger("notifications-settings");
 
 export default function NotificationsSettings() {
   const { settings, isLoading, updateNotifications, isUpdating } =
@@ -40,7 +43,7 @@ export default function NotificationsSettings() {
     try {
       await updateNotifications({ [field]: value });
     } catch {
-      console.error("Failed to update notification preferences");
+      logger.error("Failed to update notification preferences");
     }
   };
 

@@ -51,6 +51,9 @@ import { useIsMobile } from "@/hooks/use-mobile";
 // Import Custom Pickers
 import { IconPicker } from "../../common/icon-picker";
 import { ColorPicker } from "../../common/color-picker";
+import { createLogger } from "@/lib/logging";
+
+const logger = createLogger("account-form");
 
 type AccountFormProps = {
   open: boolean;
@@ -170,7 +173,9 @@ export function AccountForm({
       }
       onOpenChange(false);
     } catch (error) {
-      console.error(error);
+      logger.error("Failed to save account", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       toast.error("Failed to save account");
     }
   };

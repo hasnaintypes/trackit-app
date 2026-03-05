@@ -10,11 +10,7 @@ interface LogoProps {
 export function Logo({ size = 20, className, showText = false }: LogoProps) {
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <Wallet
-        className="text-primary"
-        size={size}
-        strokeWidth={2}
-      />
+      <Wallet className="text-primary" size={size} strokeWidth={2} />
       {showText && (
         <span className="font-medium text-black dark:text-white">Cashio</span>
       )}

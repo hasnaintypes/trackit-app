@@ -1001,7 +1001,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/women/33.jpg",
     },
     content:
-      "This AI budgeting concept sounds fascinating  I’ve been waiting for something that predicts spending patterns like this 💡.",
+      "This AI budgeting concept sounds fascinating -- I’ve been waiting for something that predicts spending patterns like this.",
     timestamp: "3 hours ago",
     likes: 9,
     postId: "post-ai-finance-insights",
@@ -1025,7 +1025,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/women/35.jpg",
     },
     content:
-      "Group expense features are underrated  this could save a lot of awkward 'who owes who' moments 😅.",
+      "Group expense features are underrated -- this could save a lot of awkward 'who owes who' moments.",
     timestamp: "2 days ago",
     likes: 11,
     postId: "post-group-expenses",
@@ -1037,7 +1037,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/men/36.jpg",
     },
     content:
-      "Security-first design is so important in fintech. Glad to see RBAC and 2FA implemented 🔒.",
+      "Security-first design is so important in fintech. Glad to see RBAC and 2FA implemented.",
     timestamp: "4 hours ago",
     likes: 7,
     postId: "post-security-rbac-2fa",
@@ -1121,7 +1121,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/women/43.jpg",
     },
     content:
-      "Smart categorization saves me hours of cleanup. The anomaly detection sounds 🔥.",
+      "Smart categorization saves me hours of cleanup. The anomaly detection sounds impressive.",
     timestamp: "8 hours ago",
     likes: 13,
     postId: "post-ai-categorization",
@@ -1157,7 +1157,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/men/46.jpg",
     },
     content:
-      "OCR has been hit or miss in my experience. Hoping this Gemini model improves accuracy 👀.",
+      "OCR has been hit or miss in my experience. Hoping this Gemini model improves accuracy.",
     timestamp: "6 hours ago",
     likes: 3,
     postId: "post-gemini-ocr-expenses",
@@ -1181,7 +1181,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/men/48.jpg",
     },
     content:
-      "Love seeing security prioritized upfront. Finance apps need to take notes 🔐.",
+      "Love seeing security prioritized upfront. Finance apps need to take notes.",
     timestamp: "1 day ago",
     likes: 10,
     postId: "post-security-rbac-2fa",
@@ -1217,7 +1217,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/women/51.jpg",
     },
     content:
-      "Goal-based budgeting really helps visualize long-term plans. I’m using it for debt-free goals 💪.",
+      "Goal-based budgeting really helps visualize long-term plans. I’m using it for debt-free goals.",
     timestamp: "4 hours ago",
     likes: 12,
     postId: "post-goal-based-budgeting",
@@ -1265,7 +1265,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/women/55.jpg",
     },
     content:
-      "Smart categorization saved me from hours of manual cleanup. AI finally doing something useful 😄.",
+      "Smart categorization saved me from hours of manual cleanup. AI finally doing something useful.",
     timestamp: "2 days ago",
     likes: 11,
     postId: "post-ai-categorization",
@@ -1289,7 +1289,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/women/57.jpg",
     },
     content:
-      "AI-driven financial projections could really help with long-term investment planning. Curious how accurate it gets over time 🤔.",
+      "AI-driven financial projections could really help with long-term investment planning. Curious how accurate it gets over time.",
     timestamp: "5 hours ago",
     likes: 8,
     postId: "post-ai-finance-insights",
@@ -1325,7 +1325,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/men/59.jpg",
     },
     content:
-      "RBAC + 2FA combo makes total sense for fintech. Would love a post about how roles are managed internally 🔒.",
+      "RBAC + 2FA combo makes total sense for fintech. Would love a post about how roles are managed internally.",
     timestamp: "7 hours ago",
     likes: 7,
     postId: "post-security-rbac-2fa",
@@ -1349,7 +1349,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/men/60.jpg",
     },
     content:
-      "Stripe Polar’s speed still blows my mind. Real-time transfers feel almost instant ⚡.",
+      "Stripe Polar’s speed still blows my mind. Real-time transfers feel almost instant.",
     timestamp: "1 day ago",
     likes: 11,
     postId: "post-stripe-polar",
@@ -1361,7 +1361,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/women/61.jpg",
     },
     content:
-      "Goal-based budgeting feels like gamified savings  love the progress tracking element 🎯.",
+      "Goal-based budgeting feels like gamified savings -- love the progress tracking element.",
     timestamp: "4 hours ago",
     likes: 14,
     postId: "post-goal-based-budgeting",
@@ -1409,7 +1409,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/women/64.jpg",
     },
     content:
-      "Love that your AI detects anomalies automatically. It’s like a safety net for budgets 🧠.",
+      "Love that your AI detects anomalies automatically. It’s like a safety net for budgets.",
     timestamp: "1 day ago",
     likes: 12,
     postId: "post-ai-categorization",

@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
+import { createLogger } from "@/lib/logging";
 import { AIService } from "@/server/services/aiService";
+
+const logger = createLogger("ai-scan-receipt-route");
 import type { CategoryForAI } from "@/types/category";
 
 export async function POST(req: Request) {
@@ -34,7 +37,9 @@ export async function POST(req: Request) {
     });
     return NextResponse.json({ result });
   } catch (err) {
-    console.error("AI scan-receipt route error:", err);
+    logger.error("AI scan-receipt route error", {
+      error: err instanceof Error ? err.message : String(err),
+    });
     const message =
       err instanceof Error
         ? err.message

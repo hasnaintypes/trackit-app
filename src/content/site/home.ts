@@ -228,7 +228,7 @@ export const testimonials: Testimonial[] = [
     role: "UI/UX Creator",
     image: "https://randomuser.me/api/portraits/men/11.jpg",
     quote:
-      "I love Cashio ❤️. The UI blocks are well-structured, simple to use, and beautifully designed. It makes launching a finance app fast.",
+      "I love Cashio. The UI blocks are well-structured, simple to use, and beautifully designed. It makes launching a finance app fast.",
   },
   {
     name: "Eric Ampire",

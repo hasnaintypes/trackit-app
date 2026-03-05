@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { validateAndParseTransactions } from "@/server/services/fileService";
+import { validateAndParseTransactions } from "@/lib/shared/file-parser";
 import type {
   TransactionField,
   ColumnMapping,

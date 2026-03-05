@@ -507,7 +507,10 @@ export default function DisplaySettings() {
                 >
                   <div className="flex w-full items-center justify-between">
                     <p className="font-medium">1 234,56</p>
-                    <RadioGroupItem value={ThousandSeparator.SPACE} id="space" />
+                    <RadioGroupItem
+                      value={ThousandSeparator.SPACE}
+                      id="space"
+                    />
                   </div>
                   <span className="text-muted-foreground mt-1 text-sm">
                     Space (Commonly used)

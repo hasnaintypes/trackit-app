@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { createLogger } from "@/lib/logging";
 import { useAccounts } from "@/hooks/use-accounts";
+
+const logger = createLogger("account-settings");
 import AccountForm from "@/components/forms/accounts/account-form";
 import {
   Card,
@@ -49,7 +52,9 @@ export default function AccountSettings() {
       } catch {}
       toast.success("Default account updated");
     } catch (err) {
-      console.error(err);
+      logger.error("Account settings error", {
+        error: err instanceof Error ? err.message : String(err),
+      });
       try {
         toast.dismiss?.();
       } catch {}
@@ -64,7 +69,9 @@ export default function AccountSettings() {
     try {
       await deleteAccount({ id });
     } catch (err) {
-      console.error(err);
+      logger.error("Account settings error", {
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
   };
 

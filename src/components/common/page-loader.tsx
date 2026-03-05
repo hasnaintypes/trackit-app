@@ -10,13 +10,22 @@ export function PageLoader() {
   const isMutating = useIsMutating();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     setLoading(true);
     const timeout = setTimeout(() => setLoading(false), 500);
     return () => clearTimeout(timeout);
-  }, [pathname, searchParams]);
+  }, [pathname, searchParams, mounted]);
+
+  // Avoid hydration mismatch: render nothing until client-side mount
+  if (!mounted) return null;
 
   const showLoader = loading || isFetching > 0 || isMutating > 0;
 
