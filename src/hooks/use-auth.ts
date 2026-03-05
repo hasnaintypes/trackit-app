@@ -125,12 +125,12 @@ export function useAuth() {
   const signOut = async (): Promise<void> => {
     setLoading(true);
     try {
+      // Clear persisted user data first to avoid stale data on redirect
+      clearPersistedUser();
+      setUser(null);
       await authClient.signOut({
         fetchOptions: { onSuccess: () => setUser(null) },
       });
-      // Clear persisted user data
-      clearPersistedUser();
-      setUser(null);
       logger.info("User signed out");
     } catch (err) {
       const errorObj = toError(err);

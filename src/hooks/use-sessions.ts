@@ -7,7 +7,7 @@ export function useSessions() {
     staleTime: 1000 * 30,
   });
 
-  const utils = api.useContext();
+  const utils = api.useUtils();
 
   const revoke = api.session.revoke.useMutation({
     onSuccess() {

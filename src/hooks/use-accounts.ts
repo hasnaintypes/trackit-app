@@ -7,7 +7,7 @@ import type { ApiBankAccount } from "@/types/account";
  * - provides list, create, update, delete helpers for bank accounts
  */
 export function useAccounts() {
-  const utils = api.useContext();
+  const utils = api.useUtils();
 
   const listQuery = api.account.list.useQuery(undefined, {
     staleTime: 1000 * 60 * 2,

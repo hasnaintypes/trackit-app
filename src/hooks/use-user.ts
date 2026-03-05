@@ -37,7 +37,7 @@ export function useUser() {
     setUser(mapApiToUser(typedUser));
   }, [getMe.data, setUser]);
 
-  const utils = api.useContext();
+  const utils = api.useUtils();
 
   const updateProfileMutation = api.user.updateProfile.useMutation({
     onSuccess: (updatedUser) => {
