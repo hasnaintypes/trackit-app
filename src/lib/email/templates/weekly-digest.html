@@ -1,25 +1,28 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Weekly Digest</title>
   </head>
   <body
     style="
       margin: 0;
       padding: 0;
-      font-family:
-        -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto,
-        &quot;Helvetica Neue&quot;, Arial, sans-serif;
-      background-color: #f4f4f5;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+        'Helvetica Neue', Arial, sans-serif;
+      background-color: #f9fafb;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
     "
   >
     <table
       width="100%"
       cellpadding="0"
       cellspacing="0"
-      style="background-color: #f4f4f5; padding: 40px 20px"
+      border="0"
+      style="background-color: #f9fafb; padding: 40px 20px"
     >
       <tr>
         <td align="center">
@@ -27,97 +30,137 @@
             width="600"
             cellpadding="0"
             cellspacing="0"
+            border="0"
             style="
               background-color: #ffffff;
               border-radius: 8px;
               overflow: hidden;
-              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
             "
           >
+            <!-- Header -->
             <tr>
               <td
                 style="
-                  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-                  padding: 30px;
+                  background-color: #18181b;
+                  padding: 32px;
                   text-align: center;
                 "
               >
                 <h1
                   style="
-                    margin: 0;
+                    margin: 0 0 6px;
                     color: #ffffff;
                     font-size: 24px;
-                    font-weight: 600;
+                    font-weight: 700;
+                    letter-spacing: -0.3px;
                   "
                 >
-                  📅 Weekly Digest
+                  Cashio
                 </h1>
-                <p style="margin: 10px 0 0; color: #ede9fe; font-size: 14px">
-                  {{weekRange}}
+                <p
+                  style="
+                    margin: 0;
+                    color: #9ca3af;
+                    font-size: 14px;
+                    font-weight: 400;
+                  "
+                >
+                  Weekly Digest &mdash; {{weekRange}}
                 </p>
               </td>
             </tr>
 
+            <!-- Content -->
             <tr>
-              <td style="padding: 40px 30px">
+              <td style="padding: 32px 40px">
                 <p
                   style="
-                    margin: 0 0 30px;
-                    font-size: 16px;
+                    margin: 0 0 20px;
+                    font-size: 15px;
                     line-height: 1.6;
                     color: #18181b;
                   "
                 >
-                  Hi {{userName}},<br />
-                  Here's your weekly spending summary.
+                  Hi {{userName}},
                 </p>
 
+                <p
+                  style="
+                    margin: 0 0 28px;
+                    font-size: 15px;
+                    line-height: 1.6;
+                    color: #374151;
+                  "
+                >
+                  Here is your weekly spending summary.
+                </p>
+
+                <!-- Weekly Total Card -->
                 <table
                   width="100%"
                   cellpadding="0"
                   cellspacing="0"
+                  border="0"
                   style="
-                    background-color: #f0f9ff;
-                    border-radius: 6px;
-                    padding: 20px;
-                    margin-bottom: 30px;
+                    background-color: #f9fafb;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 8px;
+                    margin-bottom: 28px;
                   "
                 >
                   <tr>
-                    <td
-                      style="
-                        font-size: 14px;
-                        color: #71717a;
-                        padding-bottom: 8px;
-                      "
-                    >
-                      Total Spent This Week
-                    </td>
-                    <td
-                      style="
-                        font-size: 24px;
-                        font-weight: 600;
-                        text-align: right;
-                        color: #18181b;
-                      "
-                    >
-                      ${{weeklyTotal}}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td
-                      colspan="2"
-                      style="padding-top: 10px; font-size: 12px; color: #71717a"
-                    >
-                      {{changeText}} from last week
+                    <td style="padding: 20px 24px">
+                      <table
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        border="0"
+                      >
+                        <tr>
+                          <td
+                            style="
+                              font-size: 13px;
+                              color: #6b7280;
+                              vertical-align: middle;
+                            "
+                          >
+                            Total Spent This Week
+                          </td>
+                          <td
+                            style="
+                              font-size: 24px;
+                              font-weight: 700;
+                              text-align: right;
+                              color: #18181b;
+                              vertical-align: middle;
+                            "
+                          >
+                            ${{weeklyTotal}}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td
+                            colspan="2"
+                            style="
+                              padding-top: 10px;
+                              font-size: 13px;
+                              color: #6b7280;
+                            "
+                          >
+                            {{changeText}} from last week
+                          </td>
+                        </tr>
+                      </table>
                     </td>
                   </tr>
                 </table>
 
+                <!-- Activity Details -->
                 <h2
                   style="
-                    margin: 0 0 20px;
-                    font-size: 18px;
+                    margin: 0 0 16px;
+                    font-size: 20px;
                     font-weight: 600;
                     color: #18181b;
                   "
@@ -128,73 +171,78 @@
                   width="100%"
                   cellpadding="0"
                   cellspacing="0"
-                  style="margin-bottom: 30px"
+                  border="0"
+                  style="margin-bottom: 28px"
                 >
                   <tr>
                     <td
-                      style="padding: 12px 0; border-bottom: 1px solid #e4e4e7"
+                      style="
+                        padding: 12px 0;
+                        border-bottom: 1px solid #e5e7eb;
+                        font-size: 15px;
+                        color: #6b7280;
+                      "
                     >
-                      <span style="font-size: 14px; color: #71717a"
-                        >Transactions</span
-                      >
+                      Transactions
                     </td>
                     <td
                       style="
                         padding: 12px 0;
-                        border-bottom: 1px solid #e4e4e7;
+                        border-bottom: 1px solid #e5e7eb;
                         text-align: right;
+                        font-size: 15px;
+                        font-weight: 500;
+                        color: #18181b;
                       "
                     >
-                      <span
-                        style="
-                          font-size: 14px;
-                          font-weight: 500;
-                          color: #18181b;
-                        "
-                        >{{transactionCount}}</span
-                      >
+                      {{transactionCount}}
                     </td>
                   </tr>
                   <tr>
                     <td
-                      style="padding: 12px 0; border-bottom: 1px solid #e4e4e7"
+                      style="
+                        padding: 12px 0;
+                        border-bottom: 1px solid #e5e7eb;
+                        font-size: 15px;
+                        color: #6b7280;
+                      "
                     >
-                      <span style="font-size: 14px; color: #71717a"
-                        >Top Category</span
-                      >
+                      Top Category
                     </td>
                     <td
                       style="
                         padding: 12px 0;
-                        border-bottom: 1px solid #e4e4e7;
+                        border-bottom: 1px solid #e5e7eb;
                         text-align: right;
+                        font-size: 15px;
+                        font-weight: 500;
+                        color: #18181b;
                       "
                     >
-                      <span
-                        style="
-                          font-size: 14px;
-                          font-weight: 500;
-                          color: #18181b;
-                        "
-                        >{{topCategory}}</span
-                      >
+                      {{topCategory}}
                     </td>
                   </tr>
                 </table>
 
-                <table width="100%" cellpadding="0" cellspacing="0">
+                <!-- CTA Button -->
+                <table
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
+                >
                   <tr>
-                    <td align="center" style="padding: 20px 0">
+                    <td align="center" style="padding: 8px 0">
                       <a
                         href="{{appUrl}}/transactions"
                         style="
                           display: inline-block;
-                          background-color: #8b5cf6;
+                          background-color: #18181b;
                           color: #ffffff;
                           text-decoration: none;
-                          padding: 12px 30px;
+                          padding: 12px 28px;
                           border-radius: 6px;
-                          font-size: 14px;
+                          font-size: 15px;
                           font-weight: 500;
                         "
                         >View All Transactions</a
@@ -205,20 +253,30 @@
               </td>
             </tr>
 
+            <!-- Footer -->
             <tr>
               <td
                 style="
-                  background-color: #f4f4f5;
-                  padding: 20px 30px;
+                  background-color: #f3f4f6;
+                  padding: 20px 40px;
                   text-align: center;
-                  border-top: 1px solid #e4e4e7;
+                  border-top: 1px solid #e5e7eb;
                 "
               >
-                <p style="margin: 0; font-size: 12px; color: #71717a">
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 12px;
+                    line-height: 1.5;
+                    color: #9ca3af;
+                  "
+                >
+                  You are receiving this weekly digest as part of your Cashio
+                  account.<br />
                   <a
                     href="{{appUrl}}/settings"
                     style="color: #18181b; text-decoration: underline"
-                    >Manage notification preferences</a
+                    >Manage notification settings</a
                   >
                 </p>
               </td>

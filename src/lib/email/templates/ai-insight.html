@@ -1,25 +1,28 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>AI Spending Insights</title>
   </head>
   <body
     style="
       margin: 0;
       padding: 0;
-      font-family:
-        -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto,
-        &quot;Helvetica Neue&quot;, Arial, sans-serif;
-      background-color: #f4f4f5;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+        'Helvetica Neue', Arial, sans-serif;
+      background-color: #f9fafb;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
     "
   >
     <table
       width="100%"
       cellpadding="0"
       cellspacing="0"
-      style="background-color: #f4f4f5; padding: 40px 20px"
+      border="0"
+      style="background-color: #f9fafb; padding: 40px 20px"
     >
       <tr>
         <td align="center">
@@ -27,42 +30,54 @@
             width="600"
             cellpadding="0"
             cellspacing="0"
+            border="0"
             style="
               background-color: #ffffff;
               border-radius: 8px;
               overflow: hidden;
-              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
             "
           >
             <!-- Header -->
             <tr>
               <td
                 style="
-                  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
-                  padding: 30px;
+                  background-color: #18181b;
+                  padding: 32px;
                   text-align: center;
                 "
               >
                 <h1
                   style="
-                    margin: 0;
+                    margin: 0 0 6px;
                     color: #ffffff;
                     font-size: 24px;
-                    font-weight: 600;
+                    font-weight: 700;
+                    letter-spacing: -0.3px;
                   "
                 >
-                  ✨ Smart Spending Insights
+                  Cashio
                 </h1>
+                <p
+                  style="
+                    margin: 0;
+                    color: #9ca3af;
+                    font-size: 14px;
+                    font-weight: 400;
+                  "
+                >
+                  Smart Spending Insights
+                </p>
               </td>
             </tr>
 
             <!-- Content -->
             <tr>
-              <td style="padding: 40px 30px">
+              <td style="padding: 32px 40px">
                 <p
                   style="
                     margin: 0 0 20px;
-                    font-size: 16px;
+                    font-size: 15px;
                     line-height: 1.6;
                     color: #18181b;
                   "
@@ -72,78 +87,111 @@
 
                 <p
                   style="
-                    margin: 0 0 24px;
-                    font-size: 16px;
+                    margin: 0 0 28px;
+                    font-size: 15px;
                     line-height: 1.6;
-                    color: #18181b;
+                    color: #374151;
                   "
                 >
                   Our AI has analyzed your recent financial activity. Here are
-                  some key highlights and suggestions:
+                  some key highlights and suggestions.
                 </p>
 
                 <!-- Insights Box -->
-                <div
+                <table
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
                   style="
-                    background-color: #f5f3ff;
+                    background-color: #f9fafb;
+                    border: 1px solid #e5e7eb;
                     border-radius: 8px;
-                    padding: 25px;
-                    margin-bottom: 30px;
-                    border: 1px solid #ddd6fe;
+                    margin-bottom: 28px;
                   "
                 >
-                  <p
-                    style="
-                      margin: 0;
-                      font-size: 15px;
-                      line-height: 1.7;
-                      color: #4c1d95;
-                      white-space: pre-line;
-                    "
-                  >
-                    {{aiContent}}
-                  </p>
-                </div>
+                  <tr>
+                    <td style="padding: 24px">
+                      <h3
+                        style="
+                          margin: 0 0 12px;
+                          font-size: 13px;
+                          font-weight: 600;
+                          color: #374151;
+                          text-transform: uppercase;
+                          letter-spacing: 0.5px;
+                        "
+                      >
+                        AI Analysis
+                      </h3>
+                      <p
+                        style="
+                          margin: 0;
+                          font-size: 15px;
+                          line-height: 1.7;
+                          color: #374151;
+                          white-space: pre-line;
+                        "
+                      >
+                        {{aiContent}}
+                      </p>
+                    </td>
+                  </tr>
+                </table>
 
-                <!-- Anomaly Box (Optional) -->
+                <!-- Anomaly Box (Conditional) -->
                 {{#if hasAnomalies}}
-                <div
+                <table
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
                   style="
-                    background-color: #fff7ed;
+                    background-color: #f9fafb;
+                    border: 1px solid #e5e7eb;
                     border-radius: 8px;
-                    padding: 20px;
-                    margin-bottom: 30px;
-                    border: 1px solid #ffedd5;
+                    margin-bottom: 28px;
                   "
                 >
-                  <h3
-                    style="
-                      margin: 0 0 10px;
-                      font-size: 14px;
-                      font-weight: 600;
-                      color: #9a3412;
-                    "
-                  >
-                    ⚠️ Unusual Activity Detected
-                  </h3>
-                  <p
-                    style="
-                      margin: 0;
-                      font-size: 13px;
-                      line-height: 1.5;
-                      color: #7c2d12;
-                    "
-                  >
-                    We noticed some transactions that don't match your usual
-                    patterns. You might want to review them in the app.
-                  </p>
-                </div>
+                  <tr>
+                    <td style="padding: 20px 24px">
+                      <h3
+                        style="
+                          margin: 0 0 10px;
+                          font-size: 13px;
+                          font-weight: 600;
+                          color: #374151;
+                          text-transform: uppercase;
+                          letter-spacing: 0.5px;
+                        "
+                      >
+                        Unusual Activity Detected
+                      </h3>
+                      <p
+                        style="
+                          margin: 0;
+                          font-size: 13px;
+                          line-height: 1.6;
+                          color: #6b7280;
+                        "
+                      >
+                        We noticed some transactions that do not match your
+                        usual patterns. You may want to review them in the app.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
                 {{/if}}
 
                 <!-- CTA Button -->
-                <table width="100%" cellpadding="0" cellspacing="0">
+                <table
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
+                >
                   <tr>
-                    <td align="center" style="padding: 10px 0">
+                    <td align="center" style="padding: 8px 0">
                       <a
                         href="{{appUrl}}/overview"
                         style="
@@ -151,9 +199,9 @@
                           background-color: #18181b;
                           color: #ffffff;
                           text-decoration: none;
-                          padding: 12px 30px;
+                          padding: 12px 28px;
                           border-radius: 6px;
-                          font-size: 14px;
+                          font-size: 15px;
                           font-weight: 500;
                         "
                         >View Full Analysis</a
@@ -168,19 +216,26 @@
             <tr>
               <td
                 style="
-                  background-color: #f4f4f5;
-                  padding: 20px 30px;
+                  background-color: #f3f4f6;
+                  padding: 20px 40px;
                   text-align: center;
-                  border-top: 1px solid #e4e4e7;
+                  border-top: 1px solid #e5e7eb;
                 "
               >
-                <p style="margin: 0; font-size: 12px; color: #71717a">
-                  Powered by Gemini AI. These are suggestions based on your
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 12px;
+                    line-height: 1.5;
+                    color: #9ca3af;
+                  "
+                >
+                  Powered by AI. These are suggestions based on your spending
                   history.<br />
                   <a
                     href="{{appUrl}}/settings"
                     style="color: #18181b; text-decoration: underline"
-                    >Control your alerts</a
+                    >Manage notification settings</a
                   >
                 </p>
               </td>

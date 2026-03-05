@@ -1,25 +1,28 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Budget Alert</title>
   </head>
   <body
     style="
       margin: 0;
       padding: 0;
-      font-family:
-        -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto,
-        &quot;Helvetica Neue&quot;, Arial, sans-serif;
-      background-color: #f4f4f5;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+        'Helvetica Neue', Arial, sans-serif;
+      background-color: #f9fafb;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
     "
   >
     <table
       width="100%"
       cellpadding="0"
       cellspacing="0"
-      style="background-color: #f4f4f5; padding: 40px 20px"
+      border="0"
+      style="background-color: #f9fafb; padding: 40px 20px"
     >
       <tr>
         <td align="center">
@@ -27,42 +30,54 @@
             width="600"
             cellpadding="0"
             cellspacing="0"
+            border="0"
             style="
               background-color: #ffffff;
               border-radius: 8px;
               overflow: hidden;
-              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
             "
           >
             <!-- Header -->
             <tr>
               <td
                 style="
-                  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-                  padding: 30px;
+                  background-color: #18181b;
+                  padding: 32px;
                   text-align: center;
                 "
               >
                 <h1
                   style="
-                    margin: 0;
+                    margin: 0 0 6px;
                     color: #ffffff;
                     font-size: 24px;
-                    font-weight: 600;
+                    font-weight: 700;
+                    letter-spacing: -0.3px;
                   "
                 >
-                  ⚠️ Budget Alert
+                  Cashio
                 </h1>
+                <p
+                  style="
+                    margin: 0;
+                    color: #9ca3af;
+                    font-size: 14px;
+                    font-weight: 400;
+                  "
+                >
+                  Budget Alert
+                </p>
               </td>
             </tr>
 
             <!-- Content -->
             <tr>
-              <td style="padding: 40px 30px">
+              <td style="padding: 32px 40px">
                 <p
                   style="
                     margin: 0 0 20px;
-                    font-size: 16px;
+                    font-size: 15px;
                     line-height: 1.6;
                     color: #18181b;
                   "
@@ -72,15 +87,16 @@
 
                 <p
                   style="
-                    margin: 0 0 30px;
-                    font-size: 16px;
+                    margin: 0 0 28px;
+                    font-size: 15px;
                     line-height: 1.6;
-                    color: #18181b;
+                    color: #374151;
                   "
                 >
-                  You've reached
-                  <strong style="color: #d97706">{{percentage}}%</strong> of
-                  your budget limit for <strong>{{categoryName}}</strong>.
+                  You have reached
+                  <strong style="color: #18181b">{{percentage}}%</strong> of
+                  your budget limit for
+                  <strong style="color: #18181b">{{categoryName}}</strong>.
                 </p>
 
                 <!-- Budget Info Card -->
@@ -88,33 +104,39 @@
                   width="100%"
                   cellpadding="0"
                   cellspacing="0"
+                  border="0"
                   style="
-                    background-color: #fef3c7;
-                    border-radius: 6px;
-                    padding: 20px;
-                    margin-bottom: 30px;
+                    background-color: #f9fafb;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 8px;
+                    margin-bottom: 28px;
                   "
                 >
                   <tr>
-                    <td>
-                      <table width="100%" cellpadding="0" cellspacing="0">
+                    <td style="padding: 20px 24px">
+                      <table
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        border="0"
+                      >
                         <tr>
                           <td
                             style="
-                              padding-bottom: 10px;
-                              font-size: 14px;
-                              color: #71717a;
+                              padding-bottom: 12px;
+                              font-size: 13px;
+                              color: #6b7280;
                             "
                           >
                             Spent
                           </td>
                           <td
                             style="
-                              padding-bottom: 10px;
-                              font-size: 18px;
-                              font-weight: 600;
+                              padding-bottom: 12px;
+                              font-size: 20px;
+                              font-weight: 700;
                               text-align: right;
-                              color: #d97706;
+                              color: #18181b;
                             "
                           >
                             ${{spent}}
@@ -123,35 +145,48 @@
                         <tr>
                           <td
                             style="
-                              padding-bottom: 10px;
-                              font-size: 14px;
-                              color: #71717a;
+                              padding-bottom: 12px;
+                              font-size: 13px;
+                              color: #6b7280;
+                              border-top: 1px solid #e5e7eb;
+                              padding-top: 12px;
                             "
                           >
                             Budget Limit
                           </td>
                           <td
                             style="
-                              padding-bottom: 10px;
-                              font-size: 16px;
+                              padding-bottom: 12px;
+                              font-size: 15px;
                               font-weight: 500;
                               text-align: right;
-                              color: #18181b;
+                              color: #374151;
+                              border-top: 1px solid #e5e7eb;
+                              padding-top: 12px;
                             "
                           >
                             ${{limit}}
                           </td>
                         </tr>
                         <tr>
-                          <td style="font-size: 14px; color: #71717a">
+                          <td
+                            style="
+                              font-size: 13px;
+                              color: #6b7280;
+                              border-top: 1px solid #e5e7eb;
+                              padding-top: 12px;
+                            "
+                          >
                             Remaining
                           </td>
                           <td
                             style="
-                              font-size: 16px;
+                              font-size: 15px;
                               font-weight: 500;
                               text-align: right;
                               color: #10b981;
+                              border-top: 1px solid #e5e7eb;
+                              padding-top: 12px;
                             "
                           >
                             ${{remaining}}
@@ -164,10 +199,10 @@
 
                 <p
                   style="
-                    margin: 0 0 20px;
-                    font-size: 14px;
+                    margin: 0 0 24px;
+                    font-size: 15px;
                     line-height: 1.6;
-                    color: #71717a;
+                    color: #374151;
                   "
                 >
                   Keep track of your spending to stay within your budget. You
@@ -176,40 +211,55 @@
                 </p>
 
                 <!-- AI Recommendations -->
-                <div
+                <table
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
                   style="
-                    background-color: #f0f9ff;
-                    border-left: 4px solid #0ea5e9;
-                    padding: 15px;
-                    margin-bottom: 30px;
+                    background-color: #f9fafb;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 8px;
+                    margin-bottom: 28px;
                   "
                 >
-                  <h3
-                    style="
-                      margin: 0 0 10px;
-                      font-size: 14px;
-                      font-weight: 600;
-                      color: #0369a1;
-                    "
-                  >
-                    💡 AI Recommendations
-                  </h3>
-                  <p
-                    style="
-                      margin: 0;
-                      font-size: 13px;
-                      line-height: 1.5;
-                      color: #0c4a6e;
-                    "
-                  >
-                    {{aiRecommendations}}
-                  </p>
-                </div>
+                  <tr>
+                    <td style="padding: 20px 24px">
+                      <h3
+                        style="
+                          margin: 0 0 10px;
+                          font-size: 13px;
+                          font-weight: 600;
+                          color: #374151;
+                          text-transform: uppercase;
+                          letter-spacing: 0.5px;
+                        "
+                      >
+                        AI Recommendations
+                      </h3>
+                      <p
+                        style="
+                          margin: 0;
+                          font-size: 13px;
+                          line-height: 1.6;
+                          color: #6b7280;
+                        "
+                      >
+                        {{aiRecommendations}}
+                      </p>
+                    </td>
+                  </tr>
+                </table>
 
                 <!-- CTA Button -->
-                <table width="100%" cellpadding="0" cellspacing="0">
+                <table
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
+                >
                   <tr>
-                    <td align="center" style="padding: 20px 0">
+                    <td align="center" style="padding: 8px 0">
                       <a
                         href="{{appUrl}}/budget"
                         style="
@@ -217,9 +267,9 @@
                           background-color: #18181b;
                           color: #ffffff;
                           text-decoration: none;
-                          padding: 12px 30px;
+                          padding: 12px 28px;
                           border-radius: 6px;
-                          font-size: 14px;
+                          font-size: 15px;
                           font-weight: 500;
                         "
                         >View Budget Details</a
@@ -234,19 +284,26 @@
             <tr>
               <td
                 style="
-                  background-color: #f4f4f5;
-                  padding: 20px 30px;
+                  background-color: #f3f4f6;
+                  padding: 20px 40px;
                   text-align: center;
-                  border-top: 1px solid #e4e4e7;
+                  border-top: 1px solid #e5e7eb;
                 "
               >
-                <p style="margin: 0; font-size: 12px; color: #71717a">
-                  You're receiving this because you have budget alerts
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 12px;
+                    line-height: 1.5;
+                    color: #9ca3af;
+                  "
+                >
+                  You are receiving this because you have budget alerts
                   enabled.<br />
                   <a
                     href="{{appUrl}}/settings"
                     style="color: #18181b; text-decoration: underline"
-                    >Manage notification preferences</a
+                    >Manage notification settings</a
                   >
                 </p>
               </td>
