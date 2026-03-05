@@ -30,25 +30,24 @@ function sleep(ms: number): Promise<void> {
 }
 
 function getApiKey(): string {
-  const apiKey =
-    env?.GEMINI_API_KEY ??
-    process.env.GEMINI_API_KEY ??
-    process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+  const apiKey = env?.GEMINI_API_KEY ?? process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error(
-      "Gemini API key is not configured. Please set GEMINI_API_KEY or NEXT_PUBLIC_GEMINI_API_KEY in your environment variables.",
+      "Gemini API key is not configured. Please set GEMINI_API_KEY in your environment variables.",
     );
   }
   return apiKey;
 }
 
 function getModelName(): string {
-  return (
-    env?.GEMINI_MODEL ??
-    process.env.GEMINI_MODEL ??
-    process.env.NEXT_PUBLIC_GEMINI_MODEL ??
-    "gemini-1.5-flash"
-  );
+  return env?.GEMINI_MODEL ?? process.env.GEMINI_MODEL ?? "gemini-1.5-flash";
+}
+
+// Singleton GenAI client to avoid creating a new instance on every call
+let _genAIInstance: GoogleGenerativeAI | null = null;
+function getGenAI(): GoogleGenerativeAI {
+  _genAIInstance ??= new GoogleGenerativeAI(getApiKey());
+  return _genAIInstance;
 }
 
 export class AIService {
@@ -94,9 +93,8 @@ export class AIService {
       JSON.stringify(categorySpending, null, 2),
     ).replace("{{existingBudgets}}", existingBudgets || "No budgets set");
 
-    const apiKey = getApiKey();
     const modelName = getModelName();
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = getGenAI();
     const model = genAI.getGenerativeModel({ model: modelName });
 
     const result = await model.generateContent(prompt);
@@ -181,9 +179,8 @@ export class AIService {
         JSON.stringify(categoryBreakdown, null, 2),
       );
 
-    const apiKey = getApiKey();
     const modelName = getModelName();
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = getGenAI();
     const model = genAI.getGenerativeModel({ model: modelName });
 
     const result = await model.generateContent(prompt);
@@ -271,9 +268,8 @@ export class AIService {
       recentTransactions,
     ).replace("{{categoryStats}}", categoryStatsFormatted);
 
-    const apiKey = getApiKey();
     const modelName = getModelName();
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = getGenAI();
     const model = genAI.getGenerativeModel({ model: modelName });
 
     const result = await model.generateContent(prompt);
@@ -348,9 +344,8 @@ export class AIService {
       .replace("{{savingsRate}}", savingsRate.toFixed(1))
       .replace("{{budgetCount}}", user.budgets.length.toString());
 
-    const apiKey = getApiKey();
     const modelName = getModelName();
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = getGenAI();
     const model = genAI.getGenerativeModel({ model: modelName });
 
     const result = await model.generateContent(prompt);
@@ -378,7 +373,6 @@ export class AIService {
     transactions: TransactionForAI[],
     categories: CategoryForAI[],
   ): Promise<CategorizationResponse> {
-    const apiKey = getApiKey();
     const modelName = getModelName();
 
     const maxRows = Number(
@@ -413,7 +407,7 @@ export class AIService {
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
-        const genAI = new GoogleGenerativeAI(apiKey);
+        const genAI = getGenAI();
         const model = genAI.getGenerativeModel({ model: modelName });
 
         const result = await model.generateContent(prompt);
@@ -455,7 +449,6 @@ export class AIService {
     imageUrl?: string | null;
     categories?: CategoryForAI[] | null;
   }): Promise<ReceiptScanResult> {
-    const apiKey = getApiKey();
     const modelName = getModelName();
 
     const inputText = options.extractedText ?? "";
@@ -490,7 +483,7 @@ export class AIService {
     let lastError: Error | null = null;
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
-        const genAI = new GoogleGenerativeAI(apiKey);
+        const genAI = getGenAI();
         const model = genAI.getGenerativeModel({ model: modelName });
 
         const result = await model.generateContent(prompt);

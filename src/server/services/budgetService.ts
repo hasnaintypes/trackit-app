@@ -194,6 +194,7 @@ export class BudgetService {
       budget.threshold_100_alert_sent = false;
     }
 
+    if (total <= 0) return;
     const percent = (spent / total) * 100;
 
     const thresholds = [
