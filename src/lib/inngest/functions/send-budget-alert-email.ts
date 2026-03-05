@@ -1,5 +1,8 @@
 import { inngest } from "@/lib/inngest/client";
+import { createLogger } from "@/lib/logging";
 import { db } from "@/server/db";
+
+const logger = createLogger("inngest-budget-alert");
 import { sendEmail } from "@/lib/email";
 import { env } from "@/env";
 import { BUDGET_THRESHOLD_REACHED_EVENT } from "@/lib/inngest/events";
@@ -88,7 +91,9 @@ export const sendBudgetAlertEmail = inngest.createFunction(
               : String(aiResult.recommendations);
           }
         } catch (e) {
-          console.error("Failed to fetch AI recommendations:", e);
+          logger.error("Failed to fetch AI recommendations", {
+            error: e instanceof Error ? e.message : String(e),
+          });
         }
       }
 
@@ -110,7 +115,7 @@ export const sendBudgetAlertEmail = inngest.createFunction(
         if (budget.user.notificationPrefs?.emailBalanceAlerts) {
           await sendEmail({
             to: budget.user.email,
-            subject: `⚠️ Budget Alert: ${budget.category.name} - ${percentage.toFixed(0)}% Used`,
+            subject: `Budget Alert: ${budget.category.name} - ${percentage.toFixed(0)}% Used`,
             html: template,
           });
         }
@@ -148,7 +153,9 @@ export const sendBudgetAlertEmail = inngest.createFunction(
           emailSent: true,
         };
       } catch (error) {
-        console.error(`Failed to send budget alert email:`, error);
+        logger.error("Failed to send budget alert email", {
+          error: error instanceof Error ? error.message : String(error),
+        });
         throw error;
       }
     });

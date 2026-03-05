@@ -1,6 +1,9 @@
 import { inngest } from "../client";
 import { RECURRING_EVENT, enqueueRecurringRun } from "../events";
+import { createLogger } from "@/lib/logging";
 import { db } from "@/server/db";
+
+const logger = createLogger("inngest-recurring");
 import { calculateNextRunAt } from "@/lib/recurrence";
 import { sendEmail } from "@/lib/email";
 import type { RecurringRule } from "@prisma/client";
@@ -165,7 +168,9 @@ export const notifyUpcomingRecurring = inngest.createFunction(
           results.push({ ruleId: rule.id, success: true });
         }
       } catch (error) {
-        console.error(`Failed to notify for rule ${rule.id}:`, error);
+        logger.error(`Failed to notify for rule ${rule.id}`, {
+          error: error instanceof Error ? error.message : String(error),
+        });
         results.push({ ruleId: rule.id, success: false, error: String(error) });
       }
     }

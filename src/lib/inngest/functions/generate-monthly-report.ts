@@ -2,7 +2,10 @@ import { db } from "@/server/db";
 import { subMonths, format } from "date-fns";
 import { sendEmail } from "@/lib/email";
 import { env } from "@/env";
+import { createLogger } from "@/lib/logging";
 import { inngest } from "../client";
+
+const logger = createLogger("inngest-monthly-report");
 
 /**
  * Generate Monthly Report
@@ -66,10 +69,9 @@ export const generateMonthlyReport = inngest.createFunction(
                 : null,
           });
         } catch (error) {
-          console.error(
-            `Failed to generate report for user ${user.id}:`,
-            error,
-          );
+          logger.error(`Failed to generate report for user ${user.id}`, {
+            error: error instanceof Error ? error.message : String(error),
+          });
           reportResults.push({
             userId: user.id,
             reportId: null,
@@ -169,10 +171,9 @@ export const generateMonthlyReport = inngest.createFunction(
 
           await ReportService.markAsSent(report.id, report.user.email ?? "");
         } catch (error) {
-          console.error(
-            `Failed to send email for report ${result.reportId}:`,
-            error,
-          );
+          logger.error(`Failed to send email for report ${result.reportId}`, {
+            error: error instanceof Error ? error.message : String(error),
+          });
           if (result.reportId) {
             await ReportService.markAsFailed(result.reportId);
           }

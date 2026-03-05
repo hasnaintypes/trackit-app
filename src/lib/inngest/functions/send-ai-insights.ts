@@ -1,5 +1,8 @@
 import { inngest } from "../client";
+import { createLogger } from "@/lib/logging";
 import { db } from "@/server/db";
+
+const logger = createLogger("inngest-ai-insights");
 import { sendEmail } from "@/lib/email";
 import { env } from "@/env";
 import { format, subDays } from "date-fns";
@@ -72,14 +75,16 @@ export const sendAiInsights = inngest.createFunction(
 
             await sendEmail({
               to: user.email,
-              subject: "✨ Personal AI Insight: Your Spending Analysis",
+              subject: "Your AI Spending Analysis",
               html: template,
             });
           });
           results.push({ userId: user.id, success: true });
         }
       } catch (error) {
-        console.error(`Failed AI insight for user ${user.id}:`, error);
+        logger.error(`Failed AI insight for user ${user.id}`, {
+          error: error instanceof Error ? error.message : String(error),
+        });
         results.push({ userId: user.id, success: false, error: String(error) });
       }
     }

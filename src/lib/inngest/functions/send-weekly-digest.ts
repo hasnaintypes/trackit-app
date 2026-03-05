@@ -1,5 +1,8 @@
 import { inngest } from "@/lib/inngest/client";
+import { createLogger } from "@/lib/logging";
 import { db } from "@/server/db";
+
+const logger = createLogger("inngest-weekly-digest");
 import { startOfWeek, endOfWeek, subWeeks, format } from "date-fns";
 import { sendEmail } from "@/lib/email";
 import { env } from "@/env";
@@ -143,10 +146,9 @@ export const sendWeeklyDigest = inngest.createFunction(
             anomalies: anomalyResult.summary,
           });
         } catch (error) {
-          console.error(
-            `Failed to generate digest for user ${user.id}:`,
-            error,
-          );
+          logger.error(`Failed to generate digest for user ${user.id}`, {
+            error: error instanceof Error ? error.message : String(error),
+          });
           digestResults.push({
             userId: user.id,
             success: false,
@@ -224,7 +226,9 @@ export const sendWeeklyDigest = inngest.createFunction(
             html: emailHtml,
           });
         } catch (error) {
-          console.error(`Failed to send digest email to ${user.id}:`, error);
+          logger.error(`Failed to send digest email to ${user.id}`, {
+            error: error instanceof Error ? error.message : String(error),
+          });
         }
       }
     });

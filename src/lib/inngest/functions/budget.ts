@@ -70,7 +70,7 @@ export const evaluateBudgetOnTransaction = inngest.createFunction(
           await NotificationService.createNotification({
             userId,
             type: NotificationType.SYSTEM_ALERT,
-            title: "⚠️ High Priority AI Insight",
+            title: "High Priority AI Insight",
             message: `Unusual activity detected: ${severe.reason}. Please review your recent transactions.`,
           });
 
@@ -95,7 +95,7 @@ export const evaluateBudgetOnTransaction = inngest.createFunction(
 
           await sendEmail({
             to: user.email,
-            subject: "🚨 High Priority: Unusual Activity Detected",
+            subject: "High Priority: Unusual Activity Detected",
             html: template,
           });
         }
