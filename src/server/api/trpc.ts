@@ -209,6 +209,8 @@ export const createTRPCRouter = t.router;
  * - In development, inserts a random delay between ~100-500ms.
  * - Logs the execution time for every called path.
  */
+const timingLogger = createLogger("trpc:timing");
+
 const timingMiddleware = t.middleware(async ({ next, path }) => {
   const start = Date.now();
 
@@ -220,7 +222,7 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
   const result = await next();
 
   const end = Date.now();
-  console.log(`[TRPC] ${path} took ${end - start}ms to execute`);
+  timingLogger.info(`${path} took ${end - start}ms to execute`);
 
   return result;
 });

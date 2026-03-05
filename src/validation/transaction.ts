@@ -12,7 +12,12 @@ export const recurrenceSchema = z.object({
 
 export const createTransactionSchema = z.object({
   accountId: z.string().min(1),
-  amount: z.string().min(1),
+  amount: z
+    .string()
+    .min(1)
+    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
+      message: "Amount must be a positive number",
+    }),
   type: z.enum(["DEBIT", "CREDIT", "TRANSFER"]),
   categoryId: z.string().nullable().optional(),
   contactId: z.string().nullable().optional(),
@@ -32,7 +37,12 @@ export const createTransactionSchema = z.object({
 export const updateTransactionSchema = z.object({
   id: z.string().min(1),
   accountId: z.string().optional(),
-  amount: z.string().optional(),
+  amount: z
+    .string()
+    .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
+      message: "Amount must be a positive number",
+    })
+    .optional(),
   type: z.enum(["DEBIT", "CREDIT", "TRANSFER"]).optional(),
   categoryId: z.string().nullable().optional(),
   contactId: z.string().nullable().optional(),

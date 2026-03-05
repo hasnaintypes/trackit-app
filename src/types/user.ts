@@ -1,40 +1,12 @@
-// User types based on Prisma schema
-export type Gender = "MALE" | "FEMALE" | "OTHER";
-export type Currency =
-  | "PKR"
-  | "USD"
-  | "EUR"
-  | "GBP"
-  | "JPY"
-  | "AUD"
-  | "CAD"
-  | "CHF"
-  | "CNY"
-  | "INR"
-  | "SGD";
-export type Country =
-  | "PK"
-  | "US"
-  | "GB"
-  | "CA"
-  | "AU"
-  | "DE"
-  | "FR"
-  | "JP"
-  | "SG"
-  | "IN"
-  | "AE";
-export type Timezone =
-  | "UTC"
-  | "EST"
-  | "CST"
-  | "MST"
-  | "PST"
-  | "GMT"
-  | "CET"
-  | "JST"
-  | "AEST"
-  | "IST";
+// User types - import enums from Prisma instead of manual definitions
+import {
+  type Gender,
+  type Currency,
+  type Country,
+  type Timezone,
+} from "@prisma/client";
+
+export type { Gender, Currency, Country, Timezone };
 
 export interface UpdateProfileInput {
   name: string;
