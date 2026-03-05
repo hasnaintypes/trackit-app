@@ -177,10 +177,10 @@ export class BudgetService {
     const budget = await db.budget.findUnique({ where: { id: budgetId } });
     if (!budget) return;
 
-    // Reset flags if period changed
+    // Atomically reset flags if period changed
     if (budget.last_alert_period !== periodKey) {
-      await db.budget.update({
-        where: { id: budgetId },
+      const resetResult = await db.budget.updateMany({
+        where: { id: budgetId, last_alert_period: { not: periodKey } },
         data: {
           last_alert_period: periodKey,
           threshold_70_alert_sent: false,
@@ -188,10 +188,11 @@ export class BudgetService {
           threshold_100_alert_sent: false,
         },
       });
-      // Refresh local state for logic below
-      budget.threshold_70_alert_sent = false;
-      budget.threshold_90_alert_sent = false;
-      budget.threshold_100_alert_sent = false;
+      if (resetResult.count > 0) {
+        budget.threshold_70_alert_sent = false;
+        budget.threshold_90_alert_sent = false;
+        budget.threshold_100_alert_sent = false;
+      }
     }
 
     if (total <= 0) return;
@@ -216,7 +217,15 @@ export class BudgetService {
     ];
 
     for (const t of thresholds) {
-      if (percent >= t.level && !budget[t.flag]) {
+      if (percent >= t.level) {
+        // Atomically set the flag only if not already set
+        const updated = await db.budget.updateMany({
+          where: { id: budgetId, [t.flag]: false },
+          data: { [t.flag]: true },
+        });
+        // If count is 0, another process already handled this threshold
+        if (updated.count === 0) continue;
+
         // Send Notification
         await NotificationService.createNotification({
           userId: budget.userId,
@@ -238,12 +247,6 @@ export class BudgetService {
             userId: budget.userId,
             threshold: t.level,
           },
-        });
-
-        // Mark as sent
-        await db.budget.update({
-          where: { id: budgetId },
-          data: { [t.flag]: true },
         });
 
         break; // Only fire the highest crossed threshold at a time
@@ -271,7 +274,7 @@ export class BudgetService {
       await NotificationService.createNotification({
         userId,
         type: NotificationType.SYSTEM_ALERT,
-        title: "🚩 Large Transaction Detected",
+        title: "Large Transaction Detected",
         message: `A transaction for ${amount.toFixed(2)} (${description}) exceeds your set threshold of ${threshold.toFixed(2)}.`,
       });
     }
@@ -296,7 +299,7 @@ export class BudgetService {
       await NotificationService.createNotification({
         userId,
         type: NotificationType.BUDGET_ALERT,
-        title: "📉 Low Balance Warning",
+        title: "Low Balance Warning",
         message: `Your account "${account.name}" balance of ${balance.toFixed(2)} is below your threshold of ${threshold.toFixed(2)}.`,
         metadata: { accountId },
       });

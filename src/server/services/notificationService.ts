@@ -1,5 +1,8 @@
 import { db } from "@/server/db";
 import { Prisma, type NotificationType } from "@prisma/client";
+import { createLogger } from "@/lib/logging";
+
+const logger = createLogger("notificationService");
 
 export class NotificationService {
   static async createNotification(params: {
@@ -57,7 +60,9 @@ export class NotificationService {
         }
       }
     } catch (error) {
-      console.error("Failed to enqueue email notification:", error);
+      logger.error("Failed to enqueue email notification", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       // Silently fail so we don't break the main transaction flow
     }
 

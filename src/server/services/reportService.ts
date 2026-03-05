@@ -3,6 +3,7 @@ import { ReportType, ReportStatus } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
 import { startOfMonth, endOfMonth, format } from "date-fns";
 import type { MonthlySummaryData, BudgetExceededData } from "@/types/report";
+import { toNum } from "@/lib/shared/decimal";
 
 export class ReportService {
   /**
@@ -24,85 +25,68 @@ export class ReportService {
     const periodStart = startOfMonth(new Date(year, month - 1));
     const periodEnd = endOfMonth(new Date(year, month - 1));
 
-    // Get all transactions for the period
-    const transactions = await db.transaction.findMany({
-      where: {
-        userId,
-        date: {
-          gte: periodStart,
-          lte: periodEnd,
-        },
+    const where: Prisma.TransactionWhereInput = {
+      userId,
+      date: {
+        gte: periodStart,
+        lte: periodEnd,
       },
-      include: {
-        category: true,
-      },
-      orderBy: { date: "desc" },
-    });
+    };
 
-    // Calculate spending by category
-    const categorySpending = transactions
-      .filter((t) => t.type === "DEBIT")
-      .reduce(
-        (acc, t) => {
-          const categoryName = t.category?.name ?? "Uncategorized";
-          const amount =
-            typeof t.amount === "object" && "toNumber" in t.amount
-              ? t.amount.toNumber()
-              : Number(t.amount);
+    const [categoryGroups, incomeAgg, expenseAgg, transactionCount, budgets] =
+      await Promise.all([
+        db.transaction.groupBy({
+          by: ["categoryId"],
+          where: { ...where, type: "DEBIT" },
+          _sum: { amount: true },
+        }),
+        db.transaction.aggregate({
+          where: { ...where, type: "CREDIT" },
+          _sum: { amount: true },
+        }),
+        db.transaction.aggregate({
+          where: { ...where, type: "DEBIT" },
+          _sum: { amount: true },
+        }),
+        db.transaction.count({ where }),
+        db.budget.findMany({
+          where: { userId },
+          include: { category: true },
+        }),
+      ]);
 
-          acc[categoryName] = (acc[categoryName] ?? 0) + amount;
-          return acc;
-        },
-        {} as Record<string, number>,
-      );
+    const categoryIds = categoryGroups
+      .map((g) => g.categoryId)
+      .filter((id): id is string => id !== null);
 
-    // Get budget status
-    const budgets = await db.budget.findMany({
-      where: { userId },
-      include: { category: true },
-    });
+    const categories =
+      categoryIds.length > 0
+        ? await db.category.findMany({
+            where: { id: { in: categoryIds } },
+            select: { id: true, name: true },
+          })
+        : [];
+
+    const categoryNameMap = new Map(categories.map((c) => [c.id, c.name]));
+
+    const categorySpending: Record<string, number> = {};
+    for (const group of categoryGroups) {
+      const name = group.categoryId
+        ? (categoryNameMap.get(group.categoryId) ?? "Uncategorized")
+        : "Uncategorized";
+      categorySpending[name] =
+        (categorySpending[name] ?? 0) + toNum(group._sum.amount);
+    }
 
     const budgetStatus = budgets.map((b) => ({
       category: b.category.name,
-      limit:
-        typeof b.amount === "object" && "toNumber" in b.amount
-          ? b.amount.toNumber()
-          : Number(b.amount),
-      spent:
-        typeof b.spentAmount === "object" && "toNumber" in b.spentAmount
-          ? b.spentAmount.toNumber()
-          : Number(b.spentAmount),
-      percentage:
-        ((typeof b.spentAmount === "object" && "toNumber" in b.spentAmount
-          ? b.spentAmount.toNumber()
-          : Number(b.spentAmount)) /
-          (typeof b.amount === "object" && "toNumber" in b.amount
-            ? b.amount.toNumber()
-            : Number(b.amount))) *
-        100,
+      limit: toNum(b.amount),
+      spent: toNum(b.spentAmount),
+      percentage: (toNum(b.spentAmount) / toNum(b.amount)) * 100,
     }));
 
-    const totalIncome = transactions
-      .filter((t) => t.type === "CREDIT")
-      .reduce(
-        (sum, t) =>
-          sum +
-          (typeof t.amount === "object" && "toNumber" in t.amount
-            ? t.amount.toNumber()
-            : Number(t.amount)),
-        0,
-      );
-
-    const totalExpenses = transactions
-      .filter((t) => t.type === "DEBIT")
-      .reduce(
-        (sum, t) =>
-          sum +
-          (typeof t.amount === "object" && "toNumber" in t.amount
-            ? t.amount.toNumber()
-            : Number(t.amount)),
-        0,
-      );
+    const totalIncome = toNum(incomeAgg._sum.amount);
+    const totalExpenses = toNum(expenseAgg._sum.amount);
 
     const reportData: MonthlySummaryData = {
       period,
@@ -111,7 +95,7 @@ export class ReportService {
       totalIncome,
       totalExpenses,
       netSavings: totalIncome - totalExpenses,
-      transactionCount: transactions.length,
+      transactionCount,
       categorySpending,
       budgetStatus,
       topCategories: Object.entries(categorySpending)
@@ -147,15 +131,8 @@ export class ReportService {
       throw new Error("Budget not found");
     }
 
-    const spent =
-      typeof budget.spentAmount === "object" && "toNumber" in budget.spentAmount
-        ? budget.spentAmount.toNumber()
-        : Number(budget.spentAmount);
-
-    const limit =
-      typeof budget.amount === "object" && "toNumber" in budget.amount
-        ? budget.amount.toNumber()
-        : Number(budget.amount);
+    const spent = toNum(budget.spentAmount);
+    const limit = toNum(budget.amount);
 
     const reportData: BudgetExceededData = {
       budgetId: budget.id,

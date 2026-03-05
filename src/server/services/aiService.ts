@@ -1,6 +1,9 @@
 import { db } from "@/server/db";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { env } from "@/env";
+import { createLogger } from "@/lib/logging";
+
+const logger = createLogger("aiService");
 import {
   BUDGET_RECOMMENDATION_TEMPLATE,
   SPENDING_INSIGHTS_TEMPLATE,
@@ -108,7 +111,9 @@ export class AIService {
       const jsonText = jsonMatch ? jsonMatch[1] : text;
       return JSON.parse(jsonText ?? text) as BudgetRecommendation[];
     } catch (error) {
-      console.error("Failed to parse AI response:", error);
+      logger.error("Failed to parse AI response", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       throw new Error(
         `Failed to parse AI recommendations: ${text.substring(0, 100)}...`,
       );
@@ -194,7 +199,9 @@ export class AIService {
       const jsonText = jsonMatch ? jsonMatch[1] : text;
       return JSON.parse(jsonText ?? text) as SpendingInsights;
     } catch (error) {
-      console.error("Failed to parse AI response:", error);
+      logger.error("Failed to parse AI response", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       throw new Error(
         `Failed to parse AI insights: ${text.substring(0, 100)}...`,
       );
@@ -283,7 +290,9 @@ export class AIService {
       const jsonText = jsonMatch ? jsonMatch[1] : text;
       return JSON.parse(jsonText ?? text) as AnomalyDetection;
     } catch (error) {
-      console.error("Failed to parse AI response:", error);
+      logger.error("Failed to parse AI response", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       throw new Error(
         `Failed to parse AI anomalies: ${text.substring(0, 100)}...`,
       );
@@ -359,7 +368,9 @@ export class AIService {
       const jsonText = jsonMatch ? jsonMatch[1] : text;
       return JSON.parse(jsonText ?? text) as FinancialAdvice;
     } catch (error) {
-      console.error("Failed to parse AI response:", error);
+      logger.error("Failed to parse AI response", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       throw new Error(
         `Failed to parse AI advice: ${text.substring(0, 100)}...`,
       );
@@ -470,10 +481,9 @@ export class AIService {
           JSON.stringify(options.categories, null, 2),
         );
       } catch (e) {
-        console.error(
-          "Failed to stringify categories for receipt scan prompt",
-          e,
-        );
+        logger.error("Failed to stringify categories for receipt scan prompt", {
+          error: e instanceof Error ? e.message : String(e),
+        });
         prompt = prompt.replace("{{categories}}", "[]");
       }
     } else {
@@ -766,10 +776,9 @@ export class AIService {
             description = candidate ?? null;
           }
         } catch (e) {
-          console.error(
-            "Failed to synthesize description from extracted text",
-            e,
-          );
+          logger.error("Failed to synthesize description from extracted text", {
+            error: e instanceof Error ? e.message : String(e),
+          });
           description = null;
         }
       }
