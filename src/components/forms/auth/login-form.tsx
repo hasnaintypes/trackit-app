@@ -18,7 +18,6 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUserStore } from "@/store/userStore";
-import { logger } from "better-auth";
 
 export function LoginForm({
   className,
@@ -91,7 +90,7 @@ export function LoginForm({
         try {
           await authRefetch();
         } catch {
-          logger.error("Failed to refetch auth state after login.");
+          // Failed to refetch auth state after login
         }
         const persisted = useUserStore.getState().user;
         if (persisted) setUser(persisted);

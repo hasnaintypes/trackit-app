@@ -81,7 +81,7 @@ export function SignupForm({
     setLoading(true);
     const loadingToastId = toast.loading("Creating account...");
     try {
-      const defaultAvatar = getAvatarUrl({ gender: "MALE" });
+      const defaultAvatar = getAvatarUrl({});
 
       await signUp({
         name,
