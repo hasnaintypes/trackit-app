@@ -24,7 +24,7 @@ export const updateProfileSchema = z.object({
 });
 
 export const uploadProfileImageSchema = z.object({
-  file: z.string().min(1),
+  file: z.string().min(1).max(10_000_000), // ~7.5MB base64 limit
   fileName: z.string().optional(),
   folder: z.string().optional(),
 });

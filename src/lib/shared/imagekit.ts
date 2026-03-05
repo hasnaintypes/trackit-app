@@ -37,8 +37,7 @@ export async function uploadImage(options: {
   fileName?: string;
   folder?: string;
 }): Promise<UploadResponse> {
-  const privateKey =
-    process.env.IMAGEKIT_PRIVATE_KEY ?? "your_imagekit_private_key";
+  const privateKey = process.env.IMAGEKIT_PRIVATE_KEY;
   if (!privateKey) {
     throw new Error(
       "IMAGEKIT_PRIVATE_KEY is not configured. Cannot upload images.",

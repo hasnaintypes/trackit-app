@@ -43,6 +43,7 @@ export function formatAmount(amount: number | string, options: FormatOptions) {
   const num = typeof amount === "string" ? parseFloat(amount) : amount;
   if (isNaN(num)) return "---";
 
+  const isNegative = num < 0;
   const absoluteNum = Math.abs(num);
 
   if (compactNumbers) {
@@ -53,9 +54,10 @@ export function formatAmount(amount: number | string, options: FormatOptions) {
     });
     const symbol = CURRENCY_SYMBOLS[currency] || currency;
     const formatted = formatter.format(absoluteNum);
+    const sign = isNegative ? "-" : "";
     return currencyPosition === CurrencyPosition.BEFORE
-      ? `${symbol}${formatted}`
-      : `${formatted} ${symbol}`;
+      ? `${sign}${symbol}${formatted}`
+      : `${sign}${formatted} ${symbol}`;
   }
 
   // Handle decimal precision
@@ -78,10 +80,11 @@ export function formatAmount(amount: number | string, options: FormatOptions) {
 
   const symbol = CURRENCY_SYMBOLS[currency] || currency;
 
+  const sign = isNegative ? "-" : "";
   if (currencyPosition === CurrencyPosition.BEFORE) {
-    return `${symbol}${formatted}`;
+    return `${sign}${symbol}${formatted}`;
   } else {
-    return `${formatted} ${symbol}`;
+    return `${sign}${formatted} ${symbol}`;
   }
 }
 

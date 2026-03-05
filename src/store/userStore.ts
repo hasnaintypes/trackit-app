@@ -25,6 +25,18 @@ export const useUserStore = create<UserState>()(
     }),
     {
       name: "cashio_user",
+      // Only persist non-sensitive fields
+      partialize: (state) =>
+        state.user
+          ? {
+              user: {
+                id: state.user.id,
+                name: state.user.name,
+                image: state.user.image,
+                role: state.user.role,
+              } as User,
+            }
+          : { user: null },
       storage: createJSONStorage(() => {
         if (typeof window !== "undefined") return localStorage;
         return {
