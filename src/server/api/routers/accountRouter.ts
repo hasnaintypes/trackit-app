@@ -166,7 +166,10 @@ export const accountRouter = createTRPCRouter({
       });
       const existing = existingRaw as RawAccount | null;
       if (existing?.userId !== userId)
-        throw new TRPCError({ code: "NOT_FOUND", message: "Account not found" });
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Account not found",
+        });
 
       if (input.isDefault) {
         await prisma.$transaction([
@@ -229,7 +232,10 @@ export const accountRouter = createTRPCRouter({
         where: { id: input.id },
       });
       if (existing?.userId !== userId)
-        throw new TRPCError({ code: "NOT_FOUND", message: "Account not found" });
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Account not found",
+        });
 
       await prisma.bankAccount.delete({ where: { id: input.id } });
       return { success: true };

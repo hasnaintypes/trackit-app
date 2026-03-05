@@ -1,5 +1,8 @@
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createLogger } from "@/lib/logging";
 import { sendEmail } from "@/lib/email";
+
+const logger = createLogger("reportRouter");
 import { TRPCError } from "@trpc/server";
 import { ReportService } from "@/server/services/reportService";
 import { ReportType } from "@prisma/client";
@@ -64,7 +67,9 @@ export const reportRouter = createTRPCRouter({
 
         return { success: true };
       } catch (error) {
-        console.error("Resend failed", error);
+        logger.error("Resend failed", {
+          error: error instanceof Error ? error.message : String(error),
+        });
         await ReportService.markAsFailed(report.id);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",

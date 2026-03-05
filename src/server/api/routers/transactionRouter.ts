@@ -1,6 +1,9 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createLogger } from "@/lib/logging";
+
+const logger = createLogger("transactionRouter");
 import type {
   Prisma,
   Transaction as TxModel,
@@ -471,9 +474,7 @@ export const transactionRouter = createTRPCRouter({
           // Update account balance if amount or type changed
           const oldAmount = Number(existing.amount);
           const newAmount =
-            input.amount !== undefined
-              ? parseFloat(input.amount)
-              : oldAmount;
+            input.amount !== undefined ? parseFloat(input.amount) : oldAmount;
           const oldType = existing.type;
           const newType = input.type ?? oldType;
           const oldEffect = oldType === "CREDIT" ? oldAmount : -oldAmount;
@@ -742,7 +743,9 @@ export const transactionRouter = createTRPCRouter({
                 },
               );
             } catch (err) {
-              console.error("AI Categorization batch error:", err);
+              logger.error("AI Categorization batch error", {
+                error: err instanceof Error ? err.message : String(err),
+              });
             }
           }
         }
@@ -781,15 +784,17 @@ export const transactionRouter = createTRPCRouter({
       const createdTransactions = created.slice(0, -1) as TxModel[];
 
       // Trigger budget evaluation and threshold checks for all created transactions
-      for (const tx of createdTransactions) {
-        await emitTransactionProcessed({
-          userId,
-          transactionId: tx.id,
-          accountId: tx.accountId,
-          categoryId: tx.categoryId ?? null,
-          date: tx.date,
-        });
-      }
+      await Promise.all(
+        createdTransactions.map((tx) =>
+          emitTransactionProcessed({
+            userId,
+            transactionId: tx.id,
+            accountId: tx.accountId,
+            categoryId: tx.categoryId ?? null,
+            date: tx.date,
+          }),
+        ),
+      );
 
       return {
         success: true,
