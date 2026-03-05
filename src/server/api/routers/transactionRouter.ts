@@ -125,7 +125,7 @@ export const transactionRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const prisma = ctx.db;
       const t = await prisma.transaction.findUnique({
-        where: { id: input.id },
+        where: { id: input.id, userId: ctx.user.id },
         select: {
           id: true,
           userId: true,
@@ -155,7 +155,7 @@ export const transactionRouter = createTRPCRouter({
           },
         },
       });
-      if (t?.userId !== ctx.user.id) return null;
+      if (!t) return null;
       return {
         ...t,
         amount: String(t.amount),
@@ -256,6 +256,16 @@ export const transactionRouter = createTRPCRouter({
               receipt_url: input.receipt_url ?? null,
               receipt_extracted_text: input.receipt_extracted_text ?? null,
             },
+          });
+
+          // Update account balance
+          const balanceDelta =
+            input.type === "CREDIT"
+              ? parseFloat(input.amount)
+              : -parseFloat(input.amount);
+          await tx.bankAccount.update({
+            where: { id: input.accountId },
+            data: { balance: { increment: balanceDelta } },
           });
 
           return { created: createdTx, rule: newRule };
@@ -457,6 +467,26 @@ export const transactionRouter = createTRPCRouter({
             where: { id: input.id },
             data,
           });
+
+          // Update account balance if amount or type changed
+          const oldAmount = Number(existing.amount);
+          const newAmount =
+            input.amount !== undefined
+              ? parseFloat(input.amount)
+              : oldAmount;
+          const oldType = existing.type;
+          const newType = input.type ?? oldType;
+          const oldEffect = oldType === "CREDIT" ? oldAmount : -oldAmount;
+          const newEffect = newType === "CREDIT" ? newAmount : -newAmount;
+          const delta = newEffect - oldEffect;
+          if (delta !== 0) {
+            const accountId = input.accountId ?? existing.accountId;
+            await tx.bankAccount.update({
+              where: { id: accountId },
+              data: { balance: { increment: delta } },
+            });
+          }
+
           return { updated, ruleId, nextRunAt };
         },
       );
@@ -487,7 +517,7 @@ export const transactionRouter = createTRPCRouter({
     .input(
       z.object({
         transactionId: z.string().optional(),
-        fileDataUrl: z.string().min(1),
+        fileDataUrl: z.string().min(1).max(10_000_000), // ~7.5MB base64 limit
         fileName: z.string().optional(),
       }),
     )
@@ -536,7 +566,18 @@ export const transactionRouter = createTRPCRouter({
           code: "NOT_FOUND",
           message: "Transaction not found",
         });
-      await prisma.transaction.delete({ where: { id: input.id } });
+      // Reverse the balance effect before deleting
+      const balanceRevert =
+        existing.type === "CREDIT"
+          ? -Number(existing.amount)
+          : Number(existing.amount);
+      await prisma.$transaction([
+        prisma.bankAccount.update({
+          where: { id: existing.accountId },
+          data: { balance: { increment: balanceRevert } },
+        }),
+        prisma.transaction.delete({ where: { id: input.id } }),
+      ]);
       return { success: true };
     }),
 
@@ -546,10 +587,10 @@ export const transactionRouter = createTRPCRouter({
       const prisma = ctx.db;
       const userId = ctx.user.id;
 
-      // Verify all transactions belong to the user
+      // Verify all transactions belong to the user and get balance info
       const existingTransactions = await prisma.transaction.findMany({
         where: { id: { in: input.ids }, userId },
-        select: { id: true },
+        select: { id: true, amount: true, type: true, accountId: true },
       });
 
       if (existingTransactions.length !== input.ids.length) {
@@ -559,12 +600,32 @@ export const transactionRouter = createTRPCRouter({
         });
       }
 
-      // Delete all transactions
-      const result = await prisma.transaction.deleteMany({
-        where: { id: { in: input.ids }, userId },
-      });
+      // Calculate balance adjustments per account
+      const balanceAdjustments: Record<string, number> = {};
+      for (const tx of existingTransactions) {
+        const revert =
+          tx.type === "CREDIT" ? -Number(tx.amount) : Number(tx.amount);
+        balanceAdjustments[tx.accountId] =
+          (balanceAdjustments[tx.accountId] ?? 0) + revert;
+      }
 
-      return { success: true, count: result.count };
+      // Delete all transactions and update balances in a single transaction
+      const balanceUpdates = Object.entries(balanceAdjustments).map(
+        ([accountId, delta]) =>
+          prisma.bankAccount.update({
+            where: { id: accountId },
+            data: { balance: { increment: delta } },
+          }),
+      );
+
+      await prisma.$transaction([
+        ...balanceUpdates,
+        prisma.transaction.deleteMany({
+          where: { id: { in: input.ids }, userId },
+        }),
+      ]);
+
+      return { success: true, count: existingTransactions.length };
     }),
 
   bulkCreate: protectedProcedure
@@ -687,8 +748,15 @@ export const transactionRouter = createTRPCRouter({
         }
       }
 
-      const created = await prisma.$transaction(
-        transactionsToProcess.map((tx) =>
+      // Calculate total balance impact
+      let totalBalanceDelta = 0;
+      for (const tx of transactionsToProcess) {
+        const amount = parseFloat(tx.amount);
+        totalBalanceDelta += tx.type === "CREDIT" ? amount : -amount;
+      }
+
+      const created = await prisma.$transaction([
+        ...transactionsToProcess.map((tx) =>
           prisma.transaction.create({
             data: {
               userId,
@@ -703,10 +771,17 @@ export const transactionRouter = createTRPCRouter({
             },
           }),
         ),
-      );
+        prisma.bankAccount.update({
+          where: { id: input.accountId },
+          data: { balance: { increment: totalBalanceDelta } },
+        }),
+      ]);
+
+      // Remove the bankAccount update result from the array
+      const createdTransactions = created.slice(0, -1) as TxModel[];
 
       // Trigger budget evaluation and threshold checks for all created transactions
-      for (const tx of created) {
+      for (const tx of createdTransactions) {
         await emitTransactionProcessed({
           userId,
           transactionId: tx.id,
@@ -718,7 +793,7 @@ export const transactionRouter = createTRPCRouter({
 
       return {
         success: true,
-        count: created.length,
+        count: createdTransactions.length,
       };
     }),
 });

@@ -276,15 +276,13 @@ export const userRouter = createTRPCRouter({
    * @param {{q?:string,limit?:number,cursor?:string}} input
    * @returns {Promise<{users:Array<object>,nextCursor?:string|undefined}>}
    */
-  search: publicProcedure
+  search: protectedProcedure
     .input(searchUserSchema)
     .query(async ({ ctx, input }) => {
       const where: Prisma.UserWhereInput = {};
       if (input.q) {
-        where.OR = [
-          { name: { contains: input.q, mode: "insensitive" } },
-          { email: { contains: input.q, mode: "insensitive" } },
-        ];
+        // Only search by name to prevent email enumeration
+        where.name = { contains: input.q, mode: "insensitive" };
       }
 
       const users = await ctx.db.user.findMany({
