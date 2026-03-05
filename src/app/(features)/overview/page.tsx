@@ -103,7 +103,7 @@ export default function OverviewPage() {
   const { data: txData, isLoading: txLoading } = listQuery({
     startDate: dateRange.start.toISOString(),
     endDate: dateRange.end.toISOString(),
-    limit: 500, // Fetch more for stats/charts
+    limit: 100, // Reasonable limit for dashboard stats/charts
   });
 
   const transactions = useMemo(

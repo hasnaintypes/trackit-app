@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     images: ["https://cashio.vercel.app/og-image.png"],
   },
   icons: {
-    icon: "/public/favicon.ico",
+    icon: "/favicon.ico",
     apple: "/apple-touch-icon.png",
   },
 };

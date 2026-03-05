@@ -79,9 +79,15 @@ export default function AccountsPage() {
     setDeletingId(id);
   };
 
+  const { deleteAccount } = useAccounts();
+
   const handleDeleteConfirm = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setDeletingId(null);
+    if (!deletingId) return;
+    try {
+      await deleteAccount({ id: deletingId });
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const mapToInitialValues = (a: Account | ApiAccount) => ({
