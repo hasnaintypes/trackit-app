@@ -161,7 +161,7 @@ function CategoryItem({
 
 export default function CategoriesSettings() {
   const { all, categories: categoryTree, remove } = useCategories();
-  const utils = api.useContext();
+  const utils = api.useUtils();
 
   // Category Form State
   const [openCategory, setOpenCategory] = useState(false);

@@ -177,8 +177,11 @@ export default function AccountSettings() {
                           )}
                         </div>
                         <p className="text-muted-foreground text-sm capitalize">
-                          {account.type.toLowerCase()} • Balance: $
-                          {account.balance.toLocaleString()}
+                          {account.type.toLowerCase()} • Balance:{" "}
+                          {Number(account.balance).toLocaleString(undefined, {
+                            style: "currency",
+                            currency: account.currency ?? "USD",
+                          })}
                         </p>
                       </div>
                     </div>

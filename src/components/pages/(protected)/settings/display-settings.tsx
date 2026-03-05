@@ -502,15 +502,28 @@ export default function DisplaySettings() {
                 </Label>
 
                 <Label
-                  htmlFor="dot"
+                  htmlFor="space"
                   className="border-muted bg-popover hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary flex cursor-pointer flex-col items-center justify-between rounded-md border-2 p-4 transition-all"
                 >
                   <div className="flex w-full items-center justify-between">
-                    <p className="font-medium">1.234,56</p>
-                    <RadioGroupItem value={ThousandSeparator.SPACE} id="dot" />
+                    <p className="font-medium">1 234,56</p>
+                    <RadioGroupItem value={ThousandSeparator.SPACE} id="space" />
                   </div>
                   <span className="text-muted-foreground mt-1 text-sm">
                     Space (Commonly used)
+                  </span>
+                </Label>
+
+                <Label
+                  htmlFor="none"
+                  className="border-muted bg-popover hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary flex cursor-pointer flex-col items-center justify-between rounded-md border-2 p-4 transition-all"
+                >
+                  <div className="flex w-full items-center justify-between">
+                    <p className="font-medium">1234.56</p>
+                    <RadioGroupItem value={ThousandSeparator.NONE} id="none" />
+                  </div>
+                  <span className="text-muted-foreground mt-1 text-sm">
+                    None
                   </span>
                 </Label>
               </RadioGroup>
