@@ -34,9 +34,10 @@ export const settingsRouter = createTRPCRouter({
   updateNotifications: protectedProcedure
     .input(updateNotificationsSchema)
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.notificationPreferences.update({
+      return ctx.db.notificationPreferences.upsert({
         where: { userId: ctx.user.id },
-        data: input,
+        update: input,
+        create: { userId: ctx.user.id, ...input },
       });
     }),
 
@@ -50,18 +51,20 @@ export const settingsRouter = createTRPCRouter({
   updateDisplay: protectedProcedure
     .input(updateDisplaySchema)
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.displaySettings.update({
+      return ctx.db.displaySettings.upsert({
         where: { userId: ctx.user.id },
-        data: input,
+        update: input,
+        create: { userId: ctx.user.id, ...input },
       });
     }),
 
   updateRegional: protectedProcedure
     .input(updateRegionalSchema)
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.userPreferences.update({
+      return ctx.db.userPreferences.upsert({
         where: { userId: ctx.user.id },
-        data: input,
+        update: input,
+        create: { userId: ctx.user.id, ...input },
       });
     }),
 });

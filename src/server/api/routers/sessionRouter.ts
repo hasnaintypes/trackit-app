@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { revokeSessionSchema } from "@/validation/session";
 
@@ -12,7 +13,6 @@ export const sessionRouter = createTRPCRouter({
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
-        token: true,
         ipAddress: true,
         userAgent: true,
         createdAt: true,
@@ -28,7 +28,6 @@ export const sessionRouter = createTRPCRouter({
       device: s.userAgent ?? "Unknown",
       lastActivity: s.updatedAt.toISOString(),
       expiresAt: s.expiresAt ? s.expiresAt.toISOString() : null,
-      token: s.token,
     }));
   }),
 
@@ -40,8 +39,11 @@ export const sessionRouter = createTRPCRouter({
       const existing = await ctx.db.session.findUnique({
         where: { id: input.id },
       });
-      if (existing?.userId !== userId) {
-        throw new Error("Session not found or not owned by user");
+      if (!existing || existing.userId !== userId) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Session not found or not owned by user",
+        });
       }
 
       await ctx.db.session.delete({ where: { id: input.id } });
