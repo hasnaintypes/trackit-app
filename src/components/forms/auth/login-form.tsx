@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUserStore } from "@/store/userStore";
+import { loginSchema } from "@/validation/auth";
 
 export function LoginForm({
   className,
@@ -69,8 +70,9 @@ export function LoginForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast.error("Email and password required");
+    const validation = loginSchema.safeParse({ email, password });
+    if (!validation.success) {
+      toast.error(validation.error.errors[0]?.message ?? "Invalid input");
       return;
     }
 

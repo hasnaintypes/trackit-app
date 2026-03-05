@@ -17,6 +17,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { getAvatarUrl } from "@/lib/shared/avatar";
+import { signupSchema } from "@/validation/auth";
 
 export function SignupForm({
   className,
@@ -60,21 +61,14 @@ export function SignupForm({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Validate name
-    if (!name.trim()) {
-      toast.error("Name is required");
-      return;
-    }
-
-    // Validate password match
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-
-    // Validate password strength
-    if (password.length < 8) {
-      toast.error("Password must be at least 8 characters long");
+    const validation = signupSchema.safeParse({
+      name,
+      email,
+      password,
+      confirmPassword,
+    });
+    if (!validation.success) {
+      toast.error(validation.error.errors[0]?.message ?? "Invalid input");
       return;
     }
 
