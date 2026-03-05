@@ -49,6 +49,9 @@ import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { IconPicker } from "@/components/common/icon-picker";
 import { ColorPicker } from "@/components/common/color-picker";
+import { createLogger } from "@/lib/logging";
+
+const logger = createLogger("subcategory-form");
 
 type SubcategoryFormProps = {
   open: boolean;
@@ -120,7 +123,9 @@ export function SubcategoryForm({
       }
       onOpenChange(false);
     } catch (err) {
-      console.error(err);
+      logger.error("Failed to save subcategory", {
+        error: err instanceof Error ? err.message : String(err),
+      });
       toast.error("Failed to save subcategory");
     }
   };

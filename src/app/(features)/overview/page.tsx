@@ -1,6 +1,9 @@
 "use client";
 
+import { createLogger } from "@/lib/logging";
 import React, { useMemo, useState } from "react";
+
+const logger = createLogger("overview-page");
 import { useUser } from "@/hooks/use-user";
 import { api } from "@/trpc/react";
 import { useAccounts } from "@/hooks/use-accounts";
@@ -72,7 +75,9 @@ export default function OverviewPage() {
         utils.account.list.invalidate(),
       ]);
     } catch (err) {
-      console.error("Failed to delete transactions:", err);
+      logger.error("Failed to delete transactions", {
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
   };
 

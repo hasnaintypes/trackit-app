@@ -81,12 +81,9 @@ async function main() {
     }
   }
 
-  // Clear existing categories for this user?
-  // Maybe just add new ones. But to avoid duplicates if run multiple times?
-  // For now, we will just create. User logic seems to imply a fresh start or specific seeding task.
-  // Using upsert is hard with tree structure without unique identifiers (name is not unique globally, constrained by parent?).
-  // Schema doesn't enforce unique name per user.
-  // We'll just create.
+  // Clear existing seeded categories for this user to make seeding idempotent
+  await prisma.category.deleteMany({ where: { userId: user.id } });
+  console.log("Cleared existing categories for user.");
 
   for (const cat of categories) {
     await createCategory(cat, null);

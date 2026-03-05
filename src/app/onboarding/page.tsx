@@ -22,6 +22,9 @@ import {
   ColorScheme,
 } from "@prisma/client";
 import { StepForms } from "@/components/pages/(protected)/onboarding/step-forms";
+import { createLogger } from "@/lib/logging";
+
+const logger = createLogger("onboarding-page");
 
 const onboardingSteps = [
   { id: 1, title: "Identity", description: "Who are you?" },
@@ -179,7 +182,9 @@ export default function OnboardingPage() {
       toast.success("All set! Welcome to Cashio.");
       router.push("/overview");
     } catch (err) {
-      console.error(err);
+      logger.error("Failed to save onboarding settings", {
+        error: err instanceof Error ? err.message : String(err),
+      });
       toast.error("Failed to save settings. Please try again.");
     } finally {
       setIsLoading(false);

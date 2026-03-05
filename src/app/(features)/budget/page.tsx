@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "@/trpc/react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Wallet } from "lucide-react";
 import { BudgetCard } from "@/components/pages/(protected)/budget/budget-card";
 import { CreateBudgetDialog } from "@/components/pages/(protected)/budget/create-budget-dialog";
 import { GenericRadarChart } from "@/components/charts/radar-chart";
@@ -63,7 +63,7 @@ export default function BudgetPage() {
       {budgetList.length === 0 ? (
         <div className="bg-muted/20 flex flex-col items-center justify-center rounded-lg border border-dashed py-12 text-center">
           <div className="bg-primary/10 mb-4 rounded-full p-4">
-            <span className="text-4xl">💰</span>
+            <Wallet className="text-primary h-8 w-8" />
           </div>
           <h3 className="text-xl font-semibold">No Budgets Yet</h3>
           <p className="text-muted-foreground mt-2 max-w-sm">

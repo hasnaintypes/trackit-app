@@ -14,6 +14,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { createLogger } from "@/lib/logging";
+
+const logger = createLogger("delete-dialog");
 
 interface DeleteDialogProps {
   trigger?: React.ReactNode;
@@ -56,7 +59,9 @@ export function DeleteDialog({
       toast.success(successMessage);
       setOpen(false);
     } catch (error) {
-      console.error("Delete Error:", error);
+      logger.error("Delete Error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       toast.error(errorMessage);
     } finally {
       setIsDeleting(false);

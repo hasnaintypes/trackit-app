@@ -54,7 +54,7 @@ export default function BudgetOverview({ budgets }: { budgets: Budget[] }) {
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="flex items-center gap-2 text-lg font-medium">
-                <span>{b.category.icon ?? "💰"}</span>
+                <span>{b.category.icon ?? ""}</span>
                 {b.category.name}
               </CardTitle>
               {isOver && (

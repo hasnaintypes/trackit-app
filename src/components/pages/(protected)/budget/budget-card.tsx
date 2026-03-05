@@ -62,7 +62,7 @@ export function BudgetCard({
     >
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-          <span className="text-2xl">{icon ?? "💰"}</span>
+          <span className="text-2xl">{icon ?? ""}</span>
           <span>{name}</span>
         </CardTitle>
         <Badge

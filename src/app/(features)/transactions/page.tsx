@@ -11,6 +11,9 @@ import { format } from "date-fns";
 import type { ChartConfig } from "@/components/ui/chart";
 import type { Transaction } from "@/types/transaction";
 import { api } from "@/trpc/react";
+import { createLogger } from "@/lib/logging";
+
+const logger = createLogger("transactions-page");
 
 export default function TransactionsPage() {
   const { listQuery, remove } = useTransactions();
@@ -48,7 +51,9 @@ export default function TransactionsPage() {
         utils.account.list.invalidate(),
       ]);
     } catch (err) {
-      console.error("Failed to delete transactions:", err);
+      logger.error("Failed to delete transactions", {
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
   };
 

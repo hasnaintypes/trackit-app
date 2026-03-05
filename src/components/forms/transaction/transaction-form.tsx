@@ -94,6 +94,9 @@ import type {
   UpdateTransactionInput,
   RecurrenceInput,
 } from "@/validation/transaction";
+import { createLogger } from "@/lib/logging";
+
+const logger = createLogger("transaction-form");
 
 type TransactionFormProps = {
   open: boolean;
@@ -283,7 +286,9 @@ export function TransactionForm({
       // Invalidation is handled by useTransactions onSuccess hooks
       onOpenChange(false);
     } catch (err) {
-      console.error(err);
+      logger.error("Failed to save transaction", {
+        error: err instanceof Error ? err.message : String(err),
+      });
       toast.error("Failed to save transaction");
     }
   };
@@ -617,7 +622,15 @@ export function TransactionForm({
                                         }
                                       } catch (e) {
                                         /* ignore invalid date */
-                                        console.log(e);
+                                        logger.info(
+                                          "Invalid date from receipt scan",
+                                          {
+                                            error:
+                                              e instanceof Error
+                                                ? e.message
+                                                : String(e),
+                                          },
+                                        );
                                       }
                                     }
                                     // paymentMethod - validate against allowed enum values
@@ -691,12 +704,22 @@ export function TransactionForm({
                                     );
                                   }
                                 } catch (err) {
-                                  console.error("AI receipt scan failed:", err);
+                                  logger.error("AI receipt scan failed", {
+                                    error:
+                                      err instanceof Error
+                                        ? err.message
+                                        : String(err),
+                                  });
                                   // don't fail the form save on AI errors
                                 }
                               }
                             } catch (err) {
-                              console.error(err);
+                              logger.error("Failed to upload receipt", {
+                                error:
+                                  err instanceof Error
+                                    ? err.message
+                                    : String(err),
+                              });
                               toast.error("Failed to upload receipt");
                             }
                           };

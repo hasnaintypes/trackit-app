@@ -62,6 +62,9 @@ import { useCategories } from "@/hooks/use-categories";
 // Custom Pickers
 import { IconPicker } from "@/components/common/icon-picker";
 import { ColorPicker } from "@/components/common/color-picker";
+import { createLogger } from "@/lib/logging";
+
+const logger = createLogger("category-form");
 
 type CategoryFormProps = {
   open: boolean;
@@ -142,7 +145,9 @@ export function CategoryForm({
       }
       onOpenChange(false);
     } catch (error) {
-      console.error(error);
+      logger.error("Failed to save category", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       toast.error("Something went wrong");
     }
   };

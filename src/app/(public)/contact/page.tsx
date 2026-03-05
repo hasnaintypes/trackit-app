@@ -1,6 +1,9 @@
 "use client";
 
+import { createLogger } from "@/lib/logging";
 import { useState, useRef, useEffect } from "react";
+
+const logger = createLogger("contact-page");
 import { motion, useInView } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -55,7 +58,7 @@ export default function ContactUsPage() {
         const hex = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
         setThemeHex(hex);
         setThemeRgb([r / 255, g / 255, b / 255]);
-        console.debug("theme resolved rgb", { primary, resolved, hex });
+        logger.debug("theme resolved rgb", { primary, resolved, hex });
       } else {
         const maybeHex = primary.trim();
         if (/^#([0-9a-f]{3,8})$/i.test(maybeHex)) {
@@ -68,20 +71,22 @@ export default function ContactUsPage() {
           const b = parseInt(hex.slice(5, 7), 16);
           setThemeHex(hex);
           setThemeRgb([r / 255, g / 255, b / 255]);
-          console.debug("theme resolved hex fallback", {
+          logger.debug("theme resolved hex fallback", {
             primary: maybeHex,
             hex,
           });
         } else {
           setThemeHex("#7c3aed");
           setThemeRgb([124 / 255, 58 / 255, 237 / 255]);
-          console.debug("theme resolved fallback used", { primary, resolved });
+          logger.debug("theme resolved fallback used", { primary, resolved });
         }
       }
     } catch (e) {
       setThemeHex("#7c3aed");
       setThemeRgb([124 / 255, 58 / 255, 237 / 255]);
-      console.debug("theme resolution error", e);
+      logger.debug("theme resolution error", {
+        error: e instanceof Error ? e.message : String(e),
+      });
     }
   }, []);
 
@@ -90,7 +95,7 @@ export default function ContactUsPage() {
     setIsSubmitting(true);
 
     try {
-      console.log("Form submitted:", { name, email, message });
+      logger.info("Form submitted", { name, email, message });
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setName("");
       setEmail("");
@@ -100,7 +105,9 @@ export default function ContactUsPage() {
         setIsSubmitted(false);
       }, 5000);
     } catch (error) {
-      console.error("Error submitting form:", error);
+      logger.error("Error submitting form", {
+        error: error instanceof Error ? error.message : String(error),
+      });
     } finally {
       setIsSubmitting(false);
     }

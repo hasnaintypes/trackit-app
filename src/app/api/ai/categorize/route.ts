@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
+import { createLogger } from "@/lib/logging";
 import { AIService } from "@/server/services/aiService";
+
+const logger = createLogger("ai-categorize-route");
 import type { TransactionForAI } from "@/types/ai";
 import type { CategoryForAI } from "@/types/category";
 
@@ -31,7 +34,9 @@ export async function POST(req: Request) {
     );
     return NextResponse.json({ result });
   } catch (err) {
-    console.error("AI categorize route error:", err);
+    logger.error("AI categorize route error", {
+      error: err instanceof Error ? err.message : String(err),
+    });
     const message =
       err instanceof Error ? err.message : "Unknown error from AI route";
     return NextResponse.json({ error: message }, { status: 500 });
