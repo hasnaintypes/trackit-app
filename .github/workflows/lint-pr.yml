@@ -1,7 +1,7 @@
-name: 🧹 Lint PRs
+name: Lint PRs
 
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, edited, synchronize, reopened]
 
 jobs:
@@ -9,10 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Validate branch name
+        env:
+          BRANCH_NAME: ${{ github.head_ref }}
         run: |
-          branch_name=${{ github.head_ref }}
-          if [[ ! $branch_name =~ ^(feat|fix|chore|docs|refactor|test|hotfix|release)/[a-z0-9._-]+$ ]]; then
-            echo "❌ Invalid branch name: $branch_name"
+          if [[ ! "$BRANCH_NAME" =~ ^(feat|fix|chore|docs|refactor|test|hotfix|release)/[a-z0-9._-]+$ ]]; then
+            echo "Invalid branch name: $BRANCH_NAME"
             echo "Follow pattern: <type>/<short-description>"
             exit 1
           fi
