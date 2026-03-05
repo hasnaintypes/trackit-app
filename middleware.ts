@@ -55,22 +55,16 @@ function isAuthPath(pathname: string) {
 function detectAuthFromCookies(req: NextRequest) {
   try {
     const cookies = req.cookies.getAll ? req.cookies.getAll() : [];
-    // quick scan for known auth cookie name fragments
-    for (const c of cookies) {
-      const n = c.name || "";
-      if (/ba|better|better-auth|next-auth|session|token|auth/i.test(n))
-        return true;
-    }
-    // As a fallback check individual common cookie names
+    // Check known auth cookie names used by Better Auth
     const common = [
+      "better-auth.session_token",
+      "better-auth.session",
+      "__Secure-better-auth.session_token",
       "ba.session",
       "ba.token",
       "better-auth",
       "better_auth",
       "next-auth.session-token",
-      "session",
-      "token",
-      "auth",
     ];
     for (const name of common) {
       if (req.cookies.get(name)) return true;

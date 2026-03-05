@@ -1,38 +1,32 @@
-"use client";
-
-import * as React from "react";
-import Image from "next/image";
+import { Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface LogoProps extends React.HTMLAttributes<HTMLDivElement> {
+interface LogoProps {
   size?: number;
+  className?: string;
+  showText?: boolean;
 }
 
-export function Logo({ size = 16, className, ...props }: LogoProps) {
-  const height = size;
-
+export function Logo({ size = 20, className, showText = false }: LogoProps) {
   return (
-    <div
-      className={cn("text-primary flex items-center justify-center", className)}
-      {...props}
-    >
-      {/* light */}
-      <Image
-        src="/logo.png"
-        alt="logo"
-        width={height * 2}
-        height={height}
-        className="block h-auto dark:hidden"
+    <div className={cn("flex items-center gap-2", className)}>
+      <Wallet
+        className="text-primary"
+        size={size}
+        strokeWidth={2}
       />
-
-      {/* dark */}
-      <Image
-        src="/logo-dark.png"
-        alt="logo dark"
-        width={height * 2}
-        height={height}
-        className="hidden h-auto dark:block"
-      />
+      {showText && (
+        <span className="font-medium text-black dark:text-white">Cashio</span>
+      )}
     </div>
+  );
+}
+
+/**
+ * LogoIcon variant for integration grids and small icon contexts.
+ */
+export function LogoIcon({ className }: { className?: string }) {
+  return (
+    <Wallet className={cn("text-primary h-6 w-6", className)} strokeWidth={2} />
   );
 }

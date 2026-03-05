@@ -6,7 +6,7 @@ import {
   VSCodium,
   MediaWiki,
 } from "public/images/logos";
-import { LogoIcon } from "@/components/ui/logo";
+import { LogoIcon } from "@/components/common/logo";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";

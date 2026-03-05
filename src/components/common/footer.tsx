@@ -14,8 +14,7 @@ export default function Footer() {
           aria-label="go home"
           className="mx-auto flex w-fit items-center gap-2"
         >
-          <Logo />
-          <span className="font-medium text-black dark:text-white">Cashio</span>
+          <Logo showText />
         </Link>
 
         <div className="my-8 flex flex-wrap justify-center gap-6 text-sm">

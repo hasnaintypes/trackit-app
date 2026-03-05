@@ -18,7 +18,7 @@ export default NAV_HEADER_LINKS;
 export const SOCIAL_LINKS = {
   twitter: "https://twitter.com/bynainee",
   facebook: "https://facebook.com/bynainee",
-  linkedin: "https://www.linkedin.com/hasnainx",
+  linkedin: "https://www.linkedin.com/in/hasnainx",
   instagram: "https://www.instagram.com/bynainee",
   github: "https://github.com/hasnaintypes",
 };

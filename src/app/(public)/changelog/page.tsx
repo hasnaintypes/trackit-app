@@ -17,7 +17,7 @@ export default function ChangelogPage() {
             What&apos;s new?
           </h1>
           <p className="text-lg text-balance opacity-80 sm:text-xl">
-            A rundown of the latest Phosphorus feature releases, product
+            A rundown of the latest Cashio feature releases, product
             enhancements, design updates and important bug fixes.
           </p>
         </div>

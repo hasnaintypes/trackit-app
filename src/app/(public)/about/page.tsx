@@ -1,4 +1,3 @@
-"use client";
 import { HeroSection, FAQSection, Blog, StatsSection } from "@component/about";
 
 const AboutPage = () => {

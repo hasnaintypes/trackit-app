@@ -317,7 +317,7 @@ export default function ContactUsPage() {
               </p>
               <Link
                 className="text-primary mt-4 font-medium"
-                href="tel:akashmoradiya3444@gmail.com"
+                href="tel:+15550000000"
               >
                 +1 (555) 000-0000
               </Link>
