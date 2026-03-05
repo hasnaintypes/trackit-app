@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import type { Prisma } from "@prisma/client";
 import {
@@ -165,7 +166,7 @@ export const accountRouter = createTRPCRouter({
       });
       const existing = existingRaw as RawAccount | null;
       if (existing?.userId !== userId)
-        throw new Error("Account not found or not owned by user");
+        throw new TRPCError({ code: "NOT_FOUND", message: "Account not found" });
 
       if (input.isDefault) {
         await prisma.$transaction([
@@ -228,7 +229,7 @@ export const accountRouter = createTRPCRouter({
         where: { id: input.id },
       });
       if (existing?.userId !== userId)
-        throw new Error("Account not found or not owned by user");
+        throw new TRPCError({ code: "NOT_FOUND", message: "Account not found" });
 
       await prisma.bankAccount.delete({ where: { id: input.id } });
       return { success: true };

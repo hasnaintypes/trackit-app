@@ -67,6 +67,35 @@ export const categoryRouter = createTRPCRouter({
         });
       }
 
+      // Cycle detection for parent change
+      if (
+        Object.prototype.hasOwnProperty.call(input, "parentCategoryId") &&
+        input.parentCategoryId
+      ) {
+        if (input.parentCategoryId === input.id) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Cannot set category as its own parent",
+          });
+        }
+        let ancestorId: string | null = input.parentCategoryId;
+        while (ancestorId) {
+          const ancestor: { parentCategoryId: string | null } | null =
+            await ctx.db.category.findUnique({
+              where: { id: ancestorId },
+              select: { parentCategoryId: true },
+            });
+          if (!ancestor) break;
+          if (ancestor.parentCategoryId === input.id) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Cannot create a circular parent-child relationship",
+            });
+          }
+          ancestorId = ancestor.parentCategoryId;
+        }
+      }
+
       return ctx.db.category.update({
         where: { id: input.id },
         data: {
@@ -99,18 +128,23 @@ export const categoryRouter = createTRPCRouter({
           message: "Category not found",
         });
       }
-      // Recursively delete category and its children.
-      const deleteRecursive = async (id: string) => {
+      // Collect all IDs to delete (category + descendants), then batch-delete
+      const idsToDelete: string[] = [];
+      const collectIds = async (id: string) => {
         const children = await ctx.db.category.findMany({
           where: { parentCategoryId: id },
+          select: { id: true },
         });
         for (const child of children) {
-          await deleteRecursive(child.id);
+          await collectIds(child.id);
         }
-        await ctx.db.category.delete({ where: { id } });
+        idsToDelete.push(id);
       };
+      await collectIds(input.id);
 
-      await deleteRecursive(input.id);
+      await ctx.db.category.deleteMany({
+        where: { id: { in: idsToDelete } },
+      });
 
       return { success: true };
     }),
@@ -158,6 +192,13 @@ export const categoryRouter = createTRPCRouter({
         }
 
         if (input.parentId) {
+          // Prevent setting parent to self
+          if (input.parentId === input.id) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Cannot set category as its own parent",
+            });
+          }
           const newParent = await ctx.db.category.findUnique({
             where: { id: input.parentId },
           });
@@ -166,6 +207,21 @@ export const categoryRouter = createTRPCRouter({
               code: "NOT_FOUND",
               message: "New parent not found",
             });
+          }
+          // Prevent cycle: check that newParent is not a descendant of this category
+          let ancestorId: string | null = newParent.parentCategoryId;
+          while (ancestorId) {
+            if (ancestorId === input.id) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: "Cannot create a circular parent-child relationship",
+              });
+            }
+            const ancestor = await ctx.db.category.findUnique({
+              where: { id: ancestorId },
+              select: { parentCategoryId: true },
+            });
+            ancestorId = ancestor?.parentCategoryId ?? null;
           }
         }
 
@@ -199,18 +255,23 @@ export const categoryRouter = createTRPCRouter({
           });
         }
 
-        // Delete recursively to remove any nested subcategories.
-        const deleteRecursive = async (id: string) => {
+        // Collect all IDs to delete, then batch-delete
+        const idsToDelete: string[] = [];
+        const collectIds = async (id: string) => {
           const children = await ctx.db.category.findMany({
             where: { parentCategoryId: id },
+            select: { id: true },
           });
           for (const child of children) {
-            await deleteRecursive(child.id);
+            await collectIds(child.id);
           }
-          await ctx.db.category.delete({ where: { id } });
+          idsToDelete.push(id);
         };
+        await collectIds(input.id);
 
-        await deleteRecursive(input.id);
+        await ctx.db.category.deleteMany({
+          where: { id: { in: idsToDelete } },
+        });
 
         return { success: true };
       }),
