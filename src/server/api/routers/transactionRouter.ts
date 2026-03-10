@@ -532,7 +532,7 @@ export const transactionRouter = createTRPCRouter({
         file: input.fileDataUrl,
         fileName: input.fileName ?? `receipt_${Date.now()}`,
         // Store receipts in a dedicated folder for easier management
-        folder: "Cashio-Uploads/Receipts",
+        folder: "Trackit-Uploads/Receipts",
       });
       const url = res?.url ?? null;
 

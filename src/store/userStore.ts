@@ -24,7 +24,7 @@ export const useUserStore = create<UserState>()(
       clear: () => set({ user: null }),
     }),
     {
-      name: "cashio_user",
+      name: "trackit_user",
       // Only persist non-sensitive fields
       partialize: (state) =>
         state.user
