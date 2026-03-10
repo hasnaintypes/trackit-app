@@ -121,7 +121,7 @@ export default function Footer() {
         </div>
         <div className="mt-8 flex flex-col items-center justify-between md:flex-row">
           <span className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} Cashio, All rights reserved
+            © {new Date().getFullYear()} Trackit, All rights reserved
           </span>
           <div className="mt-4 flex items-center gap-4 md:mt-0">
             <span className="flex items-center gap-2 text-sm text-green-600">

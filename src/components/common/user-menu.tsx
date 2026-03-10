@@ -61,7 +61,7 @@ export default function UserMenu() {
         >
           <Avatar>
             <AvatarImage
-              src={user?.image ?? "/origin/avatar.jpg"}
+              src={user?.image ?? ""}
               alt={user?.name ?? "Profile image"}
             />
             <AvatarFallback>{initials}</AvatarFallback>

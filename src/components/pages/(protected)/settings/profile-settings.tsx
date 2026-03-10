@@ -97,7 +97,7 @@ export default function ProfileSettings() {
       setIsUploadingImage(true);
       await uploadFile(file, {
         fileName: `profile-${Date.now()}`,
-        folder: "Cashio-Uploads/Profiles",
+        folder: "Trackit-Uploads/Profiles",
       });
       toast.success("Profile picture updated successfully");
     } catch (error) {

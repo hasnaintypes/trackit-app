@@ -90,7 +90,7 @@ export default function NavBar() {
               href="/overview"
               className="text-primary hover:text-primary/90"
             >
-              <Logo />
+              <Logo showText />
             </Link>
             {/* Navigation menu */}
             <NavigationMenu className="max-md:hidden">

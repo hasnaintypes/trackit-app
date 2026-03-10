@@ -24,7 +24,7 @@ export const CommentSection = ({ comments }: CommentSectionProps) => {
       // Do not call onAddComment per request; just append a local placeholder
       const placeholder: BlogComment = {
         id: `local-${Date.now()}`,
-        author: { name: "You", avatar: "/images/avatar-placeholder.png" },
+        author: { name: "You", avatar: "/images/avatars/avatar-1.jpeg" },
         content: newComment,
         timestamp: "Just now",
         likes: 0,

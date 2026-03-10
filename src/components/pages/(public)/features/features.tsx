@@ -37,8 +37,8 @@ export default function Features() {
               />
               <div className="aspect-76/59 p-1 px-6">
                 <DualModeImage
-                  darkSrc="/payments.webp"
-                  lightSrc="/payments-light.webp"
+                  darkSrc="/images/screenshots/payments-view-dark.webp"
+                  lightSrc="/images/screenshots/payments-view-light.webp"
                   alt="payments illustration"
                   width={1207}
                   height={929}
@@ -60,8 +60,8 @@ export default function Features() {
               <div className="relative mask-radial-[75%_75%] mask-radial-from-75% mask-radial-at-right max-sm:mb-6">
                 <div className="aspect-76/59 overflow-hidden rounded-lg border">
                   <DualModeImage
-                    darkSrc="/origin-cal-dark.webp"
-                    lightSrc="/origin-cal.webp"
+                    darkSrc="/images/screenshots/calendar-view-dark.webp"
+                    lightSrc="/images/screenshots/calendar-view-light.webp"
                     alt="calendar illustration"
                     width={1207}
                     height={929}
