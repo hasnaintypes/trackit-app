@@ -40,7 +40,7 @@ export const featuresList: FeatureItem[] = [
     icon: LineChartIcon,
     title: "AI Insights & Analytics",
     description:
-      "Discover spending trends, predict bills, and get personalized saving tips. Cashio’s AI helps you make smarter financial decisions every day.",
+      "Discover spending trends, predict bills, and get personalized saving tips. Trackit’s AI helps you make smarter financial decisions every day.",
     cardBorderColor:
       "border-amber-600/40 hover:border-amber-600 dark:border-amber-400/40 dark:hover:border-amber-400",
     avatarTextColor: "text-amber-600 dark:text-amber-400",
@@ -77,19 +77,19 @@ export const featuresList: FeatureItem[] = [
 ];
 
 export const hero: HeroContent = {
-  badgeText: "Now Live  Cashio v1.0",
+  badgeText: "Now Live  Trackit v1.0",
   title: "Your Smartest Way to Manage Money, Together",
   description:
-    "Cashio unifies personal and group finance in one intelligent dashboard. Track spending, split bills, set goals, and let AI guide your next move all in real time.",
+    "Trackit unifies personal and group finance in one intelligent dashboard. Track spending, split bills, set goals, and let AI guide your next move all in real time.",
   primaryCta: { href: "/sign-in", text: "Get Started Free" },
   secondaryCta: { text: "See How It Works" },
 };
 
 export const contentSection: ContentSectionContent = {
-  heading: "The Cashio ecosystem powers smarter finance.",
+  heading: "The Trackit ecosystem powers smarter finance.",
   paragraphs: [
-    "Cashio isn’t just another finance app  it’s a complete ecosystem built for individuals, teams, and businesses to manage money intelligently.",
-    "From real-time collaboration and AI-driven insights to secure payments and seamless automation, Cashio connects every part of your financial life.",
+    "Trackit isn’t just another finance app  it’s a complete ecosystem built for individuals, teams, and businesses to manage money intelligently.",
+    "From real-time collaboration and AI-driven insights to secure payments and seamless automation, Trackit connects every part of your financial life.",
   ],
   bullets: [
     {
@@ -104,7 +104,7 @@ export const contentSection: ContentSectionContent = {
 };
 
 export const integrations: IntegrationContent = {
-  heading: "Connect Cashio with your favorite tools",
+  heading: "Connect Trackit with your favorite tools",
   description:
     "Integrate with Plaid, Notion, Google Sheets, and Stripe to automate your workflow. Build custom extensions and automate reports with our API and webhooks.",
   cta: { href: "/sign-in", text: "Get Started Free" },
@@ -139,7 +139,7 @@ export const pricing = {
         "Automated settlements",
         "Priority chat support",
       ],
-      buttonText: "Upgrade to Cashio Pro",
+      buttonText: "Upgrade to Trackit Pro",
       isPopular: true,
     },
     {
@@ -154,7 +154,7 @@ export const pricing = {
         "Custom webhook support",
         "Dedicated success team",
       ],
-      buttonText: "Get Cashio Enterprise",
+      buttonText: "Get Trackit Enterprise",
     },
   ] as Plan[],
 };
@@ -165,84 +165,84 @@ export const testimonials: Testimonial[] = [
     role: "Freelance Finance Consultant",
     image: "https://randomuser.me/api/portraits/men/1.jpg",
     quote:
-      "Cashio is really extraordinary and very practical, no need to think twice. A real gold mine.",
+      "Trackit is really extraordinary and very practical, no need to think twice. A real gold mine.",
   },
   {
     name: "Yves Kalume",
     role: "Product Manager at Finlytics",
     image: "https://randomuser.me/api/portraits/men/6.jpg",
     quote:
-      "With no experience in finance apps I organized my budgets in minutes with Cashio's AI  truly effortless.",
+      "With no experience in finance apps I organized my budgets in minutes with Trackit's AI  truly effortless.",
   },
   {
     name: "Yucel Faruksahan",
     role: "UX Designer",
     image: "https://randomuser.me/api/portraits/men/7.jpg",
     quote:
-      "Great work on Cashio's dashboard. This is one of the best finance UIs that I have seen so far :)",
+      "Great work on Trackit's dashboard. This is one of the best finance UIs that I have seen so far :)",
   },
   {
     name: "Anonymous author",
     role: "Everyday User",
     image: "https://randomuser.me/api/portraits/men/8.jpg",
     quote:
-      "I am new to finance apps and wanted something simple. I searched a lot and Cashio gave a clear view without complexity. The onboarding was easy to follow and fit my needs perfectly.",
+      "I am new to finance apps and wanted something simple. I searched a lot and Trackit gave a clear view without complexity. The onboarding was easy to follow and fit my needs perfectly.",
   },
   {
     name: "Shekinah Tshiokufila",
     role: "Senior Software Engineer",
     image: "https://randomuser.me/api/portraits/men/4.jpg",
     quote:
-      "Cashio is redefining finance apps, providing efficient tools for those who value simplicity but need power. I highly recommend it.",
+      "Trackit is redefining finance apps, providing efficient tools for those who value simplicity but need power. I highly recommend it.",
   },
   {
     name: "Oketa Fred",
     role: "Fullstack Developer",
     image: "https://randomuser.me/api/portraits/men/2.jpg",
     quote:
-      "I absolutely love Cashio! The components are beautifully designed and easy to use, making finance management a breeze.",
+      "I absolutely love Trackit! The components are beautifully designed and easy to use, making finance management a breeze.",
   },
   {
     name: "Zeki",
     role: "Founder of ChatExtend",
     image: "https://randomuser.me/api/portraits/men/5.jpg",
     quote:
-      "Using Cashio felt like unlocking a finance superpower. The blend of simplicity and power lets us build workflows that are both elegant and practical.",
+      "Using Trackit felt like unlocking a finance superpower. The blend of simplicity and power lets us build workflows that are both elegant and practical.",
   },
   {
     name: "Joseph Kitheka",
     role: "Fullstack Developer",
     image: "https://randomuser.me/api/portraits/men/9.jpg",
     quote:
-      "Cashio has transformed how I manage apps. Its set of components and templates accelerated our setup. The flexibility to customize allowed unique experiences. Cashio is a game-changer!",
+      "Trackit has transformed how I manage apps. Its set of components and templates accelerated our setup. The flexibility to customize allowed unique experiences. Trackit is a game-changer!",
   },
   {
     name: "Khatab Wedaa",
     role: "Product Designer",
     image: "https://randomuser.me/api/portraits/men/10.jpg",
     quote:
-      "Cashio is elegant, clean, and responsive  very helpful to get a finance product started quickly.",
+      "Trackit is elegant, clean, and responsive  very helpful to get a finance product started quickly.",
   },
   {
     name: "Rodrigo Aguilar",
     role: "UI/UX Creator",
     image: "https://randomuser.me/api/portraits/men/11.jpg",
     quote:
-      "I love Cashio. The UI blocks are well-structured, simple to use, and beautifully designed. It makes launching a finance app fast.",
+      "I love Trackit. The UI blocks are well-structured, simple to use, and beautifully designed. It makes launching a finance app fast.",
   },
   {
     name: "Eric Ampire",
     role: "Mobile Engineer",
     image: "https://randomuser.me/api/portraits/men/12.jpg",
     quote:
-      "Cashio templates are perfect for anyone building a finance app without design experience. They are easy to use, customizable, and responsive. Highly recommended.",
+      "Trackit templates are perfect for anyone building a finance app without design experience. They are easy to use, customizable, and responsive. Highly recommended.",
   },
   {
     name: "Roland Tubonge",
     role: "Software Engineer",
     image: "https://randomuser.me/api/portraits/men/13.jpg",
     quote:
-      "Cashio is so well designed that even without deep design knowledge you can do great things. Let it surprise you!",
+      "Trackit is so well designed that even without deep design knowledge you can do great things. Let it surprise you!",
   },
 ];
 

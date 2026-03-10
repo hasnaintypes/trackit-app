@@ -89,25 +89,25 @@ export async function uploadForProfile(
   // just return the original URL. We'll attempt to upload via ImageKit to
   // ensure consistent hosting.
   // Normalize folder name so callers can pass short names like "profiles"
-  // and they will be uploaded under `Cashio-Uploads/<subfolder>`.
-  // If the caller passes a folder that already starts with `Cashio-Uploads`,
+  // and they will be uploaded under `Trackit-Uploads/<subfolder>`.
+  // If the caller passes a folder that already starts with `Trackit-Uploads`,
   // preserve it as-is. If no folder is provided, default to
-  // `Cashio-Uploads/Profiles`.
+  // `Trackit-Uploads/Profiles`.
   let targetFolder: string;
   if (!folder) {
-    targetFolder = "Cashio-Uploads/Profiles";
+    targetFolder = "Trackit-Uploads/Profiles";
   } else {
     const trimmed = folder.trim();
-    // If caller already provided a full Cashio-Uploads path, use it.
-    if (/^Cashio-Uploads(\/|$)/i.test(trimmed)) {
+    // If caller already provided a full Trackit-Uploads path, use it.
+    if (/^Trackit-Uploads(\/|$)/i.test(trimmed)) {
       targetFolder = trimmed;
     } else if (/^profiles$/i.test(trimmed)) {
       // common short name -> map to canonical Profiles folder
-      targetFolder = "Cashio-Uploads/Profiles";
+      targetFolder = "Trackit-Uploads/Profiles";
     } else {
-      // Normalize and prefix with Cashio-Uploads
+      // Normalize and prefix with Trackit-Uploads
       const normalized = trimmed.replace(/^\/+|\/+$/g, "");
-      targetFolder = `Cashio-Uploads/${normalized}`;
+      targetFolder = `Trackit-Uploads/${normalized}`;
     }
   }
 

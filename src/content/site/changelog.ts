@@ -17,7 +17,7 @@ const changelog: ChangelogContent = {
       ],
       // image: {
       //   src: "/marketing-ui.png",
-      //   alt: "Screenshot of the Cashio marketing homepage",
+      //   alt: "Screenshot of the Trackit marketing homepage",
       //   width: 600,
       //   height: 400,
       // },

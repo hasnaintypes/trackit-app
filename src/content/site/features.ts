@@ -2,9 +2,9 @@ import type { FeaturesContent } from "@/types/site";
 
 export const featuresContent: FeaturesContent = {
   heading:
-    "The Cashio ecosystem unites finance, automation, and collaboration.",
+    "The Trackit ecosystem unites finance, automation, and collaboration.",
   subheading:
-    "Cashio goes beyond personal finance tracking. It’s a complete ecosystem  from real-time group management to AI-driven insights helping users and teams grow smarter with money.",
+    "Trackit goes beyond personal finance tracking. It’s a complete ecosystem  from real-time group management to AI-driven insights helping users and teams grow smarter with money.",
   leftFeatures: [
     {
       title: "Multi-Account Tracking",
@@ -54,13 +54,13 @@ export const featuresContent: FeaturesContent = {
   center: {
     title: "A connected financial ecosystem",
     description:
-      "Cashio links your accounts, AI insights, and collaboration tools into one powerful experience. It’s the smarter, faster, and safer way to manage both personal and group finances.",
+      "Trackit links your accounts, AI insights, and collaboration tools into one powerful experience. It’s the smarter, faster, and safer way to manage both personal and group finances.",
   },
   teaser: {
     heading:
       "Practical finance that gets you results quickly and clearly built for individuals and groups",
     subheading:
-      "Set up in minutes, sync accounts, track shared balances, and automate recurring actions like bill reminders and transfers. Cashio removes the busywork so you can focus on what matters.",
+      "Set up in minutes, sync accounts, track shared balances, and automate recurring actions like bill reminders and transfers. Trackit removes the busywork so you can focus on what matters.",
     title: "Start with clarity, finish with control",
     description:
       "Fast setup, clear shared balances, seamless integrations, and automatic routines that run in the background everything focused on helping you act, not plan. Built-in security, audit logs, and role-based sharing keep your finances safe and transparent.",
