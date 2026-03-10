@@ -54,14 +54,14 @@ export default function NotificationMenu() {
         <Button
           size="icon"
           variant="ghost"
-          className="text-muted-foreground cursor-button relative mr-1 size-8 rounded-full shadow-none md:mr-2"
+          className="text-primary-foreground hover:bg-primary-foreground/10 relative size-9"
           aria-label="Open notifications"
         >
-          <BellIcon size={16} aria-hidden="true" className="cursor-pointer" />
+          <BellIcon size={20} aria-hidden="true" />
           {unreadCount > 0 && (
             <div
               aria-hidden="true"
-              className="bg-primary absolute top-0.5 right-0.5 size-1 cursor-pointer rounded-full"
+              className="absolute top-1.5 right-1.5 size-2 rounded-full bg-red-500"
             />
           )}
         </Button>

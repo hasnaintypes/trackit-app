@@ -1,6 +1,12 @@
 "use client";
 
-import { Area, AreaChart as RechartsAreaChart, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  AreaChart as RechartsAreaChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+} from "recharts";
 import {
   type ChartConfig,
   ChartContainer,
@@ -16,6 +22,12 @@ interface AreaChartProps {
   dataKeyExpense: string;
   labelKey: string;
   className?: string;
+  valueFormatter?: (value: number) => string;
+}
+
+function formatAxisValue(value: number): string {
+  if (value >= 1000) return `${Math.round(value / 1000)}k`;
+  return String(value);
 }
 
 export function AreaChart({
@@ -25,6 +37,7 @@ export function AreaChart({
   dataKeyExpense,
   labelKey,
   className,
+  valueFormatter,
 }: AreaChartProps) {
   if (!data?.length) {
     return (
@@ -43,27 +56,44 @@ export function AreaChart({
 
   return (
     <div className={cn("w-full", className)}>
-      <ChartContainer config={config} className="h-[250px] w-full">
+      <ChartContainer config={config} className="h-[300px] w-full">
         <RechartsAreaChart
           data={data}
           margin={{
-            left: 0,
-            right: 0,
-            top: 0,
+            left: 12,
+            right: 12,
+            top: 8,
             bottom: 0,
           }}
         >
+          <CartesianGrid vertical={false} strokeDasharray="3 3" />
           <XAxis
             dataKey={labelKey}
             tickLine={false}
             axisLine={false}
             tickMargin={12}
-            tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }}
+            tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
           />
-          <YAxis hide />
+          <YAxis
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+            tickFormatter={formatAxisValue}
+            tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+            width={45}
+          />
           <ChartTooltip
             cursor={false}
-            content={<ChartTooltipContent indicator="dot" />}
+            content={
+              <ChartTooltipContent
+                indicator="dot"
+                formatter={
+                  valueFormatter
+                    ? (value) => valueFormatter(Number(value))
+                    : undefined
+                }
+              />
+            }
           />
           <defs>
             <linearGradient id="fillIncome" x1="0" y1="0" x2="0" y2="1">
@@ -75,7 +105,7 @@ export function AreaChart({
               <stop
                 offset="95%"
                 stopColor="var(--color-income)"
-                stopOpacity={0}
+                stopOpacity={0.05}
               />
             </linearGradient>
             <linearGradient id="fillExpense" x1="0" y1="0" x2="0" y2="1">
@@ -87,7 +117,7 @@ export function AreaChart({
               <stop
                 offset="95%"
                 stopColor="var(--color-expense)"
-                stopOpacity={0}
+                stopOpacity={0.05}
               />
             </linearGradient>
           </defs>
@@ -97,7 +127,6 @@ export function AreaChart({
             fill="url(#fillIncome)"
             stroke="var(--color-income)"
             strokeWidth={2}
-            stackId="a"
           />
           <Area
             dataKey={dataKeyExpense}
@@ -105,7 +134,6 @@ export function AreaChart({
             fill="url(#fillExpense)"
             stroke="var(--color-expense)"
             strokeWidth={2}
-            stackId="a"
           />
         </RechartsAreaChart>
       </ChartContainer>
