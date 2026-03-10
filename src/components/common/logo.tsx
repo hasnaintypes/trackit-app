@@ -21,40 +21,44 @@ export function Logo({ size = 32, className, showText = false }: LogoProps) {
   if (!mounted) {
     return (
       <div className={cn("flex items-center gap-2", className)}>
-        <Image
-          src="/images/brand/logo.png"
-          alt="Trackit"
-          width={size}
-          height={size}
-          className="rounded-md"
-          unoptimized
-        />
+        <div className="rounded-lg bg-white/90 p-1 dark:bg-white/10">
+          <Image
+            src="/images/brand/logo.png"
+            alt="Trackit"
+            width={size}
+            height={size}
+            className="rounded-md"
+            unoptimized
+          />
+        </div>
         {showText && (
-          <span className="font-medium">Trackit</span>
+          <span className="text-lg font-semibold">Trackit</span>
         )}
       </div>
     );
   }
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <Image
-        src="/images/brand/logo.png"
-        alt="Trackit"
-        width={size}
-        height={size}
-        className="rounded-md dark:hidden"
-        unoptimized
-      />
-      <Image
-        src="/images/brand/logo-dark.png"
-        alt="Trackit"
-        width={size}
-        height={size}
-        className="hidden rounded-md dark:block"
-        unoptimized
-      />
+      <div className="rounded-lg bg-white/90 p-1 dark:bg-white/10">
+        <Image
+          src="/images/brand/logo.png"
+          alt="Trackit"
+          width={size}
+          height={size}
+          className="rounded-md dark:hidden"
+          unoptimized
+        />
+        <Image
+          src="/images/brand/logo-dark.png"
+          alt="Trackit"
+          width={size}
+          height={size}
+          className="hidden rounded-md dark:block"
+          unoptimized
+        />
+      </div>
       {showText && (
-        <span className="font-medium text-black dark:text-white">Trackit</span>
+        <span className="text-lg font-semibold">Trackit</span>
       )}
     </div>
   );
