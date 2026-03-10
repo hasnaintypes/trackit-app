@@ -1,6 +1,6 @@
-# Cashio (Work in progress)
+# Trackit (Work in progress)
 
-This repository contains the Cashio web application. The project is currently under active development and not yet production-ready.
+This repository contains the Trackit web application. The project is currently under active development and not yet production-ready.
 
 Quick reference
 
