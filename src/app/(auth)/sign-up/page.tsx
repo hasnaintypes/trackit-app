@@ -54,7 +54,7 @@ export default function SignupPage() {
         <div className="flex justify-center gap-2 md:justify-start">
           <Link href="/" className="flex items-center gap-2 font-medium">
             <Logo />
-            Cashio.
+            Trackit.
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-center">

@@ -1,7 +1,7 @@
 import "@/styles/globals.css";
 
 import { type Metadata } from "next";
-import { Host_Grotesk, Work_Sans, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 
 import { TRPCReactProvider } from "@/trpc/react";
 
@@ -11,11 +11,11 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 
 export const metadata: Metadata = {
   title: {
-    default: "Cashio – Smarter Finance Management",
-    template: "%s | Cashio",
+    default: "Trackit – Smarter Finance Management",
+    template: "%s | Trackit",
   },
   description:
-    "Cashio is your all-in-one finance management platform. Track budgets, split expenses, analyze spending with AI, and manage subscriptionsall in one dashboard.",
+    "Trackit is your all-in-one finance management platform. Track budgets, split expenses, analyze spending with AI, and manage subscriptionsall in one dashboard.",
   keywords: [
     "finance app",
     "budget tracker",
@@ -24,49 +24,42 @@ export const metadata: Metadata = {
     "group expenses",
     "SaaS finance dashboard",
   ],
-  authors: [{ name: "Cashio Team" }],
-  creator: "Cashio",
-  metadataBase: new URL("https://cashio.vercel.app"),
+  authors: [{ name: "Trackit Team" }],
+  creator: "Trackit",
+  metadataBase: new URL("https://trackit.vercel.app"),
   openGraph: {
-    title: "Cashio – Smarter Finance Management",
+    title: "Trackit – Smarter Finance Management",
     description:
       "Unify your personal and group finances with AI insights, budgeting, and expense tracking.",
-    url: "https://cashio.vercel.app",
-    siteName: "Cashio",
+    url: "https://trackit.vercel.app",
+    siteName: "Trackit",
     locale: "en_US",
     type: "website",
     images: [
       {
-        url: "https://cashio.vercel.app/og-image.png",
+        url: "https://trackit.vercel.app/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Cashio Dashboard",
+        alt: "Trackit Dashboard",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cashio – Smarter Finance Management",
+    title: "Trackit – Smarter Finance Management",
     description:
       "AI-powered finance platform for personal budgets and group expenses.",
-    creator: "@cashioapp",
-    images: ["https://cashio.vercel.app/og-image.png"],
+    creator: "@trackitapp",
+    images: ["https://trackit.vercel.app/og-image.png"],
   },
   icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    icon: "/images/brand/logo.png",
   },
 };
 
-const host_grotesk = Host_Grotesk({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["600"],
-  variable: "--display-family",
-});
-const work_sans = Work_Sans({
-  subsets: ["latin"],
-  weight: ["400"],
-  variable: "--body-family",
+  variable: "--font-inter",
 });
 const jetbrains_mono = JetBrains_Mono({
   subsets: ["latin"],
@@ -83,7 +76,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${host_grotesk.variable} ${work_sans.variable} ${jetbrains_mono.variable}`}
+      className={`${inter.variable} ${jetbrains_mono.variable}`}
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>
