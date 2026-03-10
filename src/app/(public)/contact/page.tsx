@@ -31,63 +31,48 @@ export default function ContactUsPage() {
   );
 
   useEffect(() => {
-    try {
-      const root = getComputedStyle(document.documentElement);
-      const primary = root.getPropertyValue("--primary").trim() || "#e60a64";
+    function resolveThemeColor() {
+      try {
+        // Use a canvas to reliably convert any CSS color format (including oklch) to RGB
+        const el = document.createElement("div");
+        el.style.color = "var(--primary)";
+        document.body.appendChild(el);
+        const resolved = getComputedStyle(el).color;
+        document.body.removeChild(el);
 
-      const el = document.createElement("div");
-      el.style.color = "var(--primary)";
-      document.body.appendChild(el);
-      const resolved = getComputedStyle(el).color;
-      document.body.removeChild(el);
-
-      const reRgb =
-        /rgba?\(\s*(\d+(?:\.\d+)?)(?:%?)[,\s]+(\d+(?:\.\d+)?)(?:%?)[,\s]+(\d+(?:\.\d+)?)(?:%?)(?:\s*\/\s*(\d+(?:\.\d+)?))?\s*\)/i;
-      const m = reRgb.exec(resolved);
-      if (m) {
-        const parseComponent = (v: string) => {
-          const num = Number(v);
-          if (num > 1) return Math.round(num);
-          return Math.round(num * 255);
-        };
-
-        const r = parseComponent(m[1]!);
-        const g = parseComponent(m[2]!);
-        const b = parseComponent(m[3]!);
-        const toHex = (v: number) => v.toString(16).padStart(2, "0");
-        const hex = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-        setThemeHex(hex);
-        setThemeRgb([r / 255, g / 255, b / 255]);
-        logger.debug("theme resolved rgb", { primary, resolved, hex });
-      } else {
-        const maybeHex = primary.trim();
-        if (/^#([0-9a-f]{3,8})$/i.test(maybeHex)) {
-          const expand = (h: string) =>
-            h.length === 4 ? `#${h[1]}${h[1]}${h[2]}${h[2]}${h[3]}${h[3]}` : h;
-          const hex = expand(maybeHex);
-
-          const r = parseInt(hex.slice(1, 3), 16);
-          const g = parseInt(hex.slice(3, 5), 16);
-          const b = parseInt(hex.slice(5, 7), 16);
+        const canvas = document.createElement("canvas");
+        canvas.width = 1;
+        canvas.height = 1;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.fillStyle = resolved;
+          ctx.fillRect(0, 0, 1, 1);
+          const pixel = ctx.getImageData(0, 0, 1, 1).data;
+          const r = pixel[0] ?? 0;
+          const g = pixel[1] ?? 0;
+          const b = pixel[2] ?? 0;
+          const toHex = (v: number) => v.toString(16).padStart(2, "0");
+          const hex = `#${toHex(r)}${toHex(g)}${toHex(b)}`;
           setThemeHex(hex);
           setThemeRgb([r / 255, g / 255, b / 255]);
-          logger.debug("theme resolved hex fallback", {
-            primary: maybeHex,
-            hex,
-          });
-        } else {
-          setThemeHex("#7c3aed");
-          setThemeRgb([124 / 255, 58 / 255, 237 / 255]);
-          logger.debug("theme resolved fallback used", { primary, resolved });
+          return;
         }
+      } catch {
+        // fall through to fallback
       }
-    } catch (e) {
       setThemeHex("#7c3aed");
       setThemeRgb([124 / 255, 58 / 255, 237 / 255]);
-      logger.debug("theme resolution error", {
-        error: e instanceof Error ? e.message : String(e),
-      });
     }
+
+    resolveThemeColor();
+
+    // Re-resolve when theme changes (dark/light toggle mutates class on <html>)
+    const observer = new MutationObserver(() => resolveThemeColor());
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

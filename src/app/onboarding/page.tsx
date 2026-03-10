@@ -179,7 +179,7 @@ export default function OnboardingPage() {
 
       await completeOnboarding.mutateAsync();
       await refetch();
-      toast.success("All set! Welcome to Cashio.");
+      toast.success("All set! Welcome to Trackit.");
       router.push("/overview");
     } catch (err) {
       logger.error("Failed to save onboarding settings", {
@@ -213,7 +213,7 @@ export default function OnboardingPage() {
             <Rocket className="h-6 w-6" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-            Welcome to Cashio
+            Welcome to Trackit
           </h1>
           <p className="text-muted-foreground mx-auto max-w-md text-lg">
             Let&apos;s customize your workspace to fit your needs. This only
