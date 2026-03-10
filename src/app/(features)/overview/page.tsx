@@ -4,19 +4,21 @@ import { createLogger } from "@/lib/logging";
 import React, { useMemo, useState } from "react";
 
 const logger = createLogger("overview-page");
-import { useUser } from "@/hooks/use-user";
 import { api } from "@/trpc/react";
 import { useAccounts } from "@/hooks/use-accounts";
 import { useTransactions } from "@/hooks/use-transactions";
 import { useCategories } from "@/hooks/use-categories";
-import { OverviewHeader } from "@/components/pages/(protected)/overview/overview-header";
 import { StatsCards } from "@/components/pages/(protected)/overview/stats-cards";
 import { RecentTransactions } from "@/components/pages/(protected)/overview/recent-transactions";
 import { BarChart } from "@/components/charts/bar-chart";
 import { PieChart } from "@/components/charts/pie-chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import TransactionForm from "@/components/forms/transaction/transaction-form";
-import { subDays, subMonths, format, startOfDay, startOfHour } from "date-fns";
+import {
+  subMonths,
+  format,
+  startOfMonth,
+  endOfMonth,
+} from "date-fns";
 import type { ChartConfig } from "@/components/ui/chart";
 import type { Transaction } from "@/types/transaction";
 
@@ -32,29 +34,25 @@ export default function OverviewPage() {
   const router = useRouter();
   const { settings, isLoading: settingsLoading } = useSettings();
 
-  // Use effect for redirect logic to avoid "flash" if possible,
-  // or at least handle it before data loads
   useEffect(() => {
     if (!settingsLoading && settings?.display.defaultView) {
       const defaultView = settings.display.defaultView;
       if (defaultView === DefaultView.TRANSACTIONS) {
         router.replace("/transactions");
       } else if (defaultView === DefaultView.NETWORTH) {
-        router.replace("/reports"); // Assuming net worth is in reports
+        router.replace("/reports");
       } else if (defaultView === DefaultView.PORTFOLIO) {
-        router.replace("/accounts"); // Fallback or portfolio if exists
+        router.replace("/accounts");
       }
     }
   }, [settings, settingsLoading, router]);
 
-  const { user } = useUser();
   const { accounts, isLoading: accountsLoading } = useAccounts();
   const { listQuery } = useTransactions();
   const { allFlat, categoryMap } = useCategories();
 
   const utils = api.useUtils();
 
-  const [period, setPeriod] = useState("last30");
   const [isTxFormOpen, setIsTxFormOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
@@ -69,7 +67,6 @@ export default function OverviewPage() {
   const handleDeleteTransactions = async (ids: string[]) => {
     try {
       await Promise.all(ids.map((id) => remove.mutateAsync({ id })));
-      // Invalidate both transactions and accounts so stats update immediately
       await Promise.all([
         utils.transaction.list.invalidate(),
         utils.account.list.invalidate(),
@@ -81,34 +78,9 @@ export default function OverviewPage() {
     }
   };
 
-  // Calculate date range based on period - stabilize with startOfHour
-  const dateRange = useMemo(() => {
-    const end = startOfHour(new Date());
-    let start;
-    switch (period) {
-      case "last7":
-        start = startOfDay(subDays(new Date(), 7));
-        break;
-      case "last30":
-        start = startOfDay(subDays(new Date(), 30));
-        break;
-      case "last90":
-        start = startOfDay(subDays(new Date(), 90));
-        break;
-      case "year":
-        start = startOfDay(subDays(new Date(), 365));
-        break;
-      default:
-        start = startOfDay(subDays(new Date(), 30));
-    }
-    return { start, end };
-  }, [period]);
-
-  // Fetch transactions for the selected period
+  // Fetch all transactions (no date filter) for overview stats
   const { data: txData, isLoading: txLoading } = listQuery({
-    startDate: dateRange.start.toISOString(),
-    endDate: dateRange.end.toISOString(),
-    limit: 100, // Reasonable limit for dashboard stats/charts
+    limit: 500,
   });
 
   const transactions = useMemo(
@@ -116,58 +88,110 @@ export default function OverviewPage() {
     [txData?.transactions],
   );
 
-  // 1. Calculate Stats
-  const stats = useMemo(() => {
+  // Compute stats with date ranges and percentage changes
+  const statsData = useMemo(() => {
+    const now = new Date();
+    const currentMonthStart = startOfMonth(now);
+    const currentMonthEnd = endOfMonth(now);
+    const prevMonthStart = startOfMonth(subMonths(now, 1));
+    const prevMonthEnd = endOfMonth(subMonths(now, 1));
+
+    // Total balance from accounts
     const totalBalance = accounts.reduce(
       (acc, curr) => acc + parseFloat(curr.balance),
       0,
     );
 
-    let income = 0;
-    let expense = 0;
+    // Find date range of all transactions
+    let earliestDate: Date | null = null;
+    let latestDate: Date | null = null;
+
+    let totalIncome = 0;
+    let totalExpense = 0;
+    let currentMonthIncome = 0;
+    let currentMonthExpense = 0;
+    let prevMonthIncome = 0;
+    let prevMonthExpense = 0;
+
+    // Track earliest income/expense dates
+    let earliestIncomeDate: Date | null = null;
+    let earliestExpenseDate: Date | null = null;
 
     transactions.forEach((tx) => {
       const amount = Math.abs(parseFloat(tx.amount));
+      const txDate = new Date(tx.date);
+
+      if (!earliestDate || txDate < earliestDate) earliestDate = txDate;
+      if (!latestDate || txDate > latestDate) latestDate = txDate;
+
       if (tx.type === "CREDIT") {
-        income += amount;
+        totalIncome += amount;
+        if (!earliestIncomeDate || txDate < earliestIncomeDate)
+          earliestIncomeDate = txDate;
+        if (txDate >= currentMonthStart && txDate <= currentMonthEnd)
+          currentMonthIncome += amount;
+        if (txDate >= prevMonthStart && txDate <= prevMonthEnd)
+          prevMonthIncome += amount;
       } else if (tx.type === "DEBIT") {
-        expense += amount;
+        totalExpense += amount;
+        if (!earliestExpenseDate || txDate < earliestExpenseDate)
+          earliestExpenseDate = txDate;
+        if (txDate >= currentMonthStart && txDate <= currentMonthEnd)
+          currentMonthExpense += amount;
+        if (txDate >= prevMonthStart && txDate <= prevMonthEnd)
+          prevMonthExpense += amount;
       }
     });
 
+    const formatDateRange = (start: Date | null, end: Date | null) => {
+      if (!start) return "No data yet";
+      const endDate = end ?? now;
+      return `${format(start, "d MMM")} - ${format(endDate, "d MMM yyyy")}`;
+    };
+
+    const calcChange = (current: number, previous: number): number | null => {
+      if (previous === 0) return current > 0 ? 100 : null;
+      return Math.round(((current - previous) / previous) * 100);
+    };
+
     return {
-      totalBalance: totalBalance.toString(),
-      totalIncome: income.toString(),
-      totalExpense: expense.toString(),
+      balance: {
+        title: "Total Balance",
+        dateRange: formatDateRange(earliestDate, latestDate),
+        value: totalBalance.toString(),
+        changePercent: calcChange(totalBalance, totalBalance - (currentMonthIncome - currentMonthExpense)),
+        changeLabel: "Last Month",
+      },
+      income: {
+        title: "Total Income",
+        dateRange: formatDateRange(earliestIncomeDate, latestDate),
+        value: totalIncome.toString(),
+        changePercent: calcChange(currentMonthIncome, prevMonthIncome),
+        changeLabel: "Last Month",
+      },
+      spending: {
+        title: "Total Spending",
+        dateRange: formatDateRange(earliestExpenseDate, latestDate),
+        value: totalExpense.toString(),
+        changePercent: calcChange(currentMonthExpense, prevMonthExpense),
+        changeLabel: "Last Month",
+      },
     };
   }, [accounts, transactions]);
 
-  // 2. Prepare Bar Chart Data (Daily breakdown)
+  // Bar Chart Data — last 30 days of spending
   const barChartData = useMemo(() => {
     const buckets: Record<string, number> = {};
-    const isYear = period === "year";
+    const now = new Date();
 
-    // Initialize buckets based on period
-    if (isYear) {
-      for (let i = 0; i < 12; i++) {
-        const d = format(subMonths(new Date(), i), "MMM yyyy");
-        buckets[d] = 0;
-      }
-    } else {
-      const daysCount = period === "last7" ? 7 : period === "last90" ? 90 : 30;
-      for (let i = 0; i < daysCount; i++) {
-        const d = format(subDays(new Date(), i), "MMM dd");
-        buckets[d] = 0;
-      }
+    for (let i = 0; i < 30; i++) {
+      const d = format(new Date(now.getTime() - i * 86400000), "MMM dd");
+      buckets[d] = 0;
     }
 
     transactions.forEach((tx) => {
       if (tx.type === "DEBIT") {
-        const date = new Date(tx.date);
-        const label = isYear
-          ? format(date, "MMM yyyy")
-          : format(date, "MMM dd");
-
+        const label = format(new Date(tx.date), "MMM dd");
         if (buckets[label] !== undefined) {
           buckets[label] += Math.abs(parseFloat(tx.amount));
         }
@@ -177,7 +201,7 @@ export default function OverviewPage() {
     return Object.entries(buckets)
       .map(([date, amount]) => ({ date, amount }))
       .reverse();
-  }, [transactions, period]);
+  }, [transactions]);
 
   const barChartConfig = {
     amount: {
@@ -186,7 +210,7 @@ export default function OverviewPage() {
     },
   } satisfies ChartConfig;
 
-  // 3. Prepare Pie Chart Data (Category breakdown)
+  // Pie Chart Data — category breakdown
   const pieChartData = useMemo(() => {
     const categories = allFlat.data ?? [];
     const categoriesMap: Record<string, number> = {};
@@ -202,21 +226,15 @@ export default function OverviewPage() {
     });
 
     return Object.entries(categoriesMap).map(([name, value], index) => {
-      // Find the category object to get its mapped color
       const category = categories.find((c) => c.name === name);
       const fill = category?.color ?? `var(--chart-${(index % 5) + 1})`;
-
-      return {
-        name,
-        value,
-        fill,
-      };
+      return { name, value, fill };
     });
   }, [transactions, allFlat.data, categoryMap]);
 
   const pieChartConfig = useMemo(() => {
     const config: ChartConfig = {};
-    pieChartData.forEach((item, _index) => {
+    pieChartData.forEach((item) => {
       config[item.name] = {
         label: item.name,
         color: item.fill,
@@ -226,18 +244,11 @@ export default function OverviewPage() {
   }, [pieChartData]);
 
   return (
-    <div className="container mx-auto max-w-7xl flex-1 space-y-8 px-4 py-8 pt-6 sm:px-6 lg:px-8">
-      <OverviewHeader
-        userName={user?.name}
-        period={period}
-        onPeriodChange={setPeriod}
-        onAddTransaction={() => setIsTxFormOpen(true)}
-      />
-
+    <div className="space-y-8">
       <StatsCards
-        totalBalance={stats.totalBalance}
-        totalIncome={stats.totalIncome}
-        totalExpense={stats.totalExpense}
+        balance={statsData.balance}
+        income={statsData.income}
+        spending={statsData.spending}
         isLoading={accountsLoading || txLoading}
       />
 
@@ -281,26 +292,6 @@ export default function OverviewPage() {
         onEdit={handleEditTransaction}
         onDelete={handleDeleteTransactions}
         onView={handleEditTransaction}
-      />
-
-      <TransactionForm
-        open={isTxFormOpen}
-        onOpenChange={(open) => {
-          setIsTxFormOpen(open);
-          if (!open) setSelectedTransaction(null);
-        }}
-        initialValues={
-          selectedTransaction
-            ? {
-                ...selectedTransaction,
-                paymentMethod: selectedTransaction.paymentMethod ?? undefined,
-                categoryId: selectedTransaction.categoryId ?? undefined,
-                notes: selectedTransaction.notes ?? undefined,
-                description: selectedTransaction.description ?? undefined,
-                receipt_url: selectedTransaction.receipt_url ?? undefined,
-              }
-            : null
-        }
       />
     </div>
   );

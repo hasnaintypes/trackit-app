@@ -9,6 +9,7 @@ import { budgetRouter } from "@/server/api/routers/budgetRouter";
 import { reportRouter } from "@/server/api/routers/reportRouter";
 import { aiRouter } from "@/server/api/routers/aiRouter";
 import { settingsRouter } from "@/server/api/routers/settingsRouter";
+import { overviewRouter } from "@/server/api/routers/overviewRouter";
 
 /**
  * This is the primary router for your server.
@@ -26,6 +27,7 @@ export const appRouter = createTRPCRouter({
   report: reportRouter,
   ai: aiRouter,
   settings: settingsRouter,
+  overview: overviewRouter,
 });
 
 // export type definition of API

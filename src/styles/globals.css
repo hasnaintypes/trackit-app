@@ -2,6 +2,16 @@
 @import "tw-animate-css";
 @import "prismjs/themes/prism-okaidia.css";
 
+/* Hide scrollbars globally while maintaining scroll functionality */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
 /* Prism overrides to better match the site's theme using CSS variables */
 .token.comment,
 .token.prolog,
