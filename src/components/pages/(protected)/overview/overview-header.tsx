@@ -10,55 +10,35 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface OverviewHeaderProps {
-  userName?: string | null;
+interface OverviewActionsProps {
   period: string;
   onPeriodChange: (period: string) => void;
   onAddTransaction: () => void;
 }
 
-export function OverviewHeader({
-  userName,
+export function OverviewActions({
   period,
   onPeriodChange,
   onAddTransaction,
-}: OverviewHeaderProps) {
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
-  };
-
+}: OverviewActionsProps) {
   return (
-    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-      <div>
-        <h1 className="font-display text-3xl font-bold tracking-tight">
-          {getGreeting()}, {userName ?? "User"}
-        </h1>
-        <p className="text-muted-foreground">
-          Here&apos;s what&apos;s happening with your money.
-        </p>
-      </div>
+    <div className="flex items-center justify-end gap-3">
+      <Select value={period} onValueChange={onPeriodChange}>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Select period" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="last7">Last 7 days</SelectItem>
+          <SelectItem value="last30">Last 30 days</SelectItem>
+          <SelectItem value="last90">Last 90 days</SelectItem>
+          <SelectItem value="year">Last year</SelectItem>
+        </SelectContent>
+      </Select>
 
-      <div className="flex items-center gap-3">
-        <Select value={period} onValueChange={onPeriodChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select period" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="last7">Last 7 days</SelectItem>
-            <SelectItem value="last30">Last 30 days</SelectItem>
-            <SelectItem value="last90">Last 90 days</SelectItem>
-            <SelectItem value="year">Last year</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Button onClick={onAddTransaction} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Add Transaction
-        </Button>
-      </div>
+      <Button onClick={onAddTransaction} className="gap-2">
+        <Plus className="h-4 w-4" />
+        Add Transaction
+      </Button>
     </div>
   );
 }
