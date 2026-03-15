@@ -5,6 +5,11 @@
 
 import "./src/env.js";
 import { withBetterStack } from "@logtail/next";
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
 
 /** @type {import("next").NextConfig} */
 
@@ -60,4 +65,4 @@ config.headers = async () => [
   },
 ];
 
-export default withBetterStack(config);
+export default withBundleAnalyzer(withBetterStack(config));
