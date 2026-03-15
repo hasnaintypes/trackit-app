@@ -1,12 +1,22 @@
 "use client";
 
+import React, { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { api } from "@/trpc/react";
 import { toNum } from "@/lib/shared/decimal";
 import { Loader2, Wallet } from "lucide-react";
 import { BudgetCard } from "@/components/pages/(protected)/budget/budget-card";
 import { CreateBudgetDialog } from "@/components/pages/(protected)/budget/create-budget-dialog";
-import { GenericRadarChart } from "@/components/charts/radar-chart";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { ChartConfig } from "@/components/ui/chart";
+
+const GenericRadarChart = dynamic(
+  () =>
+    import("@/components/charts/radar-chart").then((m) => ({
+      default: m.GenericRadarChart,
+    })),
+  { loading: () => <Skeleton className="h-[300px] w-full rounded-xl" /> },
+);
 
 export default function BudgetPage() {
   const { data: budgets, isLoading } = api.budget.all.useQuery();
@@ -90,27 +100,31 @@ export default function BudgetPage() {
           {/* Sidebar: Analytics */}
           <div className="space-y-6">
             <h2 className="text-xl font-semibold tracking-tight">Analytics</h2>
-            <GenericRadarChart
-              title="Spending Distribution"
-              description="Budget v/s Actual Spending"
-              data={chartData}
-              indexKey="category"
-              dataKeys={[
-                {
-                  key: "budget",
-                  name: "Budget Limit",
-                  color: "var(--color-budget)",
-                  fillOpacity: 0.2,
-                },
-                {
-                  key: "spent",
-                  name: "Actual Spent",
-                  color: "var(--color-spent)",
-                  fillOpacity: 0.5,
-                },
-              ]}
-              config={radarConfig}
-            />
+            <Suspense
+              fallback={<Skeleton className="h-[300px] w-full rounded-xl" />}
+            >
+              <GenericRadarChart
+                title="Spending Distribution"
+                description="Budget v/s Actual Spending"
+                data={chartData}
+                indexKey="category"
+                dataKeys={[
+                  {
+                    key: "budget",
+                    name: "Budget Limit",
+                    color: "var(--color-budget)",
+                    fillOpacity: 0.2,
+                  },
+                  {
+                    key: "spent",
+                    name: "Actual Spent",
+                    color: "var(--color-spent)",
+                    fillOpacity: 0.5,
+                  },
+                ]}
+                config={radarConfig}
+              />
+            </Suspense>
           </div>
         </div>
       )}

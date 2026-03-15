@@ -1,15 +1,30 @@
 "use client";
 
-import React, { useMemo, useCallback, useState } from "react";
+import React, { Suspense, useMemo, useCallback, useState } from "react";
+import dynamic from "next/dynamic";
 import { api } from "@/trpc/react";
 import { useAccounts } from "@/hooks/use-accounts";
 import { useTransactions } from "@/hooks/use-transactions";
 import { useCategories } from "@/hooks/use-categories";
 import { StatsCards } from "@/components/pages/(protected)/overview/stats-cards";
 import { RecentTransactions } from "@/components/pages/(protected)/overview/recent-transactions";
-import { BarChart } from "@/components/charts/bar-chart";
-import { PieChart } from "@/components/charts/pie-chart";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const BarChart = dynamic(
+  () =>
+    import("@/components/charts/bar-chart").then((m) => ({
+      default: m.BarChart,
+    })),
+  { loading: () => <Skeleton className="h-[300px] w-full rounded-xl" /> },
+);
+const PieChart = dynamic(
+  () =>
+    import("@/components/charts/pie-chart").then((m) => ({
+      default: m.PieChart,
+    })),
+  { loading: () => <Skeleton className="h-[300px] w-full rounded-xl" /> },
+);
 import {
   Select,
   SelectContent,
@@ -276,14 +291,18 @@ export default function OverviewPage() {
             </Select>
           </CardHeader>
           <CardContent className="pl-2">
-            <BarChart
-              data={barChartData}
-              config={barChartConfig}
-              dataKey="amount"
-              labelKey="date"
-              className="h-[300px] w-full"
-              valueFormatter={(val) => formatAmount(val)}
-            />
+            <Suspense
+              fallback={<Skeleton className="h-[300px] w-full rounded-xl" />}
+            >
+              <BarChart
+                data={barChartData}
+                config={barChartConfig}
+                dataKey="amount"
+                labelKey="date"
+                className="h-[300px] w-full"
+                valueFormatter={(val) => formatAmount(val)}
+              />
+            </Suspense>
           </CardContent>
         </Card>
 
@@ -292,14 +311,18 @@ export default function OverviewPage() {
             <CardTitle>Spending by Category</CardTitle>
           </CardHeader>
           <CardContent>
-            <PieChart
-              data={pieChartData}
-              config={pieChartConfig}
-              dataKey="value"
-              nameKey="name"
-              className="mx-auto aspect-square max-h-[300px]"
-              valueFormatter={(val) => formatAmount(val)}
-            />
+            <Suspense
+              fallback={<Skeleton className="h-[300px] w-full rounded-xl" />}
+            >
+              <PieChart
+                data={pieChartData}
+                config={pieChartConfig}
+                dataKey="value"
+                nameKey="name"
+                className="mx-auto aspect-square max-h-[300px]"
+                valueFormatter={(val) => formatAmount(val)}
+              />
+            </Suspense>
           </CardContent>
         </Card>
       </div>
