@@ -13,12 +13,7 @@ import { RecentTransactions } from "@/components/pages/(protected)/overview/rece
 import { BarChart } from "@/components/charts/bar-chart";
 import { PieChart } from "@/components/charts/pie-chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  subMonths,
-  format,
-  startOfMonth,
-  endOfMonth,
-} from "date-fns";
+import { subMonths, format, startOfMonth, endOfMonth } from "date-fns";
 import type { ChartConfig } from "@/components/ui/chart";
 import type { Transaction } from "@/types/transaction";
 
@@ -53,9 +48,8 @@ export default function OverviewPage() {
 
   const utils = api.useUtils();
 
-  const [isTxFormOpen, setIsTxFormOpen] = useState(false);
-  const [selectedTransaction, setSelectedTransaction] =
-    useState<Transaction | null>(null);
+  const [, setIsTxFormOpen] = useState(false);
+  const [, setSelectedTransaction] = useState<Transaction | null>(null);
 
   const { remove } = useTransactions();
 
@@ -159,7 +153,10 @@ export default function OverviewPage() {
         title: "Total Balance",
         dateRange: formatDateRange(earliestDate, latestDate),
         value: totalBalance.toString(),
-        changePercent: calcChange(totalBalance, totalBalance - (currentMonthIncome - currentMonthExpense)),
+        changePercent: calcChange(
+          totalBalance,
+          totalBalance - (currentMonthIncome - currentMonthExpense),
+        ),
         changeLabel: "Last Month",
       },
       income: {

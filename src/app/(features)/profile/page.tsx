@@ -2,12 +2,7 @@
 
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
-import {
-  UserPen,
-  Bell,
-  ShieldCheck,
-  CreditCard,
-} from "lucide-react";
+import { UserPen, Bell, ShieldCheck, CreditCard } from "lucide-react";
 import EditProfileSection from "@/components/pages/(protected)/profile/edit-profile-section";
 import NotificationsSection from "@/components/pages/(protected)/profile/notifications-section";
 import SecuritySection from "@/components/pages/(protected)/profile/security-section";

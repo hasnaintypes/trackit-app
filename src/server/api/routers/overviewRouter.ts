@@ -141,7 +141,9 @@ export const overviewRouter = createTRPCRouter({
    * Monthly income + expense totals for the area chart.
    */
   balanceOverview: protectedProcedure
-    .input(z.object({ months: z.number().min(1).max(24).default(6) }).default({}))
+    .input(
+      z.object({ months: z.number().min(1).max(24).default(6) }).default({}),
+    )
     .query(async ({ ctx, input }) => {
       const userId = ctx.user.id;
       const db = ctx.db;
@@ -261,7 +263,8 @@ export const overviewRouter = createTRPCRouter({
           name: cat?.name ?? "Uncategorized",
           color: cat?.color ?? null,
           amount,
-          percentage: totalSpending > 0 ? Math.round((amount / totalSpending) * 100) : 0,
+          percentage:
+            totalSpending > 0 ? Math.round((amount / totalSpending) * 100) : 0,
         };
       })
       .sort((a, b) => b.amount - a.amount);

@@ -102,7 +102,7 @@ export default function AccountsPage() {
   });
 
   return (
-    <div className="animate-in fade-in-50 mx-auto flex min-h-screen max-w-7xl flex-col space-y-8 p-8 duration-500">
+    <div className="animate-in fade-in-50 flex flex-col space-y-8 duration-500">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-foreground text-3xl font-bold tracking-tight">
