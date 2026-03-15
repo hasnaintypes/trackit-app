@@ -31,9 +31,7 @@ export function Logo({ size = 32, className, showText = false }: LogoProps) {
             unoptimized
           />
         </div>
-        {showText && (
-          <span className="text-lg font-semibold">Trackit</span>
-        )}
+        {showText && <span className="text-lg font-semibold">Trackit</span>}
       </div>
     );
   }
@@ -57,9 +55,7 @@ export function Logo({ size = 32, className, showText = false }: LogoProps) {
           unoptimized
         />
       </div>
-      {showText && (
-        <span className="text-lg font-semibold">Trackit</span>
-      )}
+      {showText && <span className="text-lg font-semibold">Trackit</span>}
     </div>
   );
 }

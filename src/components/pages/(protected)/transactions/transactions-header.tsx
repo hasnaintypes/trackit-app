@@ -24,7 +24,12 @@ export function TransactionsHeader({
       </div>
 
       <div className="flex items-center gap-2">
-        <Button onClick={onImport} variant="outline" size="sm" className="gap-2">
+        <Button
+          onClick={onImport}
+          variant="outline"
+          size="sm"
+          className="gap-2"
+        >
           <Upload className="h-4 w-4" />
           Bulk Import
         </Button>

@@ -13,12 +13,7 @@ export default function ThemeSwitcherButton() {
 
   if (!mounted) {
     return (
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-hidden
-        className="size-9"
-      >
+      <Button variant="ghost" size="icon" aria-hidden className="size-9">
         <Sun className="size-5" />
       </Button>
     );

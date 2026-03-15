@@ -83,10 +83,7 @@ export default function NavBar() {
                 <Menu className="size-5" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent
-              align="start"
-              className="w-48 border p-2 lg:hidden"
-            >
+            <PopoverContent align="start" className="w-48 border p-2 lg:hidden">
               <nav className="flex flex-col gap-1">
                 {navigationLinks.map((link, index) => (
                   <Link
@@ -104,7 +101,7 @@ export default function NavBar() {
           {/* Logo */}
           <Link
             href="/overview"
-            className="hover:opacity-90 flex items-center transition-opacity"
+            className="flex items-center transition-opacity hover:opacity-90"
           >
             <Logo showText />
           </Link>
@@ -128,17 +125,17 @@ export default function NavBar() {
 
         {/* Center - Search Bar */}
         <div
-          className="relative hidden flex-1 max-w-md cursor-pointer xl:block"
+          className="relative hidden max-w-md flex-1 cursor-pointer xl:block"
           onClick={() => setOpen(true)}
         >
-          <Search className="text-primary-foreground/60 pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2" />
+          <Search className="text-primary-foreground/60 pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
           <Input
             type="text"
             placeholder="Search anything..."
             readOnly
-            className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60 focus-visible:bg-primary-foreground/15 h-10 w-full cursor-pointer rounded-md border pl-10 pr-16 transition-colors focus-visible:ring-1 focus-visible:ring-white/50"
+            className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60 focus-visible:bg-primary-foreground/15 h-10 w-full cursor-pointer rounded-md border pr-16 pl-10 transition-colors focus-visible:ring-1 focus-visible:ring-white/50"
           />
-          <kbd className="text-primary-foreground/60 pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded border border-white/20 bg-white/10 px-2 py-0.5 text-xs font-medium">
+          <kbd className="text-primary-foreground/60 pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 rounded border border-white/20 bg-white/10 px-2 py-0.5 text-xs font-medium">
             ⌘ F
           </kbd>
         </div>

@@ -28,11 +28,51 @@ function DecorativeChart({ color }: { color: string }) {
       xmlns="http://www.w3.org/2000/svg"
     >
       {/* Bars */}
-      <rect x="2" y="28" width="8" height="20" rx="2" fill={color} opacity="0.3" />
-      <rect x="14" y="18" width="8" height="30" rx="2" fill={color} opacity="0.45" />
-      <rect x="26" y="24" width="8" height="24" rx="2" fill={color} opacity="0.35" />
-      <rect x="38" y="10" width="8" height="38" rx="2" fill={color} opacity="0.55" />
-      <rect x="50" y="4" width="8" height="44" rx="2" fill={color} opacity="0.7" />
+      <rect
+        x="2"
+        y="28"
+        width="8"
+        height="20"
+        rx="2"
+        fill={color}
+        opacity="0.3"
+      />
+      <rect
+        x="14"
+        y="18"
+        width="8"
+        height="30"
+        rx="2"
+        fill={color}
+        opacity="0.45"
+      />
+      <rect
+        x="26"
+        y="24"
+        width="8"
+        height="24"
+        rx="2"
+        fill={color}
+        opacity="0.35"
+      />
+      <rect
+        x="38"
+        y="10"
+        width="8"
+        height="38"
+        rx="2"
+        fill={color}
+        opacity="0.55"
+      />
+      <rect
+        x="50"
+        y="4"
+        width="8"
+        height="44"
+        rx="2"
+        fill={color}
+        opacity="0.7"
+      />
       {/* Trend line */}
       <path
         d="M6 30 L18 20 L30 26 L42 12 L54 6"
@@ -59,7 +99,8 @@ export function StatsCards({
       ...balance,
       formattedValue: formatAmount(balance.value),
       icon: Wallet,
-      iconBg: "bg-blue-100 text-blue-600 dark:bg-blue-900/60 dark:text-blue-400",
+      iconBg:
+        "bg-blue-100 text-blue-600 dark:bg-blue-900/60 dark:text-blue-400",
       changeColor: "text-emerald-600 dark:text-emerald-400",
       chartColor: "#3b82f6",
     },
@@ -67,7 +108,8 @@ export function StatsCards({
       ...income,
       formattedValue: formatAmount(income.value),
       icon: ArrowUpRight,
-      iconBg: "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/60 dark:text-emerald-400",
+      iconBg:
+        "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/60 dark:text-emerald-400",
       changeColor: "text-emerald-600 dark:text-emerald-400",
       chartColor: "#10b981",
     },
@@ -75,7 +117,8 @@ export function StatsCards({
       ...spending,
       formattedValue: formatAmount(spending.value),
       icon: ArrowDownRight,
-      iconBg: "bg-rose-100 text-rose-600 dark:bg-rose-900/60 dark:text-rose-400",
+      iconBg:
+        "bg-rose-100 text-rose-600 dark:bg-rose-900/60 dark:text-rose-400",
       changeColor: "text-rose-600 dark:text-rose-400",
       chartColor: "#f43f5e",
     },
