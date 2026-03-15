@@ -93,19 +93,11 @@ export default function AccountSettings() {
   };
 
   return (
-    <div className="flex-1 space-y-6 p-8">
+    <div className="flex-1 space-y-6">
       <AccountForm open={open} onOpenChange={setOpen} />
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-foreground text-3xl font-bold">Account</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage your financial connections and preferences
-          </p>
-        </div>
-        {/* Only show top button if we have accounts (Empty state has its own button) */}
-        {accounts.length > 0 && (
+      {accounts.length > 0 && (
+        <div className="flex justify-end">
           <Button
             onClick={() => setOpen(true)}
             className="cursor-pointer gap-2"
@@ -113,8 +105,8 @@ export default function AccountSettings() {
             <Plus className="h-4 w-4" />
             Add Account
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* --- CONDITIONAL RENDERING --- */}
       {accounts.length === 0 ? (

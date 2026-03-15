@@ -6,6 +6,7 @@ import { toNum } from "@/lib/shared/decimal";
 const logger = createLogger("inngest-weekly-digest");
 import { startOfWeek, endOfWeek, subWeeks, format } from "date-fns";
 import { sendEmail } from "@/lib/email";
+import { getTemplate } from "@/lib/email/template-cache";
 import { env } from "@/env";
 
 interface DigestResult {
@@ -143,13 +144,7 @@ export const sendWeeklyDigest = inngest.createFunction(
     });
 
     await step.run("send-emails", async () => {
-      const fs = await import("fs/promises");
-      const path = await import("path");
-      const templatePath = path.join(
-        process.cwd(),
-        "src/lib/email/templates/weekly-digest.html",
-      );
-      const template = await fs.readFile(templatePath, "utf-8");
+      const template = await getTemplate("weekly-digest.html");
 
       for (const result of results) {
         if (!result.success) continue;

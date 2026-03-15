@@ -4,6 +4,7 @@ import { db } from "@/server/db";
 
 const logger = createLogger("inngest-ai-insights");
 import { sendEmail } from "@/lib/email";
+import { getTemplate } from "@/lib/email/template-cache";
 import { env } from "@/env";
 import { format, subDays } from "date-fns";
 
@@ -58,14 +59,8 @@ export const sendAiInsights = inngest.createFunction(
 
         if (insights) {
           await step.run(`send-email-${user.id}`, async () => {
-            // Read template
-            const fs = await import("fs/promises");
-            const path = await import("path");
-            const templatePath = path.join(
-              process.cwd(),
-              "src/lib/email/templates/ai-insight.html",
-            );
-            let template = await fs.readFile(templatePath, "utf-8");
+            // Read template from cache
+            let template = await getTemplate("ai-insight.html");
 
             template = template
               .replace(/{{userName}}/g, user.name ?? "there")

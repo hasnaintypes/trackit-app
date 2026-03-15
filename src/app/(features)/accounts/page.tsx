@@ -1,21 +1,12 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import {
-  Search,
-  Wallet,
-  PlusCircle,
-  LayoutGrid,
-  List as ListIcon,
-  Filter,
-} from "lucide-react";
+import { Wallet, PlusCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent } from "@/components/ui/card";
 
 const AccountForm = dynamic(
   () => import("@/components/forms/accounts/account-form"),
@@ -46,28 +37,11 @@ export default function AccountsPage() {
   const { accounts, isLoading } = useAccounts();
   const { formatAmount } = useFormatter();
 
-  const [searchQuery, setSearchQuery] = useState("");
-
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<
     Account | ApiAccount | null
   >(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
-  const [layoutMode, setLayoutMode] = useState<"grid" | "list">("grid");
-
-  const filteredAccounts = useMemo(
-    () =>
-      accounts.filter((acc) =>
-        acc.name.toLowerCase().includes(searchQuery.toLowerCase()),
-      ),
-    [accounts, searchQuery],
-  );
-
-  const totalBalance = useMemo(
-    () => accounts.reduce((sum, acc) => sum + Number(acc.balance), 0),
-    [accounts],
-  );
 
   const handleEdit = useCallback(
     (e: React.MouseEvent, account: Account | ApiAccount) => {
@@ -122,25 +96,9 @@ export default function AccountsPage() {
           <AccountSkeleton />
         ) : accounts.length === 0 ? (
           <EmptyState onCreate={() => setIsCreateOpen(true)} />
-        ) : filteredAccounts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <Search className="text-muted-foreground/30 mb-4 h-12 w-12" />
-            <h3 className="text-lg font-semibold">No accounts found</h3>
-            <p className="text-muted-foreground">
-              No accounts match your search query:{" "}
-              <span className="font-medium">{`"${searchQuery}"`}</span>
-            </p>
-            <Button
-              variant="link"
-              onClick={() => setSearchQuery("")}
-              className="mt-2"
-            >
-              Clear search
-            </Button>
-          </div>
         ) : (
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {filteredAccounts.map((account) => (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {accounts.map((account) => (
               <AccountCard
                 key={account.id}
                 account={account}

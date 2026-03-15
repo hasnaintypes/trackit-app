@@ -155,7 +155,7 @@ export default function ReportsPage() {
       {/* Header section with Welcome text similar to other pages */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+          <h1 className="text-foreground text-3xl font-bold tracking-tight">
             Reports & Insights
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -165,7 +165,7 @@ export default function ReportsPage() {
         <Button
           onClick={handleGenerateMonthly}
           disabled={generateMutation.isPending}
-          className="h-11 cursor-pointer bg-emerald-600 px-6 font-semibold text-white shadow-sm transition-all hover:translate-y-[-1px] hover:bg-emerald-700 hover:shadow-md active:translate-y-[1px] active:scale-[0.98]"
+          className="gap-2 shadow-sm"
         >
           {generateMutation.isPending && (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

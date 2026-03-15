@@ -58,6 +58,45 @@ function getGenAI(): GoogleGenerativeAI {
   return _genAIInstance;
 }
 
+async function callGeminiWithRetry<T>(
+  prompt: string,
+  parser: (text: string) => T,
+): Promise<T> {
+  let lastError: Error | null = null;
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const genAI = getGenAI();
+      const model = genAI.getGenerativeModel({ model: getModelName() });
+      const result = await model.generateContent(prompt);
+      const text = result.response.text();
+      return parser(text);
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      // Don't retry on parse/validation errors
+      if (
+        lastError.message.includes("Failed to parse") ||
+        lastError.message.includes("Invalid response")
+      ) {
+        throw lastError;
+      }
+      if (attempt < MAX_RETRIES) {
+        const delay = RETRY_DELAY_MS * attempt;
+        logger.warn(
+          `Gemini API call failed (attempt ${attempt}/${MAX_RETRIES}), retrying in ${delay}ms`,
+          {
+            error: lastError.message,
+          },
+        );
+        await sleep(delay);
+      }
+    }
+  }
+  throw new TRPCError({
+    code: "INTERNAL_SERVER_ERROR",
+    message: `AI request failed after ${MAX_RETRIES} attempts: ${lastError?.message ?? "Unknown error"}`,
+  });
+}
+
 export class AIService {
   /**
    * Generate AI-powered budget recommendations
@@ -94,15 +133,9 @@ export class AIService {
       JSON.stringify(categorySpending, null, 2),
     ).replace("{{existingBudgets}}", existingBudgets || "No budgets set");
 
-    const modelName = getModelName();
-    const genAI = getGenAI();
-    const model = genAI.getGenerativeModel({ model: modelName });
-
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
-
-    return extractJsonFromAI<BudgetRecommendation[]>(text, "recommendations");
+    return callGeminiWithRetry(prompt, (text) =>
+      extractJsonFromAI<BudgetRecommendation[]>(text, "recommendations"),
+    );
   }
 
   /**
@@ -158,15 +191,9 @@ export class AIService {
         JSON.stringify(categoryBreakdown, null, 2),
       );
 
-    const modelName = getModelName();
-    const genAI = getGenAI();
-    const model = genAI.getGenerativeModel({ model: modelName });
-
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
-
-    return extractJsonFromAI<SpendingInsights>(text, "insights");
+    return callGeminiWithRetry(prompt, (text) =>
+      extractJsonFromAI<SpendingInsights>(text, "insights"),
+    );
   }
 
   /**
@@ -231,15 +258,9 @@ export class AIService {
       recentTransactions,
     ).replace("{{categoryStats}}", categoryStatsFormatted);
 
-    const modelName = getModelName();
-    const genAI = getGenAI();
-    const model = genAI.getGenerativeModel({ model: modelName });
-
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
-
-    return extractJsonFromAI<AnomalyDetection>(text, "anomalies");
+    return callGeminiWithRetry(prompt, (text) =>
+      extractJsonFromAI<AnomalyDetection>(text, "anomalies"),
+    );
   }
 
   /**
@@ -282,15 +303,9 @@ export class AIService {
       .replace("{{savingsRate}}", savingsRate.toFixed(1))
       .replace("{{budgetCount}}", user.budgets.length.toString());
 
-    const modelName = getModelName();
-    const genAI = getGenAI();
-    const model = genAI.getGenerativeModel({ model: modelName });
-
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
-
-    return extractJsonFromAI<FinancialAdvice>(text, "advice");
+    return callGeminiWithRetry(prompt, (text) =>
+      extractJsonFromAI<FinancialAdvice>(text, "advice"),
+    );
   }
 
   /**

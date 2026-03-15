@@ -77,10 +77,10 @@ export default function AnalyticsPage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-foreground text-2xl font-bold tracking-tight">
+        <h1 className="text-foreground text-3xl font-bold tracking-tight">
           Analytics
         </h1>
-        <p className="text-muted-foreground mt-1 text-sm">
+        <p className="text-muted-foreground mt-1">
           Visualize your income, expenses, and spending patterns
         </p>
       </div>

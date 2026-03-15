@@ -5,6 +5,7 @@ import { toNum } from "@/lib/shared/decimal";
 import { NotificationService } from "@/server/services/notificationService";
 import { NotificationType } from "@prisma/client";
 import { sendEmail } from "@/lib/email";
+import { getTemplate } from "@/lib/email/template-cache";
 import { env } from "@/env";
 import { db } from "@/server/db";
 import { AIService } from "@/server/services/aiService";
@@ -76,13 +77,7 @@ export const evaluateBudgetOnTransaction = inngest.createFunction(
           });
 
           // 2. Immediate Email Alert
-          const fs = await import("fs/promises");
-          const path = await import("path");
-          const templatePath = path.join(
-            process.cwd(),
-            "src/lib/email/templates/ai-insight.html",
-          );
-          let template = await fs.readFile(templatePath, "utf-8");
+          let template = await getTemplate("ai-insight.html");
 
           template = template
             .replace(/{{userName}}/g, user.name ?? "there")

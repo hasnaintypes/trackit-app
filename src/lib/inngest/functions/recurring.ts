@@ -6,6 +6,7 @@ import { db } from "@/server/db";
 const logger = createLogger("inngest-recurring");
 import { calculateNextRunAt } from "@/lib/recurrence";
 import { sendEmail } from "@/lib/email";
+import { toNum } from "@/lib/shared/decimal";
 import type { RecurringRule } from "@prisma/client";
 import { RecurringStatus } from "@prisma/client";
 import type { RecurrenceConfig } from "@/types/recurrence";
@@ -99,7 +100,7 @@ export const processRecurringTransaction = inngest.createFunction(
       await sendEmail({
         to: userEmail,
         subject: "Recurring transaction processed",
-        html: `A recurring transaction for <strong>${rule.description ?? "Transaction"}</strong> was processed for ${String(rule.amount)} on ${runAt.toDateString()}.`,
+        html: `A recurring transaction for <strong>${rule.description ?? "Transaction"}</strong> was processed for ${toNum(rule.amount).toFixed(2)} on ${runAt.toDateString()}.`,
       });
     }
   },
@@ -150,7 +151,7 @@ export const notifyUpcomingRecurring = inngest.createFunction(
               html: `
                 <div style="font-family: sans-serif; padding: 20px;">
                   <h2>Upcoming Payment Reminder</h2>
-                  <p>This is a reminder that a recurring payment for <strong>${rule.description}</strong> of <strong>$${String(rule.amount)}</strong> is scheduled for tomorrow, ${new Date(rule.nextRunAt).toDateString()}.</p>
+                  <p>This is a reminder that a recurring payment for <strong>${rule.description}</strong> of <strong>$${toNum(rule.amount).toFixed(2)}</strong> is scheduled for tomorrow, ${new Date(rule.nextRunAt).toDateString()}.</p>
                   <p>Please ensure you have sufficient funds in your account.</p>
                 </div>
               `,
@@ -161,7 +162,7 @@ export const notifyUpcomingRecurring = inngest.createFunction(
               userId: rule.userId,
               type: NotificationType.TRANSACTION_RECURRING,
               title: "Upcoming Recurring Payment",
-              message: `Reminder: Your recurring payment for ${rule.description} ($${String(rule.amount)}) is scheduled for tomorrow.`,
+              message: `Reminder: Your recurring payment for ${rule.description} ($${toNum(rule.amount).toFixed(2)}) is scheduled for tomorrow.`,
               metadata: { ruleId: rule.id },
             });
           });

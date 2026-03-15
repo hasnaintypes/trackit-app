@@ -1,6 +1,7 @@
 import { db } from "@/server/db";
 import { subMonths, format } from "date-fns";
 import { sendEmail } from "@/lib/email";
+import { getTemplate } from "@/lib/email/template-cache";
 import { env } from "@/env";
 import { createLogger } from "@/lib/logging";
 import { inngest } from "../client";
@@ -116,14 +117,8 @@ export const generateMonthlyReport = inngest.createFunction(
             topCategories: Array<{ name: string; amount: number }>;
           };
 
-          // Read monthly summary template
-          const fs = await import("fs/promises");
-          const path = await import("path");
-          const templatePath = path.join(
-            process.cwd(),
-            "src/lib/email/templates/monthly-summary.html",
-          );
-          let template = await fs.readFile(templatePath, "utf-8");
+          // Read monthly summary template from cache
+          let template = await getTemplate("monthly-summary.html");
 
           // Replace variables with actual data
           template = template

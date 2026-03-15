@@ -29,14 +29,7 @@ export default function AppearanceSettings() {
   }, []);
 
   return (
-    <div className="flex-1 space-y-6 p-8">
-      <div>
-        <h1 className="text-foreground text-3xl font-bold">Appearance</h1>
-        <p className="text-muted-foreground mt-1">
-          Customize how the application looks
-        </p>
-      </div>
-
+    <div className="flex-1 space-y-6">
       {/* Theme */}
       <Card>
         <CardHeader>

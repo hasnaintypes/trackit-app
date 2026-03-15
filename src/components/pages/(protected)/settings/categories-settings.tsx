@@ -269,7 +269,7 @@ export default function CategoriesSettings() {
 
   if (all.status === "pending") {
     return (
-      <div className="mx-auto max-w-6xl flex-1 space-y-6 p-4 md:p-8">
+      <div className="flex-1 space-y-6">
         <div className="bg-muted h-8 w-64 animate-pulse rounded" />
         <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -289,7 +289,7 @@ export default function CategoriesSettings() {
 
   if (all.status === "error") {
     return (
-      <div className="mx-auto max-w-6xl flex-1 space-y-6 p-4 md:p-8">
+      <div className="flex-1 space-y-6">
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Error Loading Categories</AlertTitle>
@@ -305,18 +305,9 @@ export default function CategoriesSettings() {
   // --- MAIN RENDER ---
 
   return (
-    <div className="mx-auto max-w-6xl flex-1 space-y-8 p-4 md:p-8">
-      <div>
-        <h1 className="text-foreground text-3xl font-bold">
-          Transaction Categories
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Organize your finances with custom categories and subcategories.
-        </p>
-      </div>
-
-      <div className="flex items-center justify-between border-b pb-4">
-        <h2 className="text-foreground text-2xl font-semibold">
+    <div className="flex-1 space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-foreground text-lg font-semibold">
           Category Groups ({parentCategories.length})
         </h2>
         <div className="flex items-center gap-3">

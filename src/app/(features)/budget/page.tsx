@@ -53,8 +53,10 @@ export default function BudgetPage() {
     <div className="space-y-8">
       <div className="flex flex-col justify-between gap-4 border-b pb-6 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Budget & Goals</h1>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-foreground text-3xl font-bold tracking-tight">
+            Budget & Goals
+          </h1>
+          <p className="text-muted-foreground mt-1">
             Manage your spending limits and track your financial health.
           </p>
         </div>

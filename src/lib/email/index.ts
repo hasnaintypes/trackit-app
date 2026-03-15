@@ -1,6 +1,5 @@
 import Handlebars from "handlebars";
-import { readFileSync } from "fs";
-import { join } from "path";
+import { getTemplate } from "@/lib/email/template-cache";
 
 interface SendEmailOptions {
   to: string;
@@ -60,16 +59,8 @@ export async function sendTemplateEmail({
   template,
   data,
 }: SendTemplateEmailOptions): Promise<void> {
-  // Load template from file
-  const templatePath = join(
-    process.cwd(),
-    "src",
-    "lib",
-    "email",
-    "templates",
-    `${template}.html`,
-  );
-  const templateContent = readFileSync(templatePath, "utf-8");
+  // Load template from cache
+  const templateContent = await getTemplate(`${template}.html`);
 
   // Compile template with Handlebars
   const compiledTemplate = Handlebars.compile(templateContent);

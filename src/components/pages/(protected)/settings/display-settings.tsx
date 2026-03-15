@@ -93,7 +93,7 @@ export default function DisplaySettings() {
 
   if (isLoading || !settings) {
     return (
-      <div className="mt-8 flex-1 space-y-8 p-8">
+      <div className="flex-1 space-y-6">
         <Skeleton className="h-10 w-48" />
         <Skeleton className="h-4 w-72" />
         <div className="space-y-6 pt-4">
@@ -135,14 +135,7 @@ export default function DisplaySettings() {
   ];
 
   return (
-    <div className="mt-8 flex-1 space-y-8 p-8">
-      <div>
-        <h1 className="text-foreground text-3xl font-bold">Display</h1>
-        <p className="text-muted-foreground mt-1">
-          Configure how your data is displayed and regional localization.
-        </p>
-      </div>
-
+    <div className="flex-1 space-y-6">
       {/* --- SECTION 1: Default Dashboard View --- */}
       <Card>
         <CardHeader>

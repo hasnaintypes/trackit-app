@@ -5,6 +5,7 @@ import { toNum } from "@/lib/shared/decimal";
 
 const logger = createLogger("inngest-budget-alert");
 import { sendEmail } from "@/lib/email";
+import { getTemplate } from "@/lib/email/template-cache";
 import { env } from "@/env";
 import { BUDGET_THRESHOLD_REACHED_EVENT } from "@/lib/inngest/events";
 
@@ -55,14 +56,8 @@ export const sendBudgetAlertEmail = inngest.createFunction(
       const percentage = (spent / limit) * 100;
       const remaining = Math.max(0, limit - spent);
 
-      // Read budget alert template
-      const fs = await import("fs/promises");
-      const path = await import("path");
-      const templatePath = path.join(
-        process.cwd(),
-        "src/lib/email/templates/budget-alert.html",
-      );
-      let template = await fs.readFile(templatePath, "utf-8");
+      // Read budget alert template from cache
+      let template = await getTemplate("budget-alert.html");
 
       // Fetch AI recommendations if threshold is high
       let recommendations = "";
