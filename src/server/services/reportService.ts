@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { db } from "@/server/db";
 import { ReportType, ReportStatus } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
@@ -19,7 +20,10 @@ export class ReportService {
       isNaN(year) ||
       isNaN(month)
     ) {
-      throw new Error(`Invalid period format: ${period}. Expected YYYY-MM`);
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `Invalid period format: ${period}. Expected YYYY-MM`,
+      });
     }
 
     const periodStart = startOfMonth(new Date(year, month - 1));
@@ -128,7 +132,7 @@ export class ReportService {
     });
 
     if (!budget || budget.userId !== userId) {
-      throw new Error("Budget not found");
+      throw new TRPCError({ code: "NOT_FOUND", message: "Budget not found" });
     }
 
     const spent = toNum(budget.spentAmount);

@@ -5,6 +5,7 @@ import {
   protectedProcedure,
 } from "@/server/api/trpc";
 import { uploadForProfile } from "@/lib/shared/imagekit";
+import { TRPCError } from "@trpc/server";
 import type { Prisma } from "@prisma/client";
 import {
   updateProfileSchema,
@@ -184,7 +185,10 @@ export const userRouter = createTRPCRouter({
 
       const imageUrl = result && (result.url ?? result.filePath);
       if (!imageUrl || typeof imageUrl !== "string")
-        throw new Error("Image upload did not return a valid URL");
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Image upload did not return a valid URL",
+        });
 
       const user = await ctx.db.user.update({
         where: { id: userId },

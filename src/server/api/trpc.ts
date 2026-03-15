@@ -222,7 +222,9 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
   const result = await next();
 
   const end = Date.now();
-  timingLogger.info(`${path} took ${end - start}ms to execute`);
+  if (process.env.NODE_ENV === "development") {
+    timingLogger.info(`${path} took ${end - start}ms to execute`);
+  }
 
   return result;
 });
@@ -265,3 +267,23 @@ const enforceAuthMiddleware = t.middleware(({ ctx, next }) => {
 export const protectedProcedure = t.procedure
   .use(timingMiddleware)
   .use(enforceAuthMiddleware);
+
+/**
+ * AI rate-limited procedure.
+ *
+ * Extends `protectedProcedure` with per-user rate limiting for AI endpoints.
+ */
+import { checkRateLimit, AI_MAX } from "@/server/api/rateLimit";
+
+export const aiRateLimitedProcedure = protectedProcedure.use(
+  async ({ ctx, next }) => {
+    const { allowed } = checkRateLimit(ctx.user.id, "ai", AI_MAX);
+    if (!allowed) {
+      throw new TRPCError({
+        code: "TOO_MANY_REQUESTS",
+        message: "Rate limit exceeded. Try again in a minute.",
+      });
+    }
+    return next();
+  },
+);

@@ -46,10 +46,8 @@ export class BudgetService {
       select: { id: true },
     });
 
-    // 3. Trigger evaluation for each relevant budget
-    for (const b of budgetIds) {
-      await this.reevaluateBudget(b.id);
-    }
+    // 3. Trigger evaluation for each relevant budget in parallel
+    await Promise.all(budgetIds.map((b) => this.reevaluateBudget(b.id)));
   }
 
   /**
@@ -103,13 +101,8 @@ export class BudgetService {
       data: { spentAmount: spent },
     });
 
-    // Threshold checks
-    await this.checkThresholds(
-      budgetId,
-      spent,
-      toNum(budget.amount),
-      periodKey,
-    );
+    // Threshold checks — pass the already-loaded budget to avoid a redundant fetch
+    await this.checkThresholds(budget, spent, toNum(budget.amount), periodKey);
   }
 
   /**
@@ -170,13 +163,12 @@ export class BudgetService {
   }
 
   private static async checkThresholds(
-    budgetId: string,
+    budget: NonNullable<Awaited<ReturnType<typeof db.budget.findUnique>>>,
     spent: number,
     total: number,
     periodKey: string,
   ) {
-    const budget = await db.budget.findUnique({ where: { id: budgetId } });
-    if (!budget) return;
+    const budgetId = budget.id;
 
     // Atomically reset flags if period changed
     if (budget.last_alert_period !== periodKey) {

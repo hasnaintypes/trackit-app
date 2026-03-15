@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Prisma } from "@prisma/client";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { toNum } from "@/lib/shared/decimal";
@@ -152,29 +153,12 @@ export const overviewRouter = createTRPCRouter({
 
       const startDate = startOfMonth(subMonths(new Date(), monthsBack - 1));
 
-      // Prisma groupBy doesn't support grouping by date parts directly,
-      // so we use a raw query approach via findMany + JS aggregation on
-      // a bounded set (max 24 months of data).
-      const rawTransactions = await db.transaction.findMany({
-        where: {
-          userId,
-          date: { gte: startDate },
-        },
-        select: {
-          amount: true,
-          type: true,
-          date: true,
-        },
-        orderBy: { date: "asc" },
-      });
-
-      // Aggregate by month
+      // Pre-fill all months so months with zero transactions still appear
       const monthlyMap = new Map<
         string,
         { month: string; year: number; income: number; expense: number }
       >();
 
-      // Pre-fill all months so there are no gaps
       for (let i = 0; i < monthsBack; i++) {
         const d = subMonths(new Date(), monthsBack - 1 - i);
         const key = format(d, "yyyy-MM");
@@ -186,15 +170,34 @@ export const overviewRouter = createTRPCRouter({
         });
       }
 
-      for (const tx of rawTransactions) {
-        const key = format(new Date(tx.date), "yyyy-MM");
-        const bucket = monthlyMap.get(key);
-        if (!bucket) continue;
-        const amount = Math.abs(toNum(tx.amount));
-        if (tx.type === "CREDIT") {
-          bucket.income += amount;
-        } else if (tx.type === "DEBIT") {
-          bucket.expense += amount;
+      // Aggregate in SQL instead of loading all rows into JS
+      const rows = await db.$queryRaw<
+        Array<{
+          key: string;
+          month: string;
+          year: number;
+          income: number;
+          expense: number;
+        }>
+      >(Prisma.sql`
+        SELECT
+          TO_CHAR(date, 'YYYY-MM') AS key,
+          TO_CHAR(date, 'Mon') AS month,
+          EXTRACT(YEAR FROM date)::int AS year,
+          COALESCE(SUM(CASE WHEN type = 'CREDIT' THEN ABS(amount) ELSE 0 END), 0)::float AS income,
+          COALESCE(SUM(CASE WHEN type = 'DEBIT' THEN ABS(amount) ELSE 0 END), 0)::float AS expense
+        FROM "Transaction"
+        WHERE "userId" = ${userId} AND date >= ${startDate}
+        GROUP BY 1, 2, 3
+        ORDER BY 1 ASC
+      `);
+
+      // Merge SQL results into the pre-filled month map
+      for (const row of rows) {
+        const bucket = monthlyMap.get(row.key);
+        if (bucket) {
+          bucket.income = Number(row.income);
+          bucket.expense = Number(row.expense);
         }
       }
 

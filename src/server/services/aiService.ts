@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { db } from "@/server/db";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { env } from "@/env";
@@ -37,9 +38,11 @@ function sleep(ms: number): Promise<void> {
 function getApiKey(): string {
   const apiKey = env?.GEMINI_API_KEY ?? process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error(
-      "Gemini API key is not configured. Please set GEMINI_API_KEY in your environment variables.",
-    );
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message:
+        "Gemini API key is not configured. Please set GEMINI_API_KEY in your environment variables.",
+    });
   }
   return apiKey;
 }
@@ -60,17 +63,18 @@ export class AIService {
    * Generate AI-powered budget recommendations
    */
   static async generateBudgetRecommendations(userId: string) {
-    const transactions = await db.transaction.findMany({
-      where: { userId },
-      include: { category: true },
-      orderBy: { date: "desc" },
-      take: 100,
-    });
-
-    const budgets = await db.budget.findMany({
-      where: { userId },
-      include: { category: true },
-    });
+    const [transactions, budgets] = await Promise.all([
+      db.transaction.findMany({
+        where: { userId },
+        include: { category: true },
+        orderBy: { date: "desc" },
+        take: 100,
+      }),
+      db.budget.findMany({
+        where: { userId },
+        include: { category: true },
+      }),
+    ]);
 
     const categorySpending: Record<string, number> = {};
     transactions.forEach((t) => {
@@ -115,7 +119,10 @@ export class AIService {
       isNaN(year) ||
       isNaN(month)
     ) {
-      throw new Error(`Invalid period format: ${period}. Expected YYYY-MM.`);
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `Invalid period format: ${period}. Expected YYYY-MM.`,
+      });
     }
 
     const startDate = new Date(year, month - 1, 1);
@@ -253,7 +260,8 @@ export class AIService {
       },
     });
 
-    if (!user) throw new Error("User not found");
+    if (!user)
+      throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
 
     const totalIncome = user.transactions
       .filter((t) => t.type === "CREDIT")
@@ -306,15 +314,18 @@ export class AIService {
     }
 
     if (transactions.length > maxRows) {
-      throw new Error(
-        `Cannot process ${transactions.length} transactions. Maximum allowed is ${maxRows}. Please reduce the file size or contact support.`,
-      );
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `Cannot process ${transactions.length} transactions. Maximum allowed is ${maxRows}. Please reduce the file size or contact support.`,
+      });
     }
 
     if (!categories || categories.length === 0) {
-      throw new Error(
-        "No categories available for AI categorization. Please create categories first.",
-      );
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message:
+          "No categories available for AI categorization. Please create categories first.",
+      });
     }
 
     const prompt = CATEGORY_PROMPT_TEMPLATE.replace(
@@ -355,9 +366,10 @@ export class AIService {
       }
     }
 
-    throw new Error(
-      `Failed to categorize transactions after ${MAX_RETRIES} attempts: ${lastError?.message ?? "Unknown error"}`,
-    );
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: `Failed to categorize transactions after ${MAX_RETRIES} attempts: ${lastError?.message ?? "Unknown error"}`,
+    });
   }
 
   /**

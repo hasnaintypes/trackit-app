@@ -105,39 +105,39 @@ export const accountRouter = createTRPCRouter({
           ? Boolean(input.isDefault)
           : existingCount === 0;
 
-      // If final value is default, unset previous defaults in a transaction
-      if (isDefaultFinal) {
-        await prisma.$transaction([
-          prisma.bankAccount.updateMany({
+      // Wrap unset-old-defaults + create in a single interactive transaction
+      const createdRaw = await prisma.$transaction(async (tx) => {
+        if (isDefaultFinal) {
+          await tx.bankAccount.updateMany({
             where: { userId, isDefault: true },
             data: { isDefault: false },
-          }),
-        ]);
-      }
+          });
+        }
 
-      const createdRaw = await prisma.bankAccount.create({
-        data: {
-          userId,
-          name: input.name,
-          type: input.type,
-          currency: input.currency ?? "USD",
-          balance: input.balance ?? undefined,
-          color: input.color ?? undefined,
-          icon: input.icon ?? undefined,
-          isDefault: isDefaultFinal,
-        },
-        select: {
-          id: true,
-          name: true,
-          type: true,
-          currency: true,
-          balance: true,
-          color: true,
-          icon: true,
-          isDefault: true,
-          createdAt: true,
-          updatedAt: true,
-        },
+        return tx.bankAccount.create({
+          data: {
+            userId,
+            name: input.name,
+            type: input.type,
+            currency: input.currency ?? "USD",
+            balance: input.balance ?? undefined,
+            color: input.color ?? undefined,
+            icon: input.icon ?? undefined,
+            isDefault: isDefaultFinal,
+          },
+          select: {
+            id: true,
+            name: true,
+            type: true,
+            currency: true,
+            balance: true,
+            color: true,
+            icon: true,
+            isDefault: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        });
       });
 
       const created = createdRaw as RawAccount;
@@ -172,15 +172,6 @@ export const accountRouter = createTRPCRouter({
           message: "Account not found",
         });
 
-      if (input.isDefault) {
-        await prisma.$transaction([
-          prisma.bankAccount.updateMany({
-            where: { userId, isDefault: true },
-            data: { isDefault: false },
-          }),
-        ]);
-      }
-
       const data: Prisma.BankAccountUpdateInput = {};
       if (typeof input.name !== "undefined") data.name = input.name;
       if (typeof input.type !== "undefined") data.type = input.type;
@@ -192,21 +183,31 @@ export const accountRouter = createTRPCRouter({
         data.isDefault = input.isDefault;
       data.updatedAt = new Date();
 
-      const updatedRaw = await prisma.bankAccount.update({
-        where: { id: input.id },
-        data,
-        select: {
-          id: true,
-          name: true,
-          type: true,
-          currency: true,
-          balance: true,
-          color: true,
-          icon: true,
-          isDefault: true,
-          createdAt: true,
-          updatedAt: true,
-        },
+      // Wrap unset-old-defaults + update in a single interactive transaction
+      const updatedRaw = await prisma.$transaction(async (tx) => {
+        if (input.isDefault) {
+          await tx.bankAccount.updateMany({
+            where: { userId, isDefault: true },
+            data: { isDefault: false },
+          });
+        }
+
+        return tx.bankAccount.update({
+          where: { id: input.id },
+          data,
+          select: {
+            id: true,
+            name: true,
+            type: true,
+            currency: true,
+            balance: true,
+            color: true,
+            icon: true,
+            isDefault: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        });
       });
       const updated = updatedRaw as RawAccount;
 

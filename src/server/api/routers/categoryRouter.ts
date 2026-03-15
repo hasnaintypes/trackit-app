@@ -128,19 +128,17 @@ export const categoryRouter = createTRPCRouter({
           message: "Category not found",
         });
       }
-      // Collect all IDs to delete (category + descendants), then batch-delete
-      const idsToDelete: string[] = [];
-      const collectIds = async (id: string) => {
+      // Iterative BFS: collect all descendant IDs in O(depth) queries
+      const idsToDelete: string[] = [input.id];
+      let currentIds = [input.id];
+      while (currentIds.length > 0) {
         const children = await ctx.db.category.findMany({
-          where: { parentCategoryId: id },
+          where: { parentCategoryId: { in: currentIds } },
           select: { id: true },
         });
-        for (const child of children) {
-          await collectIds(child.id);
-        }
-        idsToDelete.push(id);
-      };
-      await collectIds(input.id);
+        currentIds = children.map((c) => c.id);
+        idsToDelete.push(...currentIds);
+      }
 
       await ctx.db.category.deleteMany({
         where: { id: { in: idsToDelete } },
@@ -255,19 +253,17 @@ export const categoryRouter = createTRPCRouter({
           });
         }
 
-        // Collect all IDs to delete, then batch-delete
-        const idsToDelete: string[] = [];
-        const collectIds = async (id: string) => {
+        // Iterative BFS: collect all descendant IDs in O(depth) queries
+        const idsToDelete: string[] = [input.id];
+        let currentIds = [input.id];
+        while (currentIds.length > 0) {
           const children = await ctx.db.category.findMany({
-            where: { parentCategoryId: id },
+            where: { parentCategoryId: { in: currentIds } },
             select: { id: true },
           });
-          for (const child of children) {
-            await collectIds(child.id);
-          }
-          idsToDelete.push(id);
-        };
-        await collectIds(input.id);
+          currentIds = children.map((c) => c.id);
+          idsToDelete.push(...currentIds);
+        }
 
         await ctx.db.category.deleteMany({
           where: { id: { in: idsToDelete } },
