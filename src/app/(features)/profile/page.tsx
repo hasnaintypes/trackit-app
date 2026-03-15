@@ -1,12 +1,29 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
+import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 import { UserPen, Bell, ShieldCheck, CreditCard } from "lucide-react";
-import EditProfileSection from "@/components/pages/(protected)/profile/edit-profile-section";
-import NotificationsSection from "@/components/pages/(protected)/profile/notifications-section";
-import SecuritySection from "@/components/pages/(protected)/profile/security-section";
-import BillingSection from "@/components/pages/(protected)/profile/billing-section";
+
+const sectionFallback = <Skeleton className="h-96 w-full rounded-xl" />;
+
+const EditProfileSection = dynamic(
+  () => import("@/components/pages/(protected)/profile/edit-profile-section"),
+  { loading: () => sectionFallback },
+);
+const NotificationsSection = dynamic(
+  () => import("@/components/pages/(protected)/profile/notifications-section"),
+  { loading: () => sectionFallback },
+);
+const SecuritySection = dynamic(
+  () => import("@/components/pages/(protected)/profile/security-section"),
+  { loading: () => sectionFallback },
+);
+const BillingSection = dynamic(
+  () => import("@/components/pages/(protected)/profile/billing-section"),
+  { loading: () => sectionFallback },
+);
 
 const sections = [
   { id: "edit-profile", label: "Edit profile", icon: UserPen },
@@ -49,10 +66,12 @@ export default function ProfilePage() {
 
       {/* Content Area */}
       <div className="min-w-0 flex-1">
-        {activeSection === "edit-profile" && <EditProfileSection />}
-        {activeSection === "notifications" && <NotificationsSection />}
-        {activeSection === "security" && <SecuritySection />}
-        {activeSection === "billing" && <BillingSection />}
+        <Suspense fallback={sectionFallback}>
+          {activeSection === "edit-profile" && <EditProfileSection />}
+          {activeSection === "notifications" && <NotificationsSection />}
+          {activeSection === "security" && <SecuritySection />}
+          {activeSection === "billing" && <BillingSection />}
+        </Suspense>
       </div>
     </div>
   );

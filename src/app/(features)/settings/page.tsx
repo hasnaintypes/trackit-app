@@ -1,12 +1,29 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
+import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
-import AccountSettings from "@/components/pages/(protected)/settings/account-settings";
-import AppearanceSettings from "@/components/pages/(protected)/settings/appearance-settings";
-import DisplaySettings from "@/components/pages/(protected)/settings/display-settings";
-import CategoriesSettings from "@/components/pages/(protected)/settings/categories-settings";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Wallet, Palette, BarChart3, Layers } from "lucide-react";
+
+const sectionFallback = <Skeleton className="h-96 w-full rounded-xl" />;
+
+const AccountSettings = dynamic(
+  () => import("@/components/pages/(protected)/settings/account-settings"),
+  { loading: () => sectionFallback },
+);
+const AppearanceSettings = dynamic(
+  () => import("@/components/pages/(protected)/settings/appearance-settings"),
+  { loading: () => sectionFallback },
+);
+const CategoriesSettings = dynamic(
+  () => import("@/components/pages/(protected)/settings/categories-settings"),
+  { loading: () => sectionFallback },
+);
+const DisplaySettings = dynamic(
+  () => import("@/components/pages/(protected)/settings/display-settings"),
+  { loading: () => sectionFallback },
+);
 
 const sections = [
   { id: "account", label: "Account", icon: Wallet },
@@ -49,10 +66,12 @@ export default function SettingsPage() {
 
       {/* Content Area */}
       <div className="min-w-0 flex-1">
-        {activeSection === "account" && <AccountSettings />}
-        {activeSection === "appearance" && <AppearanceSettings />}
-        {activeSection === "categories" && <CategoriesSettings />}
-        {activeSection === "display" && <DisplaySettings />}
+        <Suspense fallback={sectionFallback}>
+          {activeSection === "account" && <AccountSettings />}
+          {activeSection === "appearance" && <AppearanceSettings />}
+          {activeSection === "categories" && <CategoriesSettings />}
+          {activeSection === "display" && <DisplaySettings />}
+        </Suspense>
       </div>
     </div>
   );
