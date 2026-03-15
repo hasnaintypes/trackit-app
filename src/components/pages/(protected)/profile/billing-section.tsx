@@ -52,9 +52,7 @@ export default function BillingSection() {
               </p>
             </div>
           </div>
-          <Button className="mt-4 w-full sm:w-auto">
-            Upgrade / Downgrade
-          </Button>
+          <Button className="mt-4 w-full sm:w-auto">Upgrade / Downgrade</Button>
         </CardContent>
       </Card>
 
@@ -63,9 +61,7 @@ export default function BillingSection() {
         <CardContent className="p-6">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h3 className="text-foreground font-semibold">
-                Payment Methods
-              </h3>
+              <h3 className="text-foreground font-semibold">Payment Methods</h3>
               <p className="text-muted-foreground text-xs">
                 Manage your saved payment methods.
               </p>

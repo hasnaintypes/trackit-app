@@ -279,7 +279,7 @@ export default function EditProfileSection() {
                   className="bg-muted pr-24"
                 />
                 {user?.emailVerified && (
-                  <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                  <div className="absolute top-1/2 right-3 flex -translate-y-1/2 items-center gap-1 text-xs text-green-600 dark:text-green-400">
                     <CheckCircle className="h-3.5 w-3.5" />
                     Verified
                   </div>
@@ -312,9 +312,7 @@ export default function EditProfileSection() {
               <Label htmlFor="timezone">Timezone</Label>
               <Select
                 value={formData.timezone ?? undefined}
-                onValueChange={(value) =>
-                  handleSelectChange("timezone", value)
-                }
+                onValueChange={(value) => handleSelectChange("timezone", value)}
               >
                 <SelectTrigger id="timezone">
                   <SelectValue placeholder="Select your timezone" />
@@ -332,10 +330,7 @@ export default function EditProfileSection() {
 
           {/* Actions */}
           <div className="mt-8 flex gap-3">
-            <Button
-              onClick={handleUpdateProfile}
-              disabled={isUpdatingProfile}
-            >
+            <Button onClick={handleUpdateProfile} disabled={isUpdatingProfile}>
               {isUpdatingProfile ? "Saving..." : "Save changes"}
             </Button>
             <Button variant="outline">Cancel</Button>
