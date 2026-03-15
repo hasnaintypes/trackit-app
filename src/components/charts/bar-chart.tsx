@@ -23,6 +23,11 @@ interface BarChartProps {
   valueFormatter?: (value: number) => string;
 }
 
+function formatAxisValue(value: number): string {
+  if (value >= 1000) return `${Math.round(value / 1000)}k`;
+  return String(value);
+}
+
 export function BarChart({
   data,
   config,
@@ -52,28 +57,59 @@ export function BarChart({
 
   return (
     <ChartContainer config={config} className={className}>
-      <RechartsBarChart accessibilityLayer data={data}>
-        <CartesianGrid vertical={false} />
+      <RechartsBarChart
+        accessibilityLayer
+        data={data}
+        margin={{ left: 2, right: 12, top: 8, bottom: 0 }}
+      >
+        <defs>
+          <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop
+              offset="0%"
+              stopColor={`var(--color-${dataKey})`}
+              stopOpacity={1}
+            />
+            <stop
+              offset="100%"
+              stopColor={`var(--color-${dataKey})`}
+              stopOpacity={0.4}
+            />
+          </linearGradient>
+        </defs>
+        <CartesianGrid vertical={false} strokeDasharray="3 3" />
         <XAxis
           dataKey={labelKey}
           tickLine={false}
-          tickMargin={10}
+          tickMargin={12}
           axisLine={false}
-          tickFormatter={(value: string | number) => value.toString()}
+          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
         />
         <YAxis
           tickLine={false}
           axisLine={false}
-          tickMargin={10}
-          tickFormatter={(value: number) =>
-            valueFormatter ? valueFormatter(value) : `$${value}`
+          tickMargin={8}
+          tickFormatter={valueFormatter ?? formatAxisValue}
+          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+          width={65}
+        />
+        <ChartTooltip
+          cursor={{ fill: "hsl(var(--muted))", opacity: 0.3 }}
+          content={
+            <ChartTooltipContent
+              hideLabel
+              formatter={
+                valueFormatter
+                  ? (value) => valueFormatter(Number(value))
+                  : undefined
+              }
+            />
           }
         />
-        <ChartTooltip content={<ChartTooltipContent hideLabel />} />
         <Bar
           dataKey={dataKey}
-          fill={`var(--color-${dataKey})`}
-          radius={[4, 4, 0, 0]}
+          fill="url(#barGradient)"
+          radius={[6, 6, 0, 0]}
+          maxBarSize={48}
         />
       </RechartsBarChart>
     </ChartContainer>
