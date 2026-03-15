@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -23,7 +24,7 @@ export interface BudgetCardProps {
   currency?: string;
 }
 
-export function BudgetCard({
+function BudgetCardInner({
   name,
   icon,
   amount,
@@ -119,3 +120,5 @@ export function BudgetCard({
     </Card>
   );
 }
+
+export const BudgetCard = React.memo(BudgetCardInner);

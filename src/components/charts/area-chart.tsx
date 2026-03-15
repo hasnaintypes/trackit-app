@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import {
   Area,
   AreaChart as RechartsAreaChart,
@@ -30,7 +31,7 @@ function formatAxisValue(value: number): string {
   return String(value);
 }
 
-export function AreaChart({
+function AreaChartInner({
   data,
   config,
   dataKeyIncome,
@@ -140,3 +141,5 @@ export function AreaChart({
     </div>
   );
 }
+
+export const AreaChart = React.memo(AreaChartInner);

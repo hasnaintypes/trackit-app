@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { ArrowDownRight, ArrowUpRight, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useFormatter } from "@/hooks/use-formatter";
@@ -86,7 +87,7 @@ function DecorativeChart({ color }: { color: string }) {
   );
 }
 
-export function StatsCards({
+function StatsCardsInner({
   balance,
   income,
   spending,
@@ -188,3 +189,5 @@ export function StatsCards({
     </div>
   );
 }
+
+export const StatsCards = React.memo(StatsCardsInner);

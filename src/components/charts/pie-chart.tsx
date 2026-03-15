@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Pie, PieChart as RechartsPieChart, Label } from "recharts";
 import {
   type ChartConfig,
@@ -17,7 +18,7 @@ interface PieChartProps {
   valueFormatter?: (value: number) => string;
 }
 
-export function PieChart({
+function PieChartInner({
   data,
   config,
   dataKey,
@@ -83,3 +84,5 @@ export function PieChart({
     </ChartContainer>
   );
 }
+
+export const PieChart = React.memo(PieChartInner);
