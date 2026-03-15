@@ -16,7 +16,7 @@ export default function BlogPage() {
           Blog
         </p>
 
-        <h1 className="text-foreground mt-3 text-4xl font-semibold leading-tight md:text-5xl lg:text-6xl">
+        <h1 className="text-foreground mt-3 text-4xl leading-tight font-semibold md:text-5xl lg:text-6xl">
           Latest articles & insights
         </h1>
 
@@ -46,7 +46,7 @@ export default function BlogPage() {
               {blog.featured.hero.badge}
             </Badge>
 
-            <h2 className="text-2xl font-bold leading-tight md:text-3xl">
+            <h2 className="text-2xl leading-tight font-bold md:text-3xl">
               {blog.featured.hero.title}
             </h2>
           </div>

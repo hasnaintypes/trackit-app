@@ -39,7 +39,8 @@ const featuredSidebar = [
       "https://www.bluetickconsultants.com/wp-content/uploads/2025/05/t3-stack.webp",
     imageAlt:
       "Diagram showing the architecture of the T3 Stack (Next.js, tRPC, Prisma).",
-    title: "Behind the Scenes: Why the T3 Stack Powers Trackit's Real-Time Sync",
+    title:
+      "Behind the Scenes: Why the T3 Stack Powers Trackit's Real-Time Sync",
     href: "/blog/t3-stack-and-real-time-sync",
   },
   {
@@ -443,7 +444,8 @@ By making these advanced security measures the standard, **Trackit** doesn't jus
   {
     id: "post-t3-stack-sync",
     category: "Engineering",
-    title: "Behind the Scenes: Why the T3 Stack Powers Trackit's Real-Time Sync",
+    title:
+      "Behind the Scenes: Why the T3 Stack Powers Trackit's Real-Time Sync",
     author: {
       name: "Ryan A.",
       avatar: "https://randomuser.me/api/portraits/men/2.jpg",

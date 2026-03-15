@@ -20,7 +20,8 @@ export const stats: StatsSectionContent = {
     {
       label: "Active Users",
       value: "25k+",
-      description: "Individuals and teams managing their finances with Trackit.",
+      description:
+        "Individuals and teams managing their finances with Trackit.",
     },
     {
       label: "Tracked Transactions",
