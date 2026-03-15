@@ -1,16 +1,23 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
-// no Card used here; page header layout
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { ICON_MAP } from "@/components/common/icon-picker";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Wallet } from "lucide-react";
 import { useAccounts } from "@/hooks/use-accounts";
 import { useTransactions } from "@/hooks/use-transactions";
 import { useFormatter } from "@/hooks/use-formatter";
-import TransactionForm from "@/components/forms/transaction/transaction-form";
 import { TransactionsTable } from "@/components/common/transactions-table";
+
+const TransactionForm = dynamic(
+  () => import("@/components/forms/transaction/transaction-form"),
+  { ssr: false, loading: () => null },
+);
+import { cn } from "@/lib/utils";
 import type { Transaction } from "@/types/transaction";
 
 export default function AccountDetailPage() {
@@ -19,11 +26,24 @@ export default function AccountDetailPage() {
   const { accounts, isLoading } = useAccounts();
   const { formatAmount } = useFormatter();
   const { listQuery, remove } = useTransactions();
+  const [pageIndex, setPageIndex] = useState(0);
+  const [pageSize, setPageSize] = useState(20);
   const { data: transactionsData, isLoading: isLoadingTransactions } =
-    listQuery({ accountId: id });
+    listQuery({ accountId: id, limit: pageSize, page: pageIndex + 1 });
   const [openTx, setOpenTx] = useState(false);
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
+
+  const handlePageChange = useCallback(
+    (newPageIndex: number, newPageSize?: number) => {
+      setPageIndex(newPageIndex);
+      if (typeof newPageSize === "number" && newPageSize !== pageSize) {
+        setPageSize(newPageSize);
+        setPageIndex(0);
+      }
+    },
+    [pageSize],
+  );
 
   if (isLoading) {
     return (
@@ -43,40 +63,69 @@ export default function AccountDetailPage() {
     );
   }
 
-  const Icon = ICON_MAP.get(account.icon ?? "");
+  const Icon = ICON_MAP.get(account.icon ?? "") ?? Wallet;
 
   const formattedBalance = formatAmount(Number(account.balance));
 
   return (
-    <div className="p-6">
-      <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-4">
-          <div
-            className="flex h-14 w-14 items-center justify-center rounded-lg text-lg font-bold text-white shadow-sm"
-            style={{ background: account.color ?? "#666" }}
-          >
-            {Icon ? <Icon className="h-7 w-7" /> : account.name?.charAt(0)}
-          </div>
-          <div>
-            <h1 className="text-2xl leading-tight font-bold">{account.name}</h1>
-            <div className="text-muted-foreground text-sm">{account.type}</div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="text-right">
-            <div className="text-xl font-bold">{formattedBalance}</div>
-            <div className="text-muted-foreground text-xs">
-              {account.currency}
+    <div className="space-y-8">
+      <Card>
+        <CardContent className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            <div
+              className="flex h-14 w-14 items-center justify-center rounded-full text-white shadow-sm"
+              style={{ backgroundColor: account.color ?? "#6366f1" }}
+            >
+              <Icon className="h-7 w-7" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl leading-tight font-bold">
+                  {account.name}
+                </h1>
+                <Badge
+                  variant="secondary"
+                  className="text-muted-foreground h-5 px-1.5 text-[10px] font-medium uppercase"
+                >
+                  {account.type}
+                </Badge>
+                <Badge
+                  variant="outline"
+                  className="h-5 px-1.5 text-[10px] font-medium"
+                >
+                  {account.currency}
+                </Badge>
+              </div>
+              <p className="text-muted-foreground mt-0.5 text-sm">
+                Account details and transactions
+              </p>
             </div>
           </div>
 
-          <Button onClick={() => setOpenTx(true)} className="ml-2">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add Transaction
-          </Button>
-        </div>
-      </header>
+          <div className="flex items-center gap-6">
+            <div className="text-right">
+              <p className="text-muted-foreground text-xs font-medium">
+                Balance
+              </p>
+              <p
+                className={cn(
+                  "text-3xl font-bold tracking-tight",
+                  Number(account.balance) < 0
+                    ? "text-destructive"
+                    : "text-foreground",
+                )}
+              >
+                {formattedBalance}
+              </p>
+            </div>
+
+            <Button onClick={() => setOpenTx(true)}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Add Transaction
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <TransactionForm
         open={openTx}
@@ -95,24 +144,26 @@ export default function AccountDetailPage() {
         }
       />
 
-      <main>
-        <TransactionsTable
-          transactions={transactionsData?.transactions ?? []}
-          isLoading={isLoadingTransactions}
-          onEdit={(transaction) => {
-            setSelectedTransaction(transaction);
-            setOpenTx(true);
-          }}
-          onDelete={async (ids) => {
-            await Promise.all(ids.map((id) => remove.mutateAsync({ id })));
-          }}
-          onView={(transaction) => {
-            setSelectedTransaction(transaction);
-            setOpenTx(true);
-          }}
-          accountId={account.id}
-        />
-      </main>
+      <TransactionsTable
+        transactions={transactionsData?.transactions ?? []}
+        isLoading={isLoadingTransactions}
+        pageIndex={pageIndex}
+        pageSize={pageSize}
+        totalCount={transactionsData?.totalCount ?? 0}
+        onPageChange={handlePageChange}
+        onEdit={(transaction) => {
+          setSelectedTransaction(transaction);
+          setOpenTx(true);
+        }}
+        onDelete={async (ids) => {
+          await Promise.all(ids.map((id) => remove.mutateAsync({ id })));
+        }}
+        onView={(transaction) => {
+          setSelectedTransaction(transaction);
+          setOpenTx(true);
+        }}
+        accountId={account.id}
+      />
     </div>
   );
 }

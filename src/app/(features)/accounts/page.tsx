@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import {
   Search,
@@ -14,8 +15,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from "@/components/ui/card";
 
-import AccountForm from "@/components/forms/accounts/account-form";
+const AccountForm = dynamic(
+  () => import("@/components/forms/accounts/account-form"),
+  { ssr: false, loading: () => null },
+);
 import { DeleteDialog } from "@/components/common/delete-dialog";
 import { useAccounts } from "@/hooks/use-accounts";
 import { useFormatter } from "@/hooks/use-formatter";
@@ -57,6 +62,11 @@ export default function AccountsPage() {
         acc.name.toLowerCase().includes(searchQuery.toLowerCase()),
       ),
     [accounts, searchQuery],
+  );
+
+  const totalBalance = useMemo(
+    () => accounts.reduce((sum, acc) => sum + Number(acc.balance), 0),
+    [accounts],
   );
 
   const handleEdit = useCallback(
@@ -107,79 +117,6 @@ export default function AccountsPage() {
         </div>
       </div>
 
-      {!isLoading && accounts.length > 0 && (
-        <div className="bg-card/50 border-border/50 flex items-center justify-between gap-4 rounded-lg border p-1 backdrop-blur-sm">
-          <div className="relative flex-1">
-            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-            <Input
-              placeholder="Search accounts..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-background h-9 w-full border-none pl-9 shadow-none focus-visible:ring-1"
-            />
-          </div>
-          <div className="relative flex items-center gap-1 pr-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-muted-foreground hover:text-foreground h-8 w-8"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowFilters((s) => !s);
-              }}
-            >
-              <Filter className="h-4 w-4" />
-            </Button>
-
-            <div className="bg-border mx-1 h-4 w-px" />
-
-            <Button
-              variant="ghost"
-              size="icon"
-              className={`h-8 w-8 ${layoutMode === "grid" ? "bg-muted/10" : ""}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                setLayoutMode("grid");
-              }}
-              aria-pressed={layoutMode === "grid"}
-            >
-              <LayoutGrid className="cusror-pointer h-4 w-4" />
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              className={`h-8 w-8 ${layoutMode === "list" ? "bg-muted/10" : "text-muted-foreground hover:text-foreground cursor-pointer"}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                setLayoutMode("list");
-              }}
-              aria-pressed={layoutMode === "list"}
-            >
-              <ListIcon className="h-4 w-4 cursor-pointer" />
-            </Button>
-
-            {showFilters && (
-              <div className="bg-background absolute top-full right-0 mt-2 w-64 rounded-lg border p-3 shadow-lg">
-                <div className="text-sm font-medium">Filters</div>
-                <div className="text-muted-foreground mt-2 text-sm">
-                  No filters configured yet.
-                </div>
-                <div className="mt-3 flex justify-end">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setShowFilters(false)}
-                  >
-                    Close
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
       <div className="flex-1">
         {isLoading ? (
           <AccountSkeleton />
@@ -202,7 +139,7 @@ export default function AccountsPage() {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {filteredAccounts.map((account) => (
               <AccountCard
                 key={account.id}
@@ -241,7 +178,7 @@ export default function AccountsPage() {
 
 function AccountSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
       {[1, 2, 3].map((i) => (
         <div key={i} className="bg-card/50 space-y-4 rounded-xl border p-6">
           <div className="flex items-center justify-between">

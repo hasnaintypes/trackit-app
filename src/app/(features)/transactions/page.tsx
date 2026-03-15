@@ -1,9 +1,20 @@
 "use client";
 
 import React, { useState, useMemo, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { useTransactions } from "@/hooks/use-transactions";
-import TransactionForm from "@/components/forms/transaction/transaction-form";
-import { BulkImportDialog } from "@/components/pages/(protected)/transactions/bulk-import/bulk-import-dialog";
+
+const TransactionForm = dynamic(
+  () => import("@/components/forms/transaction/transaction-form"),
+  { ssr: false, loading: () => null },
+);
+const BulkImportDialog = dynamic(
+  () =>
+    import(
+      "@/components/pages/(protected)/transactions/bulk-import/bulk-import-dialog"
+    ).then((m) => ({ default: m.BulkImportDialog })),
+  { ssr: false, loading: () => null },
+);
 import { TransactionsHeader } from "@/components/pages/(protected)/transactions/transactions-header";
 import { TransactionsList } from "@/components/pages/(protected)/transactions/transactions-list";
 import type { Transaction } from "@/types/transaction";

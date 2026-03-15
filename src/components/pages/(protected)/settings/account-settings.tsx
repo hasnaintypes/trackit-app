@@ -1,11 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { createLogger } from "@/lib/logging";
 import { useAccounts } from "@/hooks/use-accounts";
 
 const logger = createLogger("account-settings");
-import AccountForm from "@/components/forms/accounts/account-form";
+
+const AccountForm = dynamic(
+  () => import("@/components/forms/accounts/account-form"),
+  { ssr: false, loading: () => null },
+);
 import {
   Card,
   CardContent,
