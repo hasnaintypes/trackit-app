@@ -182,6 +182,7 @@ export const transactionRouter = createTRPCRouter({
 
       const account = await prisma.bankAccount.findUnique({
         where: { id: input.accountId },
+        select: { userId: true },
       });
       if (account?.userId !== userId)
         throw new TRPCError({
@@ -312,6 +313,7 @@ export const transactionRouter = createTRPCRouter({
       if (input.accountId) {
         const account = await prisma.bankAccount.findUnique({
           where: { id: input.accountId },
+          select: { userId: true },
         });
         if (account?.userId !== ctx.user.id)
           throw new TRPCError({
@@ -663,6 +665,7 @@ export const transactionRouter = createTRPCRouter({
       // Verify account ownership
       const account = await prisma.bankAccount.findUnique({
         where: { id: input.accountId, userId },
+        select: { userId: true },
       });
 
       if (!account) {

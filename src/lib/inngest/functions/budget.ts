@@ -1,6 +1,7 @@
 import { inngest } from "../client";
 import { TRANSACTION_PROCESSED_EVENT } from "../events";
 import { BudgetService } from "@/server/services/budgetService";
+import { toNum } from "@/lib/shared/decimal";
 import { NotificationService } from "@/server/services/notificationService";
 import { NotificationType } from "@prisma/client";
 import { sendEmail } from "@/lib/email";
@@ -44,7 +45,7 @@ export const evaluateBudgetOnTransaction = inngest.createFunction(
       if (transaction) {
         await BudgetService.checkLargeTransaction(
           userId,
-          transaction.amount.toNumber(),
+          toNum(transaction.amount),
           transaction.description ?? "Untitled",
         );
       }

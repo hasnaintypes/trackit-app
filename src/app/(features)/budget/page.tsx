@@ -1,6 +1,7 @@
 "use client";
 
 import { api } from "@/trpc/react";
+import { toNum } from "@/lib/shared/decimal";
 import { Loader2, Wallet } from "lucide-react";
 import { BudgetCard } from "@/components/pages/(protected)/budget/budget-card";
 import { CreateBudgetDialog } from "@/components/pages/(protected)/budget/create-budget-dialog";
@@ -21,21 +22,11 @@ export default function BudgetPage() {
   const budgetList = budgets ?? [];
 
   // Transform data for Radar Chart
-  const chartData = budgetList.slice(0, 6).map((b) => {
-    const total =
-      typeof b.amount === "object" && "toNumber" in b.amount
-        ? b.amount.toNumber()
-        : Number(b.amount);
-    const spent =
-      typeof b.spentAmount === "object" && "toNumber" in b.spentAmount
-        ? b.spentAmount.toNumber()
-        : Number(b.spentAmount);
-    return {
-      category: b.category.name,
-      budget: total,
-      spent: spent,
-    };
-  });
+  const chartData = budgetList.slice(0, 6).map((b) => ({
+    category: b.category.name,
+    budget: toNum(b.amount),
+    spent: toNum(b.spentAmount),
+  }));
 
   const radarConfig = {
     budget: {
@@ -88,17 +79,8 @@ export default function BudgetPage() {
                   id={b.id}
                   name={b.category.name}
                   icon={b.category.icon}
-                  amount={
-                    typeof b.amount === "object" && "toNumber" in b.amount
-                      ? b.amount.toNumber()
-                      : Number(b.amount)
-                  }
-                  spent={
-                    typeof b.spentAmount === "object" &&
-                    "toNumber" in b.spentAmount
-                      ? b.spentAmount.toNumber()
-                      : Number(b.spentAmount)
-                  }
+                  amount={toNum(b.amount)}
+                  spent={toNum(b.spentAmount)}
                   period={b.period}
                 />
               ))}

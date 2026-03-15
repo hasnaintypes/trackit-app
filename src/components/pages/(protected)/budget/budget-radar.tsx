@@ -1,3 +1,4 @@
+import { toNum } from "@/lib/shared/decimal";
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts";
 import {
   Card,
@@ -36,27 +37,11 @@ const chartConfig = {
 export default function BudgetRadar({ budgets }: { budgets: Budget[] }) {
   // Transform data for Radar Chart
   // We want to show top categories
-  const chartData = budgets.slice(0, 6).map((b) => {
-    const total =
-      typeof b.amount === "object" && "toNumber" in b.amount
-        ? b.amount.toNumber()
-        : typeof b.amount === "string"
-          ? parseFloat(b.amount)
-          : b.amount;
-
-    const spent =
-      typeof b.spentAmount === "object" && "toNumber" in b.spentAmount
-        ? b.spentAmount.toNumber()
-        : typeof b.spentAmount === "string"
-          ? parseFloat(b.spentAmount)
-          : b.spentAmount;
-
-    return {
-      category: b.category.name,
-      budget: total,
-      spent: spent,
-    };
-  });
+  const chartData = budgets.slice(0, 6).map((b) => ({
+    category: b.category.name,
+    budget: toNum(b.amount),
+    spent: toNum(b.spentAmount),
+  }));
 
   if (chartData.length === 0) return null;
 

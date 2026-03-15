@@ -1,6 +1,7 @@
 import { inngest } from "@/lib/inngest/client";
 import { createLogger } from "@/lib/logging";
 import { db } from "@/server/db";
+import { toNum } from "@/lib/shared/decimal";
 
 const logger = createLogger("inngest-budget-alert");
 import { sendEmail } from "@/lib/email";
@@ -48,19 +49,8 @@ export const sendBudgetAlertEmail = inngest.createFunction(
     }
 
     await step.run("send-email", async () => {
-      const spent =
-        typeof budget.spentAmount === "object" &&
-        budget.spentAmount !== null &&
-        "toNumber" in budget.spentAmount
-          ? (budget.spentAmount as { toNumber: () => number }).toNumber()
-          : Number(budget.spentAmount ?? 0);
-
-      const limit =
-        typeof budget.amount === "object" &&
-        budget.amount !== null &&
-        "toNumber" in budget.amount
-          ? (budget.amount as { toNumber: () => number }).toNumber()
-          : Number(budget.amount ?? 0);
+      const spent = toNum(budget.spentAmount);
+      const limit = toNum(budget.amount);
 
       const percentage = (spent / limit) * 100;
       const remaining = Math.max(0, limit - spent);

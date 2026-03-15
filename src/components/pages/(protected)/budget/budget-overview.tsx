@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle } from "lucide-react";
+import { toNum } from "@/lib/shared/decimal";
 
 // Define a minimal type for the budget prop based on what we know the router returns
 type Budget = {
@@ -30,19 +31,8 @@ export default function BudgetOverview({ budgets }: { budgets: Budget[] }) {
   return (
     <div className="space-y-6">
       {budgets.map((b) => {
-        const total =
-          typeof b.amount === "object" && "toNumber" in b.amount
-            ? b.amount.toNumber()
-            : typeof b.amount === "string"
-              ? parseFloat(b.amount)
-              : b.amount;
-
-        const spent =
-          typeof b.spentAmount === "object" && "toNumber" in b.spentAmount
-            ? b.spentAmount.toNumber()
-            : typeof b.spentAmount === "string"
-              ? parseFloat(b.spentAmount)
-              : b.spentAmount;
+        const total = toNum(b.amount);
+        const spent = toNum(b.spentAmount);
 
         const percent = total > 0 ? Math.min((spent / total) * 100, 100) : 0;
         const isOver = spent > total;

@@ -85,12 +85,13 @@ export default function OverviewPage() {
         await Promise.all([
           utils.transaction.list.invalidate(),
           utils.account.list.invalidate(),
+          utils.budget.all.invalidate(),
         ]);
       } catch {
         // deletion errors are surfaced by the mutation's own error state
       }
     },
-    [remove, utils.transaction.list, utils.account.list],
+    [remove, utils.transaction.list, utils.account.list, utils.budget.all],
   );
 
   const { data: txData, isLoading: txLoading } = listQuery({ limit: 100 });

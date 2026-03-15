@@ -10,6 +10,7 @@ import {
 } from "date-fns";
 import { NotificationService } from "./notificationService";
 import { NotificationType, type BudgetPeriod } from "@prisma/client";
+import { toNum } from "@/lib/shared/decimal";
 
 export class BudgetService {
   /**
@@ -94,7 +95,7 @@ export class BudgetService {
       },
     });
 
-    const spent = aggregate._sum.amount?.toNumber() ?? 0;
+    const spent = toNum(aggregate._sum.amount);
 
     // Update budget spentAmount cache
     await db.budget.update({
@@ -106,7 +107,7 @@ export class BudgetService {
     await this.checkThresholds(
       budgetId,
       spent,
-      budget.amount.toNumber(),
+      toNum(budget.amount),
       periodKey,
     );
   }
@@ -231,7 +232,7 @@ export class BudgetService {
           userId: budget.userId,
           type: NotificationType.BUDGET_ALERT,
           title: t.title,
-          message: `You have spent ${percent.toFixed(1)}% of your ${budget.amount.toNumber().toFixed(2)} budget for this period (${periodKey}).`,
+          message: `You have spent ${percent.toFixed(1)}% of your ${toNum(budget.amount).toFixed(2)} budget for this period (${periodKey}).`,
           metadata: { budgetId: budget.id },
         });
 
@@ -269,7 +270,7 @@ export class BudgetService {
     if (!prefs?.largeTransactionThreshold || !prefs.emailLargeTransactions)
       return;
 
-    const threshold = prefs.largeTransactionThreshold.toNumber();
+    const threshold = toNum(prefs.largeTransactionThreshold);
     if (amount >= threshold) {
       await NotificationService.createNotification({
         userId,
@@ -292,8 +293,8 @@ export class BudgetService {
     if (!prefs?.lowBalanceThreshold || !prefs.emailLowBalanceAlerts || !account)
       return;
 
-    const threshold = prefs.lowBalanceThreshold.toNumber();
-    const balance = account.balance.toNumber();
+    const threshold = toNum(prefs.lowBalanceThreshold);
+    const balance = toNum(account.balance);
 
     if (balance <= threshold) {
       await NotificationService.createNotification({

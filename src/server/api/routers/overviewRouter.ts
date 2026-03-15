@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
+import { toNum } from "@/lib/shared/decimal";
 
 export const overviewRouter = createTRPCRouter({
   /**
@@ -21,7 +22,7 @@ export const overviewRouter = createTRPCRouter({
       where: { userId },
       _sum: { balance: true },
     });
-    const totalBalance = Number(balanceAgg._sum.balance ?? 0);
+    const totalBalance = toNum(balanceAgg._sum.balance);
 
     // All-time income and expense totals + earliest dates
     const [allTimeIncome, allTimeExpense] = await Promise.all([
@@ -76,8 +77,8 @@ export const overviewRouter = createTRPCRouter({
         }),
       ]);
 
-    const totalIncome = Number(allTimeIncome._sum.amount ?? 0);
-    const totalExpense = Number(allTimeExpense._sum.amount ?? 0);
+    const totalIncome = toNum(allTimeIncome._sum.amount);
+    const totalExpense = toNum(allTimeExpense._sum.amount);
 
     const formatDateRange = (minDate: Date | null, maxDate: Date | null) => {
       if (!minDate) return "No data yet";
@@ -90,10 +91,10 @@ export const overviewRouter = createTRPCRouter({
       return Math.round(((current - previous) / previous) * 100);
     };
 
-    const curIncome = Number(curMonthIncome._sum.amount ?? 0);
-    const curExpense = Number(curMonthExpense._sum.amount ?? 0);
-    const prevInc = Number(prevMonthIncome._sum.amount ?? 0);
-    const prevExp = Number(prevMonthExpense._sum.amount ?? 0);
+    const curIncome = toNum(curMonthIncome._sum.amount);
+    const curExpense = toNum(curMonthExpense._sum.amount);
+    const prevInc = toNum(prevMonthIncome._sum.amount);
+    const prevExp = toNum(prevMonthExpense._sum.amount);
 
     // Earliest and latest across all transactions
     const earliestDate =
@@ -189,7 +190,7 @@ export const overviewRouter = createTRPCRouter({
         const key = format(new Date(tx.date), "yyyy-MM");
         const bucket = monthlyMap.get(key);
         if (!bucket) continue;
-        const amount = Math.abs(Number(tx.amount));
+        const amount = Math.abs(toNum(tx.amount));
         if (tx.type === "CREDIT") {
           bucket.income += amount;
         } else if (tx.type === "DEBIT") {
@@ -251,13 +252,13 @@ export const overviewRouter = createTRPCRouter({
     const categoryLookup = new Map(categories.map((c) => [c.id, c]));
 
     const totalSpending = categorySpending.reduce(
-      (sum, c) => sum + Math.abs(Number(c._sum.amount ?? 0)),
+      (sum, c) => sum + Math.abs(toNum(c._sum.amount)),
       0,
     );
 
     const breakdown = categorySpending
       .map((c) => {
-        const amount = Math.abs(Number(c._sum.amount ?? 0));
+        const amount = Math.abs(toNum(c._sum.amount));
         const cat = c.categoryId ? categoryLookup.get(c.categoryId) : null;
         return {
           name: cat?.name ?? "Uncategorized",
@@ -270,9 +271,9 @@ export const overviewRouter = createTRPCRouter({
       .sort((a, b) => b.amount - a.amount);
 
     return {
-      weekly: Number(weeklyAgg._sum.amount ?? 0),
-      monthly: Number(monthlyAgg._sum.amount ?? 0),
-      yearly: Number(yearlyAgg._sum.amount ?? 0),
+      weekly: toNum(weeklyAgg._sum.amount),
+      monthly: toNum(monthlyAgg._sum.amount),
+      yearly: toNum(yearlyAgg._sum.amount),
       total: totalSpending,
       categories: breakdown,
     };

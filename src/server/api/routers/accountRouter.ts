@@ -163,8 +163,9 @@ export const accountRouter = createTRPCRouter({
       const prisma = ctx.db;
       const existingRaw = await prisma.bankAccount.findUnique({
         where: { id: input.id },
+        select: { id: true, userId: true },
       });
-      const existing = existingRaw as RawAccount | null;
+      const existing = existingRaw as { id: string; userId: string } | null;
       if (existing?.userId !== userId)
         throw new TRPCError({
           code: "NOT_FOUND",
@@ -230,6 +231,7 @@ export const accountRouter = createTRPCRouter({
       const prisma = ctx.db;
       const existing = await prisma.bankAccount.findUnique({
         where: { id: input.id },
+        select: { userId: true },
       });
       if (existing?.userId !== userId)
         throw new TRPCError({

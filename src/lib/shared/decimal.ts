@@ -1,10 +1,16 @@
 import type { Decimal } from "@prisma/client/runtime/client";
 
 /**
- * Safely convert a Prisma Decimal (or number/string) to a JavaScript number.
+ * Safely convert a Prisma Decimal (or number/string/object with toNumber) to a JavaScript number.
  */
 export function toNum(
-  value: Decimal | number | string | null | undefined,
+  value:
+    | Decimal
+    | { toNumber: () => number }
+    | number
+    | string
+    | null
+    | undefined,
 ): number {
   if (value == null) return 0;
   if (typeof value === "number") return value;

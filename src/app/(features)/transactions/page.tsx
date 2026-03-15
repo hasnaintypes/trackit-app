@@ -57,6 +57,7 @@ export default function TransactionsPage() {
         await Promise.all([
           utils.transaction.list.invalidate(),
           utils.account.list.invalidate(),
+          utils.budget.all.invalidate(),
         ]);
       } catch (err) {
         logger.error("Failed to delete transactions", {
@@ -64,7 +65,7 @@ export default function TransactionsPage() {
         });
       }
     },
-    [remove, utils.transaction.list, utils.account.list],
+    [remove, utils.transaction.list, utils.account.list, utils.budget.all],
   );
 
   return (

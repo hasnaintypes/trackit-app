@@ -44,6 +44,7 @@ export const budgetRouter = createTRPCRouter({
           categoryId: input.categoryId,
           period: input.period,
         },
+        select: { id: true },
       });
       if (existing) {
         throw new TRPCError({

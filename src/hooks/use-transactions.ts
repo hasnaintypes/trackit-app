@@ -11,6 +11,7 @@ export function useTransactions() {
     await Promise.all([
       utils.transaction.list.invalidate(),
       utils.account.list.invalidate(),
+      utils.budget.all.invalidate(),
     ]);
   };
 

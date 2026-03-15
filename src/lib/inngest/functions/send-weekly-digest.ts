@@ -1,6 +1,7 @@
 import { inngest } from "@/lib/inngest/client";
 import { createLogger } from "@/lib/logging";
 import { db } from "@/server/db";
+import { toNum } from "@/lib/shared/decimal";
 
 const logger = createLogger("inngest-weekly-digest");
 import { startOfWeek, endOfWeek, subWeeks, format } from "date-fns";
@@ -71,38 +72,18 @@ export const sendWeeklyDigest = inngest.createFunction(
 
           const totalIncome = transactions
             .filter((t) => t.type === "CREDIT")
-            .reduce(
-              (sum, t) =>
-                sum +
-                (typeof t.amount === "object" && "toNumber" in t.amount
-                  ? t.amount.toNumber()
-                  : Number(t.amount)),
-              0,
-            );
+            .reduce((sum, t) => sum + toNum(t.amount), 0);
 
           const totalExpenses = transactions
             .filter((t) => t.type === "DEBIT")
-            .reduce(
-              (sum, t) =>
-                sum +
-                (typeof t.amount === "object" && "toNumber" in t.amount
-                  ? t.amount.toNumber()
-                  : Number(t.amount)),
-              0,
-            );
+            .reduce((sum, t) => sum + toNum(t.amount), 0);
 
           const categorySpending = transactions
             .filter((t) => t.type === "DEBIT")
             .reduce(
               (acc, t) => {
                 const category = t.category?.name ?? "Uncategorized";
-                const amount =
-                  typeof t.amount === "object" &&
-                  t.amount !== null &&
-                  "toNumber" in t.amount
-                    ? t.amount.toNumber()
-                    : Number(t.amount ?? 0);
-                acc[category] = (acc[category] ?? 0) + amount;
+                acc[category] = (acc[category] ?? 0) + toNum(t.amount);
                 return acc;
               },
               {} as Record<string, number>,

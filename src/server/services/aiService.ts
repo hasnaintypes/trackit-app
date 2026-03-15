@@ -2,6 +2,8 @@ import { db } from "@/server/db";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { env } from "@/env";
 import { createLogger } from "@/lib/logging";
+import { toNum } from "@/lib/shared/decimal";
+import { extractJsonFromAI } from "@/lib/shared/ai-utils";
 
 const logger = createLogger("aiService");
 import {
@@ -73,22 +75,14 @@ export class AIService {
     const categorySpending: Record<string, number> = {};
     transactions.forEach((t) => {
       if (t.type === "DEBIT" && t.category) {
-        const amount =
-          typeof t.amount === "object" &&
-          t.amount !== null &&
-          "toNumber" in t.amount
-            ? (t.amount as { toNumber: () => number }).toNumber()
-            : Number(t.amount ?? 0);
+        const amount = toNum(t.amount);
         categorySpending[t.category.name] =
           (categorySpending[t.category.name] ?? 0) + amount;
       }
     });
 
     const existingBudgets = budgets
-      .map(
-        (b) =>
-          `${b.category.name}: $${typeof b.amount === "object" && b.amount !== null && "toNumber" in b.amount ? (b.amount as { toNumber: () => number }).toNumber() : Number(b.amount ?? 0)} ${b.period}`,
-      )
+      .map((b) => `${b.category.name}: $${toNum(b.amount)} ${b.period}`)
       .join("\n");
 
     const prompt = BUDGET_RECOMMENDATION_TEMPLATE.replace(
@@ -104,20 +98,7 @@ export class AIService {
     const response = result.response;
     const text = response.text();
 
-    try {
-      const jsonMatch =
-        /```json\s*([\s\S]*?)\s*```/.exec(text) ??
-        /```\s*([\s\S]*?)\s*```/.exec(text);
-      const jsonText = jsonMatch ? jsonMatch[1] : text;
-      return JSON.parse(jsonText ?? text) as BudgetRecommendation[];
-    } catch (error) {
-      logger.error("Failed to parse AI response", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      throw new Error(
-        `Failed to parse AI recommendations: ${text.substring(0, 100)}...`,
-      );
-    }
+    return extractJsonFromAI<BudgetRecommendation[]>(text, "recommendations");
   }
 
   /**
@@ -150,28 +131,14 @@ export class AIService {
 
     const totalSpent = transactions
       .filter((t) => t.type === "DEBIT")
-      .reduce((sum, t) => {
-        const amount =
-          typeof t.amount === "object" &&
-          t.amount !== null &&
-          "toNumber" in t.amount
-            ? (t.amount as { toNumber: () => number }).toNumber()
-            : Number(t.amount ?? 0);
-        return sum + amount;
-      }, 0);
+      .reduce((sum, t) => sum + toNum(t.amount), 0);
 
     const categoryBreakdown = transactions
       .filter((t) => t.type === "DEBIT")
       .reduce(
         (acc, t) => {
           const category = t.category?.name ?? "Uncategorized";
-          const amount =
-            typeof t.amount === "object" &&
-            t.amount !== null &&
-            "toNumber" in t.amount
-              ? (t.amount as { toNumber: () => number }).toNumber()
-              : Number(t.amount ?? 0);
-          acc[category] = (acc[category] ?? 0) + amount;
+          acc[category] = (acc[category] ?? 0) + toNum(t.amount);
           return acc;
         },
         {} as Record<string, number>,
@@ -192,20 +159,7 @@ export class AIService {
     const response = result.response;
     const text = response.text();
 
-    try {
-      const jsonMatch =
-        /```json\s*([\s\S]*?)\s*```/.exec(text) ??
-        /```\s*([\s\S]*?)\s*```/.exec(text);
-      const jsonText = jsonMatch ? jsonMatch[1] : text;
-      return JSON.parse(jsonText ?? text) as SpendingInsights;
-    } catch (error) {
-      logger.error("Failed to parse AI response", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      throw new Error(
-        `Failed to parse AI insights: ${text.substring(0, 100)}...`,
-      );
-    }
+    return extractJsonFromAI<SpendingInsights>(text, "insights");
   }
 
   /**
@@ -226,12 +180,7 @@ export class AIService {
 
     transactions.forEach((t) => {
       const category = t.category?.name ?? "Uncategorized";
-      const amount =
-        typeof t.amount === "object" &&
-        t.amount !== null &&
-        "toNumber" in t.amount
-          ? (t.amount as { toNumber: () => number }).toNumber()
-          : Number(t.amount ?? 0);
+      const amount = toNum(t.amount);
 
       categoryStats[category] ??= { amounts: [], avg: 0, stdDev: 0 };
       categoryStats[category]?.amounts.push(amount);
@@ -256,7 +205,7 @@ export class AIService {
       .slice(0, 10)
       .map(
         (t) =>
-          `${t.date.toISOString().split("T")[0]} - ${t.category?.name ?? "Uncategorized"}: $${typeof t.amount === "object" && t.amount !== null && "toNumber" in t.amount ? (t.amount as { toNumber: () => number }).toNumber() : Number(t.amount ?? 0)} - ${t.description ?? "N/A"}`,
+          `${t.date.toISOString().split("T")[0]} - ${t.category?.name ?? "Uncategorized"}: $${toNum(t.amount)} - ${t.description ?? "N/A"}`,
       )
       .join("\n");
 
@@ -283,20 +232,7 @@ export class AIService {
     const response = result.response;
     const text = response.text();
 
-    try {
-      const jsonMatch =
-        /```json\s*([\s\S]*?)\s*```/.exec(text) ??
-        /```\s*([\s\S]*?)\s*```/.exec(text);
-      const jsonText = jsonMatch ? jsonMatch[1] : text;
-      return JSON.parse(jsonText ?? text) as AnomalyDetection;
-    } catch (error) {
-      logger.error("Failed to parse AI response", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      throw new Error(
-        `Failed to parse AI anomalies: ${text.substring(0, 100)}...`,
-      );
-    }
+    return extractJsonFromAI<AnomalyDetection>(text, "anomalies");
   }
 
   /**
@@ -321,26 +257,11 @@ export class AIService {
 
     const totalIncome = user.transactions
       .filter((t) => t.type === "CREDIT")
-      .reduce(
-        (sum, t) =>
-          sum +
-          (typeof t.amount === "object" && "toNumber" in t.amount
-            ? t.amount.toNumber()
-            : Number(t.amount)),
-        0,
-      );
+      .reduce((sum, t) => sum + toNum(t.amount), 0);
 
     const totalExpenses = user.transactions
       .filter((t) => t.type === "DEBIT")
-      .reduce((sum, t) => {
-        const amount =
-          typeof t.amount === "object" &&
-          t.amount !== null &&
-          "toNumber" in t.amount
-            ? (t.amount as { toNumber: () => number }).toNumber()
-            : Number(t.amount ?? 0);
-        return sum + amount;
-      }, 0);
+      .reduce((sum, t) => sum + toNum(t.amount), 0);
 
     const savingsRate =
       totalIncome > 0 ? ((totalIncome - totalExpenses) / totalIncome) * 100 : 0;
@@ -361,20 +282,7 @@ export class AIService {
     const response = result.response;
     const text = response.text();
 
-    try {
-      const jsonMatch =
-        /```json\s*([\s\S]*?)\s*```/.exec(text) ??
-        /```\s*([\s\S]*?)\s*```/.exec(text);
-      const jsonText = jsonMatch ? jsonMatch[1] : text;
-      return JSON.parse(jsonText ?? text) as FinancialAdvice;
-    } catch (error) {
-      logger.error("Failed to parse AI response", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      throw new Error(
-        `Failed to parse AI advice: ${text.substring(0, 100)}...`,
-      );
-    }
+    return extractJsonFromAI<FinancialAdvice>(text, "advice");
   }
 
   /**
