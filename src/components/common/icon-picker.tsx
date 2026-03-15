@@ -106,6 +106,8 @@ export const ICONS: { name: string; Icon: LucideIcon }[] = [
   { name: "weather", Icon: Sun },
 ];
 
+export const ICON_MAP = new Map(ICONS.map((i) => [i.name, i.Icon]));
+
 interface IconPickerProps {
   value: string;
   onChange: (value: string) => void;

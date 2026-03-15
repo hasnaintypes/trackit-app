@@ -11,12 +11,17 @@ import { format } from "date-fns";
 import { useFormatter } from "@/hooks/use-formatter";
 import { Wallet, ArrowUpRight, ArrowDownRight } from "lucide-react";
 
+const areaConfig = {
+  income: { label: "Income", color: "#3b82f6" },
+  expense: { label: "Expense", color: "#06b6d4" },
+} satisfies ChartConfig;
+
 export default function AnalyticsPage() {
   const { formatAmount } = useFormatter();
   const { listQuery } = useTransactions();
   const { allFlat, categoryMap } = useCategories();
 
-  const { data: txData } = listQuery({ limit: 500 });
+  const { data: txData } = listQuery({ limit: 100 });
   const transactions = useMemo(
     () => txData?.transactions ?? [],
     [txData?.transactions],
@@ -51,11 +56,6 @@ export default function AnalyticsPage() {
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
     );
   }, [transactions]);
-
-  const areaConfig = {
-    income: { label: "Income", color: "#3b82f6" },
-    expense: { label: "Expense", color: "#06b6d4" },
-  } satisfies ChartConfig;
 
   // Pie chart — spending by category
   const pieChartData = useMemo(() => {

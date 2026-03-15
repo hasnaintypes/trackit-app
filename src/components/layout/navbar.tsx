@@ -38,7 +38,7 @@ import {
   Settings,
   HelpCircle,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const navigationLinks = [
   { href: "/overview", label: "Dashboard", icon: Home },
@@ -53,7 +53,7 @@ const quickActions = [
   { href: "/help", label: "Help Center", icon: HelpCircle },
 ];
 
-export default function NavBar() {
+export default React.memo(function NavBar() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -194,4 +194,4 @@ export default function NavBar() {
       </CommandDialog>
     </header>
   );
-}
+});

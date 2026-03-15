@@ -88,27 +88,36 @@ interface TransactionsTableProps {
   onPageChange?: (pageIndex: number, pageSize?: number) => void;
 }
 
+const TRANSACTION_TYPE_CONFIG = {
+  DEBIT: {
+    label: "Expense",
+    icon: CircleArrowDown,
+    className: "bg-red-500/10 text-red-600 border-red-500/20",
+  },
+  CREDIT: {
+    label: "Income",
+    icon: CircleArrowUp,
+    className: "bg-green-500/10 text-green-600 border-green-500/20",
+  },
+  TRANSFER: {
+    label: "Transfer",
+    icon: ArrowRightLeft,
+    className: "bg-blue-500/10 text-blue-600 border-blue-500/20",
+  },
+} as const;
+
+const PAYMENT_METHOD_MAP: Record<string, string> = {
+  CARD: "Card",
+  CASH: "Cash",
+  BANK_TRANSFER: "Bank Transfer",
+  AUTO_DEBIT: "Auto Debit",
+  UPI: "UPI",
+  OTHER: "Other",
+};
+
 // Transaction type badge component
 function TransactionTypeBadge({ type }: { type: Transaction["type"] }) {
-  const config = {
-    DEBIT: {
-      label: "Expense",
-      icon: CircleArrowDown,
-      className: "bg-red-500/10 text-red-600 border-red-500/20",
-    },
-    CREDIT: {
-      label: "Income",
-      icon: CircleArrowUp,
-      className: "bg-green-500/10 text-green-600 border-green-500/20",
-    },
-    TRANSFER: {
-      label: "Transfer",
-      icon: ArrowRightLeft,
-      className: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-    },
-  };
-
-  const { label, icon: Icon, className } = config[type];
+  const { label, icon: Icon, className } = TRANSACTION_TYPE_CONFIG[type];
 
   return (
     <Badge variant="outline" className={cn("gap-1.5", className)}>
@@ -403,18 +412,11 @@ export function TransactionsTable({
             return <span className="text-muted-foreground text-sm">-</span>;
           }
 
-          const methodMap: Record<string, string> = {
-            CARD: "Card",
-            CASH: "Cash",
-            BANK_TRANSFER: "Bank Transfer",
-            AUTO_DEBIT: "Auto Debit",
-            UPI: "UPI",
-            OTHER: "Other",
-          };
-
           // eslint-disable-next-line @typescript-eslint/no-base-to-string
           const pm = String(paymentMethod);
-          return <span className="text-sm">{methodMap[pm] ?? pm}</span>;
+          return (
+            <span className="text-sm">{PAYMENT_METHOD_MAP[pm] ?? pm}</span>
+          );
         },
       },
       {

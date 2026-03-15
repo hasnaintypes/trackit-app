@@ -55,6 +55,29 @@ import { createLogger } from "@/lib/logging";
 
 const logger = createLogger("account-form");
 
+const ACCOUNT_TYPES = [
+  { value: "BANK", label: "Bank" },
+  { value: "CASH", label: "Cash" },
+  { value: "CREDIT", label: "Credit" },
+  { value: "INVESTMENT", label: "Investment" },
+  { value: "LOAN", label: "Loan" },
+  { value: "OTHER", label: "Other" },
+] as const;
+
+const CURRENCIES = [
+  { value: "USD", label: "USD ($)" },
+  { value: "EUR", label: "EUR (€)" },
+  { value: "GBP", label: "GBP (£)" },
+  { value: "JPY", label: "JPY (¥)" },
+  { value: "AUD", label: "AUD (A$)" },
+  { value: "CAD", label: "CAD (C$)" },
+  { value: "CHF", label: "CHF (Fr)" },
+  { value: "CNY", label: "CNY (¥)" },
+  { value: "INR", label: "INR (₹)" },
+  { value: "SGD", label: "SGD (S$)" },
+  { value: "PKR", label: "PKR (₨)" },
+] as const;
+
 type AccountFormProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -74,29 +97,6 @@ export function AccountForm({
     useAccounts();
 
   const isFirstAccount = (accounts ?? []).length === 0;
-
-  const ACCOUNT_TYPES = [
-    { value: "BANK", label: "Bank" },
-    { value: "CASH", label: "Cash" },
-    { value: "CREDIT", label: "Credit" },
-    { value: "INVESTMENT", label: "Investment" },
-    { value: "LOAN", label: "Loan" },
-    { value: "OTHER", label: "Other" },
-  ] as const;
-
-  const CURRENCIES = [
-    { value: "USD", label: "USD ($)" },
-    { value: "EUR", label: "EUR (€)" },
-    { value: "GBP", label: "GBP (£)" },
-    { value: "JPY", label: "JPY (¥)" },
-    { value: "AUD", label: "AUD (A$)" },
-    { value: "CAD", label: "CAD (C$)" },
-    { value: "CHF", label: "CHF (Fr)" },
-    { value: "CNY", label: "CNY (¥)" },
-    { value: "INR", label: "INR (₹)" },
-    { value: "SGD", label: "SGD (S$)" },
-    { value: "PKR", label: "PKR (₨)" },
-  ] as const;
 
   type FormValues = Omit<CreateAccountInput, "balance"> & {
     balance?: string | number;

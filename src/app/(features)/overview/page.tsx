@@ -93,7 +93,7 @@ export default function OverviewPage() {
     [remove, utils.transaction.list, utils.account.list],
   );
 
-  const { data: txData, isLoading: txLoading } = listQuery({ limit: 500 });
+  const { data: txData, isLoading: txLoading } = listQuery({ limit: 100 });
 
   const transactions = useMemo(
     () => txData?.transactions ?? [],

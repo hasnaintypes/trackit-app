@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   Search,
@@ -39,8 +39,9 @@ import { cn } from "@/lib/utils";
 
 import AccountForm from "@/components/forms/accounts/account-form";
 import { DeleteDialog } from "@/components/common/delete-dialog";
-import { ICONS } from "@/components/common/icon-picker";
+import { ICON_MAP } from "@/components/common/icon-picker";
 import { useAccounts } from "@/hooks/use-accounts";
+import { useFormatter } from "@/hooks/use-formatter";
 import type { BankAccount as Account } from "@/types/account";
 
 type ApiAccount = Omit<Account, "createdAt" | "updatedAt"> & {
@@ -54,6 +55,7 @@ type ApiAccount = Omit<Account, "createdAt" | "updatedAt"> & {
 export default function AccountsPage() {
   const router = useRouter();
   const { accounts, isLoading } = useAccounts();
+  const { formatAmount } = useFormatter();
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -65,8 +67,12 @@ export default function AccountsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [layoutMode, setLayoutMode] = useState<"grid" | "list">("grid");
 
-  const filteredAccounts = accounts.filter((acc) =>
-    acc.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  const filteredAccounts = useMemo(
+    () =>
+      accounts.filter((acc) =>
+        acc.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      ),
+    [accounts, searchQuery],
   );
 
   const handleEdit = (e: React.MouseEvent, account: Account | ApiAccount) => {
@@ -228,6 +234,7 @@ export default function AccountsPage() {
                 onEdit={handleEdit}
                 onDelete={handleDeleteClick}
                 onClick={() => router.push(`/accounts/${account.id}`)}
+                formatAmount={formatAmount}
               />
             ))}
           </div>
@@ -261,16 +268,19 @@ interface AccountCardProps {
   onEdit: (e: React.MouseEvent, account: Account | ApiAccount) => void;
   onDelete: (e: React.MouseEvent, id: string) => void;
   onClick: () => void;
+  formatAmount: (amount: number | string) => string;
 }
 
-function AccountCard({ account, onEdit, onDelete, onClick }: AccountCardProps) {
-  const IconComponent =
-    ICONS.find((i) => i.name === account.icon)?.Icon ?? Wallet;
+function AccountCard({
+  account,
+  onEdit,
+  onDelete,
+  onClick,
+  formatAmount,
+}: AccountCardProps) {
+  const IconComponent = ICON_MAP.get(account.icon ?? "") ?? Wallet;
 
-  const formattedBalance = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: account.currency,
-  }).format(Number(account.balance));
+  const formattedBalance = formatAmount(Number(account.balance));
 
   return (
     <Card

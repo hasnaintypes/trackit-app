@@ -4,10 +4,11 @@ import React, { useState } from "react";
 import { useParams } from "next/navigation";
 // no Card used here; page header layout
 import { Button } from "@/components/ui/button";
-import { ICONS } from "@/components/common/icon-picker";
+import { ICON_MAP } from "@/components/common/icon-picker";
 import { PlusCircle } from "lucide-react";
 import { useAccounts } from "@/hooks/use-accounts";
 import { useTransactions } from "@/hooks/use-transactions";
+import { useFormatter } from "@/hooks/use-formatter";
 import TransactionForm from "@/components/forms/transaction/transaction-form";
 import { TransactionsTable } from "@/components/common/transactions-table";
 import type { Transaction } from "@/types/transaction";
@@ -16,6 +17,7 @@ export default function AccountDetailPage() {
   const params = useParams();
   const id = params?.id as string | undefined;
   const { accounts, isLoading } = useAccounts();
+  const { formatAmount } = useFormatter();
   const { listQuery, remove } = useTransactions();
   const { data: transactionsData, isLoading: isLoadingTransactions } =
     listQuery({ accountId: id });
@@ -41,12 +43,9 @@ export default function AccountDetailPage() {
     );
   }
 
-  const Icon = ICONS.find((i) => i.name === account.icon)?.Icon;
+  const Icon = ICON_MAP.get(account.icon ?? "");
 
-  const formattedBalance = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: account.currency,
-  }).format(Number(account.balance));
+  const formattedBalance = formatAmount(Number(account.balance));
 
   return (
     <div className="p-6">

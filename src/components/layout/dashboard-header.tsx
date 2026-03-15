@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/hooks/use-user";
@@ -70,7 +71,7 @@ const getHeaderContent = (pathname: string) => {
   };
 };
 
-export default function DashboardHeader() {
+export default React.memo(function DashboardHeader() {
   const { user } = useUser();
   const pathname = usePathname();
   const headerContent = getHeaderContent(pathname);
@@ -115,4 +116,4 @@ export default function DashboardHeader() {
       </div>
     </div>
   );
-}
+});

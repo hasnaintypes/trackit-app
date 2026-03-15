@@ -44,6 +44,52 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+function getStatusBadge(status: string) {
+  switch (status) {
+    case "SENT":
+      return (
+        <Badge className="border-transparent bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20">
+          Ready
+        </Badge>
+      );
+    case "PENDING":
+      return (
+        <Badge
+          variant="outline"
+          className="border-amber-200 bg-amber-50 text-amber-500"
+        >
+          Scheduled
+        </Badge>
+      );
+    case "FAILED":
+      return <Badge variant="destructive">Failed</Badge>;
+    default:
+      return <Badge variant="secondary">{status}</Badge>;
+  }
+}
+
+function getTypeLabel(type: string) {
+  return type
+    .replace(/_/g, " ")
+    .toLowerCase()
+    .replace(/\b\w/g, (l) => l.toUpperCase());
+}
+
+function getReportDescription(type: string) {
+  switch (type) {
+    case "MONTHLY_SUMMARY":
+      return "Monthly financial summary";
+    case "BUDGET_EXCEEDED":
+      return "Budget limit alert analysis";
+    case "WEEKLY_DIGEST":
+      return "Weekly spending breakdown";
+    case "SPENDING_INSIGHTS":
+      return "AI-powered spending analysis";
+    default:
+      return "Financial report details";
+  }
+}
+
 export default function ReportsPage() {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [typeFilter, setTypeFilter] = useState<string>("all");
@@ -95,52 +141,6 @@ export default function ReportsPage() {
       return matchesType && matchesSearch;
     });
   }, [reports, typeFilter, searchQuery]);
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "SENT":
-        return (
-          <Badge className="border-transparent bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20">
-            Ready
-          </Badge>
-        );
-      case "PENDING":
-        return (
-          <Badge
-            variant="outline"
-            className="border-amber-200 bg-amber-50 text-amber-500"
-          >
-            Scheduled
-          </Badge>
-        );
-      case "FAILED":
-        return <Badge variant="destructive">Failed</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
-    }
-  };
-
-  const getTypeLabel = (type: string) => {
-    return type
-      .replace(/_/g, " ")
-      .toLowerCase()
-      .replace(/\b\w/g, (l) => l.toUpperCase());
-  };
-
-  const getReportDescription = (type: string) => {
-    switch (type) {
-      case "MONTHLY_SUMMARY":
-        return "Monthly financial summary";
-      case "BUDGET_EXCEEDED":
-        return "Budget limit alert analysis";
-      case "WEEKLY_DIGEST":
-        return "Weekly spending breakdown";
-      case "SPENDING_INSIGHTS":
-        return "AI-powered spending analysis";
-      default:
-        return "Financial report details";
-    }
-  };
 
   if (isLoading) {
     return (
