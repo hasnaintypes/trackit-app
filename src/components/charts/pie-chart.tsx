@@ -77,6 +77,7 @@ function PieChartInner({
                   </text>
                 );
               }
+              return null;
             }}
           />
         </Pie>

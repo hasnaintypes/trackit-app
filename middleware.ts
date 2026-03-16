@@ -54,7 +54,6 @@ function isAuthPath(pathname: string) {
  */
 function detectAuthFromCookies(req: NextRequest) {
   try {
-    const cookies = req.cookies.getAll ? req.cookies.getAll() : [];
     // Check known auth cookie names used by Better Auth
     const common = [
       "better-auth.session_token",
