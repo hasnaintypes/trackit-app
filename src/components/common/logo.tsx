@@ -27,7 +27,7 @@ export function Logo({ size = 32, className, showText = false }: LogoProps) {
             alt="Trackit"
             width={size}
             height={size}
-            className="rounded-md"
+            className="rounded-full"
             unoptimized
           />
         </div>
@@ -43,7 +43,7 @@ export function Logo({ size = 32, className, showText = false }: LogoProps) {
           alt="Trackit"
           width={size}
           height={size}
-          className="rounded-md dark:hidden"
+          className="rounded-full dark:hidden"
           unoptimized
         />
         <Image
@@ -51,7 +51,7 @@ export function Logo({ size = 32, className, showText = false }: LogoProps) {
           alt="Trackit"
           width={size}
           height={size}
-          className="hidden rounded-md dark:block"
+          className="hidden rounded-full dark:block"
           unoptimized
         />
       </div>
