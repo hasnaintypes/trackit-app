@@ -277,7 +277,7 @@ import { checkRateLimit, AI_MAX } from "@/server/api/rateLimit";
 
 export const aiRateLimitedProcedure = protectedProcedure.use(
   async ({ ctx, next }) => {
-    const { allowed } = checkRateLimit(ctx.user.id, "ai", AI_MAX);
+    const { allowed } = await checkRateLimit(ctx.user.id, "ai", AI_MAX);
     if (!allowed) {
       throw new TRPCError({
         code: "TOO_MANY_REQUESTS",

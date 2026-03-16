@@ -33,6 +33,8 @@ export const env = createEnv({
     IMAGEKIT_URL_ENDPOINT: z.string().url().optional(),
     RESEND_API_KEY: z.string(),
     EMAIL_FROM: z.string().email(),
+    UPSTASH_REDIS_REST_URL: z.string().url().optional(),
+    UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
   },
 
   /**
@@ -82,6 +84,8 @@ export const env = createEnv({
     NEXT_PUBLIC_BETTER_STACK_LOG_LEVEL:
       process.env.NEXT_PUBLIC_BETTER_STACK_LOG_LEVEL,
     NEXT_PUBLIC_GEMINI_MAX_ROWS: process.env.NEXT_PUBLIC_GEMINI_MAX_ROWS,
+    UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
+    UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
