@@ -2,6 +2,7 @@
 
 A personal finance SaaS for bank account management, transaction tracking, hierarchical budgeting, AI-powered insights, and automated reporting.
 
+<p>
   <img src="https://img.shields.io/badge/Next.js-15-black?logo=next.js&logoColor=white" alt="Next.js" />
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React" />
   <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
@@ -10,7 +11,8 @@ A personal finance SaaS for bank account management, transaction tracking, hiera
   <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL" />
   <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
   <img src="https://img.shields.io/badge/shadcn/ui-latest-000000?logo=shadcnui&logoColor=white" alt="shadcn/ui" />
-
+</p>
+<p>
   <img src="https://img.shields.io/badge/Google_Gemini-AI-8E75B2?logo=googlegemini&logoColor=white" alt="Google Gemini" />
   <img src="https://img.shields.io/badge/Inngest-Jobs-6366F1?logo=data:image/svg+xml;base64,PHN2ZyByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+SW5uZ2VzdDwvdGl0bGU+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik00LjUgMEE0LjUgNC41IDAgMCAwIDAgNC41djE1QTQuNSA0LjUgMCAwIDAgNC41IDI0aDE1YTQuNSA0LjUgMCAwIDAgNC41LTQuNXYtMTVBNC41IDQuNSAwIDAgMCAxOS41IDBoLTE1Wk03IDZoMTBhMSAxIDAgMSAxIDAgMkg3YTEgMSAwIDAgMSAwLTJabTMgNWg3YTEgMSAwIDEgMSAwIDJoLTdhMSAxIDAgMSAxIDAtMlptLTMgNWgxMGExIDEgMCAxIDEgMCAySDdhMSAxIDAgMSAxIDAtMloiLz48L3N2Zz4K&logoColor=white" alt="Inngest" />
   <img src="https://img.shields.io/badge/Resend-Email-000000?logo=resend&logoColor=white" alt="Resend" />
@@ -18,6 +20,7 @@ A personal finance SaaS for bank account management, transaction tracking, hiera
   <img src="https://img.shields.io/badge/Better_Auth-Auth-FF6B35" alt="Better Auth" />
   <img src="https://img.shields.io/badge/Better_Stack-Logging-5046E5" alt="Better Stack" />
   <img src="https://img.shields.io/badge/ImageKit-Uploads-1B64F2" alt="ImageKit" />
+</p>
 
 ---
 
