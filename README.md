@@ -1,8 +1,25 @@
 # Trackit
 
-A personal finance SaaS application for bank account management, transaction tracking, hierarchical budgeting, AI-powered insights, and automated reporting.
+A personal finance SaaS for bank account management, transaction tracking, hierarchical budgeting, AI-powered insights, and automated reporting.
 
-Built with the T3 stack: **Next.js 15** (App Router) + **tRPC 11** + **Prisma 7** + **TypeScript**.
+  <img src="https://img.shields.io/badge/Next.js-15-black?logo=next.js&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/tRPC-11-2596BE?logo=trpc&logoColor=white" alt="tRPC" />
+  <img src="https://img.shields.io/badge/Prisma-7-2D3748?logo=prisma&logoColor=white" alt="Prisma" />
+  <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/shadcn/ui-latest-000000?logo=shadcnui&logoColor=white" alt="shadcn/ui" />
+
+  <img src="https://img.shields.io/badge/Google_Gemini-AI-8E75B2?logo=googlegemini&logoColor=white" alt="Google Gemini" />
+  <img src="https://img.shields.io/badge/Inngest-Jobs-6366F1?logo=data:image/svg+xml;base64,PHN2ZyByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+SW5uZ2VzdDwvdGl0bGU+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik00LjUgMEE0LjUgNC41IDAgMCAwIDAgNC41djE1QTQuNSA0LjUgMCAwIDAgNC41IDI0aDE1YTQuNSA0LjUgMCAwIDAgNC41LTQuNXYtMTVBNC41IDQuNSAwIDAgMCAxOS41IDBoLTE1Wk03IDZoMTBhMSAxIDAgMSAxIDAgMkg3YTEgMSAwIDAgMSAwLTJabTMgNWg3YTEgMSAwIDEgMSAwIDJoLTdhMSAxIDAgMSAxIDAtMlptLTMgNWgxMGExIDEgMCAxIDEgMCAySDdhMSAxIDAgMSAxIDAtMloiLz48L3N2Zz4K&logoColor=white" alt="Inngest" />
+  <img src="https://img.shields.io/badge/Resend-Email-000000?logo=resend&logoColor=white" alt="Resend" />
+  <img src="https://img.shields.io/badge/Upstash-Redis-00E9A3?logo=upstash&logoColor=black" alt="Upstash" />
+  <img src="https://img.shields.io/badge/Better_Auth-Auth-FF6B35" alt="Better Auth" />
+  <img src="https://img.shields.io/badge/Better_Stack-Logging-5046E5" alt="Better Stack" />
+  <img src="https://img.shields.io/badge/ImageKit-Uploads-1B64F2" alt="ImageKit" />
+
+---
 
 ## Tech Stack
 
@@ -19,7 +36,6 @@ Built with the T3 stack: **Next.js 15** (App Router) + **tRPC 11** + **Prisma 7*
 | Image Uploads   | ImageKit                                              |
 | Logging         | Better Stack (Logtail)                                |
 | Styling         | Tailwind CSS + shadcn/ui                              |
-| Testing         | Vitest (unit) + Playwright (E2E)                      |
 
 ## Getting Started
 
@@ -71,26 +87,22 @@ pnpm dev:inngest
 
 ## Scripts
 
-| Command                | Description                      |
-| ---------------------- | -------------------------------- |
-| `pnpm dev`             | Start dev server (Turbo-enabled) |
-| `pnpm build`           | Production build                 |
-| `pnpm start`           | Start production server          |
-| `pnpm check`           | Lint + typecheck                 |
-| `pnpm lint`            | ESLint check                     |
-| `pnpm lint:fix`        | ESLint auto-fix                  |
-| `pnpm typecheck`       | TypeScript type check            |
-| `pnpm format:check`    | Prettier check                   |
-| `pnpm format:write`    | Prettier auto-fix                |
-| `pnpm test`            | Run unit tests                   |
-| `pnpm test:watch`      | Unit tests in watch mode         |
-| `pnpm test:ui`         | Unit tests with UI               |
-| `pnpm test:e2e`        | Run E2E tests                    |
-| `pnpm test:e2e:headed` | E2E tests in headed browser      |
-| `pnpm db:generate`     | Create Prisma migration          |
-| `pnpm db:migrate`      | Deploy migrations                |
-| `pnpm db:push`         | Push schema without migration    |
-| `pnpm db:studio`       | Open Prisma Studio               |
+| Command             | Description                      |
+| ------------------- | -------------------------------- |
+| `pnpm dev`          | Start dev server (Turbo-enabled) |
+| `pnpm build`        | Production build                 |
+| `pnpm start`        | Start production server          |
+| `pnpm check`        | Lint + typecheck                 |
+| `pnpm lint`         | ESLint check                     |
+| `pnpm lint:fix`     | ESLint auto-fix                  |
+| `pnpm typecheck`    | TypeScript type check            |
+| `pnpm format:check` | Prettier check                   |
+| `pnpm format:write` | Prettier auto-fix                |
+| `pnpm analyze`      | Bundle analysis                  |
+| `pnpm db:generate`  | Create Prisma migration          |
+| `pnpm db:migrate`   | Deploy migrations                |
+| `pnpm db:push`      | Push schema without migration    |
+| `pnpm db:studio`    | Open Prisma Studio               |
 
 ## Environment Variables
 
@@ -123,7 +135,6 @@ All environment variables are validated at startup via [T3 Env](https://env.t3.g
 | `IMAGEKIT_URL_ENDPOINT`             | ImageKit URL endpoint                                           |
 | `NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY`   | ImageKit public key                                             |
 | `NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT` | ImageKit public URL endpoint                                    |
-| `PRISMA_ACCELERATE_URL`             | Prisma Accelerate URL (if using)                                |
 
 When `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are not set, rate limiting falls back to in-memory — suitable for development but not production multi-instance deployments.
 
@@ -154,9 +165,6 @@ src/
 prisma/
   schema.prisma           # Database schema
   seed.ts                 # Database seed script
-test/
-  unit/                   # Vitest unit tests
-  e2e/                    # Playwright E2E tests
 ```
 
 ## Architecture
