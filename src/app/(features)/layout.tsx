@@ -1,5 +1,5 @@
-import NavBar from "@/components/layout/navbar";
-import DashboardHeader from "@/components/layout/dashboard-header";
+import NavBar from "@common/layout/navbar";
+import DashboardHeader from "@common/layout/dashboard-header";
 import { OnboardingGuard } from "@/components/pages/(protected)/onboarding/onboarding-guard";
 
 export default function FeaturesLayout({

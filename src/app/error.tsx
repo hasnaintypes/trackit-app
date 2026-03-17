@@ -3,7 +3,7 @@
 import React from "react";
 import { useLogger, LogLevel } from "@logtail/next";
 import { usePathname, useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { Button } from "@ui/button";
 import { cn } from "@/lib/utils";
 import { AlertTriangle } from "lucide-react";
 import { createLogger } from "@/lib/logging";

@@ -1,112 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Input } from "@/components/ui/input";
+import { Button } from "@ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@ui/popover";
+import { Input } from "@ui/input";
 import { cn } from "@/lib/utils";
-import {
-  Wallet,
-  CreditCard,
-  PiggyBank,
-  Banknote,
-  Landmark,
-  DollarSign,
-  Coins,
-  Briefcase,
-  TrendingUp,
-  Target,
-  Home,
-  Building,
-  ShoppingBag,
-  Utensils,
-  Coffee,
-  Car,
-  Plane,
-  Smartphone,
-  Laptop,
-  Wifi,
-  Film,
-  Music,
-  Gamepad,
-  Dumbbell,
-  Stethoscope,
-  GraduationCap,
-  Book,
-  Palette,
-  Camera,
-  Baby,
-  Dog,
-  Zap,
-  Shield,
-  Gift,
-  Clock,
-  AlertCircle,
-  CheckCircle,
-  Heart,
-  Star,
-  Lock,
-  Key,
-  Wrench,
-  Sun,
-  ChevronDown,
-  Search,
-  XCircle,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Wallet, ChevronDown, Search, XCircle } from "lucide-react";
+import { ICONS } from "@/constants/icons";
 
-// --- Icon List ---
-export const ICONS: { name: string; Icon: LucideIcon }[] = [
-  { name: "wallet", Icon: Wallet },
-  { name: "credit-card", Icon: CreditCard },
-  { name: "piggy-bank", Icon: PiggyBank },
-  { name: "bank", Icon: Banknote },
-  { name: "landmark", Icon: Landmark },
-  { name: "dollar", Icon: DollarSign },
-  { name: "coins", Icon: Coins },
-  { name: "briefcase", Icon: Briefcase },
-  { name: "trending-up", Icon: TrendingUp },
-  { name: "target", Icon: Target },
-  { name: "home", Icon: Home },
-  { name: "building", Icon: Building },
-  { name: "shopping", Icon: ShoppingBag },
-  { name: "food", Icon: Utensils },
-  { name: "coffee", Icon: Coffee },
-  { name: "car", Icon: Car },
-  { name: "transport", Icon: Plane },
-  { name: "phone", Icon: Smartphone },
-  { name: "tech", Icon: Laptop },
-  { name: "internet", Icon: Wifi },
-  { name: "entertainment", Icon: Film },
-  { name: "music", Icon: Music },
-  { name: "gaming", Icon: Gamepad },
-  { name: "fitness", Icon: Dumbbell },
-  { name: "health", Icon: Stethoscope },
-  { name: "education", Icon: GraduationCap },
-  { name: "books", Icon: Book },
-  { name: "art", Icon: Palette },
-  { name: "camera", Icon: Camera },
-  { name: "kids", Icon: Baby },
-  { name: "pets", Icon: Dog },
-  { name: "zap", Icon: Zap },
-  { name: "shield", Icon: Shield },
-  { name: "gift", Icon: Gift },
-  { name: "clock", Icon: Clock },
-  { name: "alert", Icon: AlertCircle },
-  { name: "check", Icon: CheckCircle },
-  { name: "heart", Icon: Heart },
-  { name: "star", Icon: Star },
-  { name: "lock", Icon: Lock },
-  { name: "key", Icon: Key },
-  { name: "tools", Icon: Wrench },
-  { name: "weather", Icon: Sun },
-];
-
-export const ICON_MAP = new Map(ICONS.map((i) => [i.name, i.Icon]));
+export { ICONS, ICON_MAP } from "@/constants/icons";
 
 interface IconPickerProps {
   value: string;

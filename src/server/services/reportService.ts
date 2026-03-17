@@ -4,7 +4,7 @@ import { ReportType, ReportStatus } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
 import { startOfMonth, endOfMonth, format } from "date-fns";
 import type { MonthlySummaryData, BudgetExceededData } from "@/types/report";
-import { toNum } from "@/lib/shared/decimal";
+import { toNum } from "@shared/decimal";
 
 export class ReportService {
   /**

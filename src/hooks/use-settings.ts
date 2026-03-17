@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "@/trpc/react";
-import { invalidateSettings } from "@/lib/trpc/invalidation";
+import { invalidateSettings } from "@/trpc/invalidation";
 import { toast } from "sonner";
 
 export function useSettings() {

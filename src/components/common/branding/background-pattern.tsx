@@ -1,7 +1,7 @@
 "use client";
 
-import DotPattern from "@/components/ui/dot-pattern";
-import Particles from "@/components/ui/particles";
+import DotPattern from "@ui/dot-pattern";
+import Particles from "@ui/particles";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 

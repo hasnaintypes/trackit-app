@@ -4,14 +4,10 @@ import React, { useCallback } from "react";
 import { BellIcon } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { api } from "@/trpc/react";
-import { invalidateNotifications } from "@/lib/trpc/invalidation";
+import { invalidateNotifications } from "@/trpc/invalidation";
 
-import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Button } from "@ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@ui/popover";
 
 function Dot({ className }: { className?: string }) {
   return (

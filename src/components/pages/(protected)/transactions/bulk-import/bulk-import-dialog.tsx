@@ -5,7 +5,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@ui/dialog";
 import { FileUploadStep } from "./steps/file-upload-step";
 import { ColumnMappingStep } from "./steps/column-mapping-step";
 import { ConfirmImportStep } from "./steps/confirm-import-step";

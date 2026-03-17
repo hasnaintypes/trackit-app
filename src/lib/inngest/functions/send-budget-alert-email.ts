@@ -1,13 +1,13 @@
 import { inngest } from "@/lib/inngest/client";
 import { createLogger } from "@/lib/logging";
 import { db } from "@/server/db";
-import { toNum } from "@/lib/shared/decimal";
+import { toNum } from "@shared/decimal";
 
 const logger = createLogger("inngest-budget-alert");
 import { sendEmail } from "@/lib/email";
 import { getTemplate } from "@/lib/email/template-cache";
 import { env } from "@/env";
-import { BUDGET_THRESHOLD_REACHED_EVENT } from "@/lib/inngest/events";
+import { BUDGET_THRESHOLD_REACHED_EVENT } from "@/constants/events";
 
 /**
  * Send Budget Alert Email

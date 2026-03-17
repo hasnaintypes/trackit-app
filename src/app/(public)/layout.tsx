@@ -1,4 +1,4 @@
-import { Footer, Header, WaitlistSection } from "@component/common";
+import { Footer, Header, WaitlistSection } from "@common/index";
 
 export default function RootLayout({
   children,

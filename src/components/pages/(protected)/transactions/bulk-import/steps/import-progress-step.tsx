@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@ui/button";
+import { Alert, AlertDescription } from "@ui/alert";
 import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Progress } from "@ui/progress";
+import { ScrollArea } from "@ui/scroll-area";
 import { useTransactions } from "@/hooks/use-transactions";
 import { toast } from "sonner";
 import type { ImportTransaction } from "@/types/bulk-import";

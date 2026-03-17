@@ -7,15 +7,15 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+} from "@ui/select";
+import { Label } from "@ui/label";
 import {
   Hash,
   LayoutDashboard,
@@ -28,10 +28,10 @@ import {
   Sun,
   Laptop,
 } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Switch } from "@/components/ui/switch";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@ui/separator";
+import { RadioGroup, RadioGroupItem } from "@ui/radio-group";
+import { Switch } from "@ui/switch";
+import { Skeleton } from "@ui/skeleton";
 import {
   DefaultView,
   CurrencyPosition,

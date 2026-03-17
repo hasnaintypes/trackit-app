@@ -10,7 +10,6 @@ const createPrismaClient = () => {
     typeof PrismaClient
   >[0] & {
     adapter?: unknown;
-    accelerateUrl?: string;
   };
 
   const clientOptions: PrismaClientOptionsAug = {
@@ -18,23 +17,8 @@ const createPrismaClient = () => {
       env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
   };
 
-  if (env.PRISMA_ACCELERATE_URL) {
-    clientOptions.accelerateUrl = env.PRISMA_ACCELERATE_URL;
-    logger.info("Using Prisma Accelerate URL from env for Prisma client");
-  }
-
   if (env.DATABASE_URL) {
     process.env.DATABASE_URL = env.DATABASE_URL;
-    logger.info(
-      "Using direct database URL for Prisma client connection via process.env.DATABASE_URL",
-    );
-  }
-
-  if (
-    env.DATABASE_URL &&
-    !clientOptions.adapter &&
-    !clientOptions.accelerateUrl
-  ) {
     try {
       clientOptions.adapter = new PrismaPg({
         connectionString: env.DATABASE_URL,

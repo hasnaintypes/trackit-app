@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { api } from "@/trpc/react";
-import { invalidateCategories } from "@/lib/trpc/invalidation";
+import { invalidateCategories } from "@/trpc/invalidation";
 import type { CategoryWithChildren } from "@/types/category";
 
 export function useCategories() {

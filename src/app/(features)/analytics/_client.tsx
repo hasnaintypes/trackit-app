@@ -3,8 +3,8 @@
 import React, { Suspense, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useTransactions } from "@/hooks/use-transactions";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@ui/skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from "@ui/card";
 
 const AreaChart = dynamic(
   () =>
@@ -19,8 +19,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import type { ChartConfig } from "@/components/ui/chart";
+} from "@ui/select";
+import type { ChartConfig } from "@ui/chart";
 import { subMonths, format } from "date-fns";
 import { useFormatter } from "@/hooks/use-formatter";
 import { CalendarDays } from "lucide-react";

@@ -1,8 +1,8 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { Avatars } from "@component/common";
-import { Button } from "@/components/ui/button";
+import { Avatars } from "@common/index";
+import { Button } from "@ui/button";
 import { CirclePlay } from "lucide-react";
 import { toast } from "sonner";
 import { hero, stats as statsContent } from "@content/site/about";

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@ui/badge";
 import { changelog } from "@/content/site/changelog";
 
 export default function ChangelogPage() {

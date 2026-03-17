@@ -18,24 +18,24 @@ import {
   GenderOptions,
   CountryOptions,
   TimezoneOptions,
-} from "@/lib/format-options";
+} from "@/constants/formatting";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+} from "@ui/card";
+import { Input } from "@ui/input";
+import { Button } from "@ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+} from "@ui/select";
+import { Label } from "@ui/label";
 import {
   Upload,
   Lock,

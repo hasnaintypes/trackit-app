@@ -1,4 +1,4 @@
-import { inngest } from "./client";
+import { inngest } from "@/lib/inngest/client";
 
 export const RECURRING_EVENT = "recurring/run";
 export const TRANSACTION_PROCESSED_EVENT = "transaction/processed";

@@ -2,7 +2,7 @@
 
 import { toast } from "sonner";
 import useSessions from "@/hooks/use-sessions";
-import { formatTimestamp } from "@/lib/format-options";
+import { formatTimestamp } from "@/constants/formatting";
 import { prettyDeviceFromUA } from "@/lib/device-map";
 import {
   Card,
@@ -10,9 +10,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+} from "@ui/card";
+import { Button } from "@ui/button";
+import { Badge } from "@ui/badge";
 import { LogOut, Smartphone } from "lucide-react";
 
 interface ActiveSession {

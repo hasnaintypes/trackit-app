@@ -3,7 +3,7 @@
 
 import React, { useState, useCallback } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { Button } from "@/components/ui/button";
+import { Button } from "@ui/button";
 import { Loader2, Zap, Check } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/trpc/react";

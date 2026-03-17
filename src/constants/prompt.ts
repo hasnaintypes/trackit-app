@@ -48,9 +48,6 @@ Example:
 
 **Now categorize all transactions and return the JSON array:**`;
 
-// ============================================================================
-// Budget Recommendation Prompt
-// ============================================================================
 export const BUDGET_RECOMMENDATION_TEMPLATE = `You are an expert financial advisor AI specializing in budget planning and optimization.
 
 Analyze the following user's spending data and existing budgets, then provide personalized budget recommendations to help them manage their finances better.
@@ -84,9 +81,6 @@ Return ONLY a valid JSON array (no markdown, no explanation) with 3-5 recommenda
 
 **Provide actionable, realistic budget recommendations:**`;
 
-// ============================================================================
-// Spending Insights Prompt
-// ============================================================================
 export const SPENDING_INSIGHTS_TEMPLATE = `You are a financial data analyst AI. Analyze the user's monthly spending and provide actionable insights.
 
 ## Period: {{period}}
@@ -126,9 +120,6 @@ Return ONLY valid JSON (no markdown):
 
 **Provide data-driven insights:**`;
 
-// ============================================================================
-// Anomaly Detection Prompt
-// ============================================================================
 export const ANOMALY_DETECTION_TEMPLATE = `You are a fraud detection and spending analysis AI. Identify unusual or anomalous transactions that deviate from normal spending patterns.
 
 ## Recent Transactions (last 10):
@@ -165,9 +156,6 @@ Return ONLY valid JSON (no markdown):
 
 **Detect unusual spending:**`;
 
-// ============================================================================
-// Financial Advice Prompt
-// ============================================================================
 export const FINANCIAL_ADVICE_TEMPLATE = `You are a certified financial advisor AI providing personalized financial wellness tips.
 
 ## User Financial Overview:
@@ -202,9 +190,6 @@ Return ONLY a valid JSON array (no markdown):
 
 **Provide personalized financial guidance:**`;
 
-// ============================================================================
-// Receipt OCR / Autofill Prompt
-// ============================================================================
 export const RECEIPT_PROMPT_TEMPLATE = `You are an expert receipt parser and financial data extractor.
 
 Given either extracted receipt text or an image URL (if text is not available), return a single JSON object (no markdown, no explanation) with the following shape:

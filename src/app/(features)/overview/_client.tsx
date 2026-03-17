@@ -2,13 +2,13 @@
 
 import React, { useMemo, useCallback, useState } from "react";
 import { api } from "@/trpc/react";
-import { invalidateTransactions } from "@/lib/trpc/invalidation";
+import { invalidateTransactions } from "@/trpc/invalidation";
 import { useAccounts } from "@/hooks/use-accounts";
 import { useTransactions } from "@/hooks/use-transactions";
 import { useCategories } from "@/hooks/use-categories";
-import { useOverviewStats } from "@/hooks/use-overview-stats";
-import { useBarChartData } from "@/hooks/use-bar-chart-data";
-import { usePieChartData } from "@/hooks/use-pie-chart-data";
+import { useOverviewStats } from "./_hooks/use-overview-stats";
+import { useBarChartData } from "./_hooks/use-bar-chart-data";
+import { usePieChartData } from "./_hooks/use-pie-chart-data";
 import { StatsCards } from "@/components/pages/(protected)/overview/stats-cards";
 import { RecentTransactions } from "@/components/pages/(protected)/overview/recent-transactions";
 import {

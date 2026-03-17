@@ -1,8 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { db as prisma } from "@/server/db";
-import { sendEmail } from "@/lib/email";
-import { renderTemplate } from "../server/utils";
+import { sendTemplateEmail } from "@/lib/email";
 import { admin } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { createLogger } from "@/lib/logging";
@@ -18,15 +17,12 @@ export const auth = betterAuth({
     minPasswordLength: 8,
     maxPasswordLength: 64,
     sendResetPassword: async ({ user, url }) => {
-      const html = renderTemplate("password-reset", {
-        name: user.name || user.email,
-        resetUrl: url,
-      });
       try {
-        await sendEmail({
+        await sendTemplateEmail({
           to: user.email,
           subject: "Reset your password",
-          html,
+          template: "password-reset",
+          data: { name: user.name || user.email, resetUrl: url },
         });
         logger.info("Password reset email sent", { email: user.email });
       } catch (error) {
@@ -43,15 +39,12 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
-      const html = renderTemplate("verification", {
-        name: user.name || user.email,
-        verificationUrl: url,
-      });
       try {
-        await sendEmail({
+        await sendTemplateEmail({
           to: user.email,
           subject: "Verify your email address",
-          html,
+          template: "verification",
+          data: { name: user.name || user.email, verificationUrl: url },
         });
         logger.info("Verification email sent", { email: user.email });
       } catch (error) {

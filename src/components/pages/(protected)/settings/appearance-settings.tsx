@@ -8,16 +8,16 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+} from "@ui/select";
+import { Label } from "@ui/label";
+import { RadioGroup, RadioGroupItem } from "@ui/radio-group";
 
 export default function AppearanceSettings() {
   const { theme: currentTheme, setTheme } = useTheme();

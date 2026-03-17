@@ -1,17 +1,17 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+} from "@ui/select";
+import { Alert, AlertDescription } from "@ui/alert";
 import { AlertCircle } from "lucide-react";
-import { validateAndParseTransactions } from "@/lib/shared/file-parser";
+import { validateAndParseTransactions } from "@shared/file-parser";
 import type {
   TransactionField,
   ColumnMapping,

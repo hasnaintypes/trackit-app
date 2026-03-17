@@ -5,7 +5,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 
 import { TRPCReactProvider } from "@/trpc/react";
 
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@ui/sonner";
 import { BetterStackWebVitals } from "@logtail/next";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 
@@ -67,7 +67,7 @@ const jetbrains_mono = JetBrains_Mono({
   variable: "--font-mono",
 });
 
-import { PageLoader } from "@/components/common/page-loader";
+import { PageLoader } from "@common/page-loader";
 import { Suspense } from "react";
 
 export default function RootLayout({

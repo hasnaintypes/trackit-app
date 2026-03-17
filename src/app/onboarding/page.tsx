@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, Loader2, Rocket } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@ui/button";
 import { toast } from "sonner";
 import { api } from "@/trpc/react";
 import { useUser } from "@/hooks/use-user";

@@ -8,11 +8,11 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
+} from "@ui/card";
+import { Switch } from "@ui/switch";
+import { Label } from "@ui/label";
+import { Skeleton } from "@ui/skeleton";
+import { Separator } from "@ui/separator";
 import type { NotificationPreferences } from "@prisma/client";
 
 const logger = createLogger("notifications-settings");

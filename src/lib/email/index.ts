@@ -1,5 +1,10 @@
+import nodemailer from "nodemailer";
 import Handlebars from "handlebars";
 import { getTemplate } from "@/lib/email/template-cache";
+import { env } from "@/env";
+import { createLogger } from "@/lib/logging";
+
+const logger = createLogger("email");
 
 interface SendEmailOptions {
   to: string;
@@ -20,34 +25,79 @@ interface SendTemplateEmailOptions {
   data: Record<string, unknown>;
 }
 
+// --- Resend transport ---
+async function sendViaResend(
+  from: string,
+  to: string,
+  subject: string,
+  html: string,
+) {
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ from, to, subject, html }),
+  });
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Resend API error: ${error}`);
+  }
+}
+
+// --- SMTP transport ---
+function getSmtpTransporter() {
+  return nodemailer.createTransport({
+    host: env.SMTP_HOST,
+    port: env.SMTP_PORT ?? 587,
+    secure: (env.SMTP_PORT ?? 587) === 465,
+    auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
+  });
+}
+
+async function sendViaSmtp(
+  from: string,
+  to: string,
+  subject: string,
+  html: string,
+) {
+  const transporter = getSmtpTransporter();
+  await transporter.sendMail({ from, to, subject, html });
+}
+
+// --- Smart sendEmail: try Resend first, fall back to SMTP ---
 export async function sendEmail({
   to,
   subject,
   html,
 }: SendEmailOptions): Promise<void> {
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM;
-  if (!apiKey || !from)
-    throw new Error("Missing RESEND_API_KEY or EMAIL_FROM env variable");
+  const hasResend = !!env.RESEND_API_KEY && !!env.EMAIL_FROM;
+  const hasSmtp = !!env.SMTP_HOST && !!env.SMTP_USER && !!env.SMTP_PASS;
 
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from,
-      to,
-      subject,
-      html,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Resend API error: ${error}`);
+  if (hasResend) {
+    try {
+      await sendViaResend(env.EMAIL_FROM!, to, subject, html);
+      logger.info("Email sent via Resend", { to, subject });
+      return;
+    } catch (err) {
+      logger.warn("Resend failed, trying SMTP fallback", {
+        to,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
   }
+
+  if (hasSmtp) {
+    const from = env.SMTP_FROM ?? env.SMTP_USER!;
+    await sendViaSmtp(from, to, subject, html);
+    logger.info("Email sent via SMTP", { to, subject });
+    return;
+  }
+
+  throw new Error(
+    "No email transport configured. Set RESEND_API_KEY or SMTP_HOST.",
+  );
 }
 
 /**
@@ -66,10 +116,11 @@ export async function sendTemplateEmail({
   const compiledTemplate = Handlebars.compile(templateContent);
 
   // Add app URL to data
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const appUrl = env.NEXT_PUBLIC_APP_URL;
   const templateData = {
     ...data,
     appUrl,
+    year: new Date().getFullYear(),
   };
 
   // Render HTML

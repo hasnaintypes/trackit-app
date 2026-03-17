@@ -5,7 +5,7 @@ import { HeaderSection, CommentSection, ContentSection } from "@component/blog";
 import { useRouter, useParams } from "next/navigation";
 import { blog } from "@content/site/blog";
 import type { BlogPost, BlogComment } from "@/types/site";
-import { Button } from "@/components/ui/button";
+import { Button } from "@ui/button";
 import { ArrowLeft } from "lucide-react";
 
 export default function Page() {

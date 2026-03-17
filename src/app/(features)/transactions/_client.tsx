@@ -19,7 +19,7 @@ import { TransactionsHeader } from "@/components/pages/(protected)/transactions/
 import { TransactionsList } from "@/components/pages/(protected)/transactions/transactions-list";
 import type { Transaction } from "@/types/transaction";
 import { api } from "@/trpc/react";
-import { invalidateTransactions } from "@/lib/trpc/invalidation";
+import { invalidateTransactions } from "@/trpc/invalidation";
 import { createLogger } from "@/lib/logging";
 
 const logger = createLogger("transactions-page");

@@ -4,13 +4,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { api } from "@/trpc/react";
-import { invalidateBudgets } from "@/lib/trpc/invalidation";
+import { invalidateBudgets } from "@/trpc/invalidation";
 import { toast } from "sonner";
 import { Loader2, Plus } from "lucide-react";
 import { useState } from "react";
 import { BudgetPeriod } from "@prisma/client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@ui/button";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@ui/dialog";
 import {
   Form,
   FormControl,
@@ -27,15 +27,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@ui/form";
+import { Input } from "@ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@ui/select";
 
 // Zod schema for budget creation
 const createBudgetSchema = z.object({

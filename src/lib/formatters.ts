@@ -4,6 +4,7 @@ import {
   CurrencyPosition,
   ThousandSeparator,
 } from "@prisma/client";
+import { CURRENCY_SYMBOLS } from "@/constants/formatting";
 
 interface FormatOptions {
   currency?: Currency;
@@ -13,20 +14,6 @@ interface FormatOptions {
   dateFormat?: DateFormat;
   compactNumbers?: boolean;
 }
-
-const CURRENCY_SYMBOLS: Record<Currency, string> = {
-  USD: "$",
-  EUR: "€",
-  GBP: "£",
-  JPY: "¥",
-  AUD: "$",
-  CAD: "$",
-  CHF: "Fr",
-  CNY: "¥",
-  INR: "₹",
-  SGD: "$",
-  PKR: "₨",
-};
 
 /**
  * Format a numeric amount based on user preferences

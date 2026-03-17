@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from "react";
 import { api } from "@/trpc/react";
-import { invalidateUser } from "@/lib/trpc/invalidation";
+import { invalidateUser } from "@/trpc/invalidation";
 import { useUserStore } from "@/store/userStore";
 import type { User, ApiUser } from "@/types/user";
 

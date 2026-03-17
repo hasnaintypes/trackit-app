@@ -17,10 +17,10 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
+} from "@ui/card";
+import { Button } from "@ui/button";
+import { Switch } from "@ui/switch";
+import { Badge } from "@ui/badge";
 import {
   Plus,
   ChevronDown,
@@ -36,7 +36,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { DeleteDialog } from "@/components/common/delete-dialog";
+import { DeleteDialog } from "@common/delete-dialog";
 import { useFormatter } from "@/hooks/use-formatter";
 
 const ICON_MAP: Record<string, LucideIcon> = {

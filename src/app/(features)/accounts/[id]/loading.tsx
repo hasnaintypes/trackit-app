@@ -1,5 +1,5 @@
-import { Skeleton } from "@/components/ui/skeleton";
-import { TableSkeleton } from "@/components/skeletons/table-skeleton";
+import { Skeleton } from "@ui/skeleton";
+import { TableSkeleton } from "@skeletons/table-skeleton";
 
 export default function AccountDetailLoading() {
   return (

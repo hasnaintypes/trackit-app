@@ -3,15 +3,15 @@
 import React, { Suspense, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { ICON_MAP } from "@/components/common/icon-picker";
+import { Button } from "@ui/button";
+import { Badge } from "@ui/badge";
+import { Card, CardContent } from "@ui/card";
+import { ICON_MAP } from "@/constants/icons";
 import { PlusCircle, Wallet } from "lucide-react";
 import { useAccounts } from "@/hooks/use-accounts";
 import { useTransactions } from "@/hooks/use-transactions";
 import { useFormatter } from "@/hooks/use-formatter";
-import { TransactionsTable } from "@/components/common/transactions-table";
+import { TransactionsTable } from "@common/transactions-table";
 
 const TransactionForm = dynamic(
   () => import("@/components/forms/transaction/transaction-form"),

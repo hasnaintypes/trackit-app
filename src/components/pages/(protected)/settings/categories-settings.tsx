@@ -2,14 +2,14 @@
 
 import React, { useState, useCallback } from "react";
 import { api } from "@/trpc/react";
-import { invalidateCategories } from "@/lib/trpc/invalidation";
+import { invalidateCategories } from "@/trpc/invalidation";
 import { useCategories } from "@/hooks/use-categories";
 import CategoryForm from "@/components/forms/categories/category-form";
 import SubcategoryForm from "@/components/forms/categories/subcategory-form";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@ui/card";
 // Tabs/Separator removed (not used)
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@ui/alert";
 import {
   Trash2,
   Edit2,
@@ -19,14 +19,14 @@ import {
   LayoutGrid,
   List,
 } from "lucide-react";
-import { ICONS } from "@/components/common/icon-picker";
+import { ICONS } from "@/constants/icons";
 // toast removed (not used in this file)
 import type { Category } from "@/types/category";
 import type {
   CreateCategoryInput,
   CreateSubcategoryInput,
 } from "@/validation/category";
-import { DeleteDialog } from "@/components/common/delete-dialog";
+import { DeleteDialog } from "@common/delete-dialog";
 
 type CategoryWithChildren = Category & { children?: CategoryWithChildren[] };
 

@@ -1,12 +1,12 @@
 import { inngest } from "../client";
-import { RECURRING_EVENT, enqueueRecurringRun } from "../events";
+import { RECURRING_EVENT, enqueueRecurringRun } from "@/constants/events";
 import { createLogger } from "@/lib/logging";
 import { db } from "@/server/db";
 
 const logger = createLogger("inngest-recurring");
 import { calculateNextRunAt } from "@/lib/recurrence";
 import { sendEmail } from "@/lib/email";
-import { toNum } from "@/lib/shared/decimal";
+import { toNum } from "@shared/decimal";
 import type { RecurringRule } from "@prisma/client";
 import { RecurringStatus } from "@prisma/client";
 import type { RecurrenceConfig } from "@/types/recurrence";

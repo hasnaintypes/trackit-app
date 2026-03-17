@@ -1,8 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@ui/badge";
+import { Button } from "@ui/button";
 
 import { BlogPostCard, FeaturedPostSidebarItem } from "@component/blog";
 import { blog } from "@content/site/blog";

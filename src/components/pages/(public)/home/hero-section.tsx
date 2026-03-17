@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@ui/badge";
+import { Button } from "@ui/button";
 import { ArrowUpRight, CirclePlay } from "lucide-react";
-import { BackgroundPattern } from "@component/common";
+import { BackgroundPattern } from "@common/index";
 import Link from "next/link";
 import { toast } from "sonner";
 import { hero } from "@content/site/home";

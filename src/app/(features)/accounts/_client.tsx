@@ -5,14 +5,14 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { Wallet, PlusCircle } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@ui/button";
+import { Skeleton } from "@ui/skeleton";
 
 const AccountForm = dynamic(
   () => import("@/components/forms/accounts/account-form"),
   { ssr: false, loading: () => null },
 );
-import { DeleteDialog } from "@/components/common/delete-dialog";
+import { DeleteDialog } from "@common/delete-dialog";
 import { useAccounts } from "@/hooks/use-accounts";
 import { useFormatter } from "@/hooks/use-formatter";
 import type { BankAccount as Account } from "@/types/account";

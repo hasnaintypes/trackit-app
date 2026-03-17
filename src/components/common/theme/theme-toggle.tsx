@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
 
-import { Switch } from "@/components/ui/switch";
+import { Switch } from "@ui/switch";
 
 function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();

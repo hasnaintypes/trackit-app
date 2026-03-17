@@ -3,7 +3,7 @@
 import React, { Suspense, useCallback, useState } from "react";
 import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@ui/skeleton";
 import { UserPen, Bell, ShieldCheck, CreditCard } from "lucide-react";
 
 const sectionFallback = <Skeleton className="h-96 w-full rounded-xl" />;

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { api } from "@/trpc/react";
-import { invalidateReports } from "@/lib/trpc/invalidation";
+import { invalidateReports } from "@/trpc/invalidation";
 import { format } from "date-fns";
 import {
   Loader2,
@@ -18,16 +18,16 @@ import { toast } from "sonner";
 import { useCallback, useMemo, useState } from "react";
 import type { Report } from "@prisma/client";
 
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@ui/button";
+import { Badge } from "@ui/badge";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+} from "@ui/dialog";
+import { Input } from "@ui/input";
 import {
   Table,
   TableBody,
@@ -35,13 +35,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@ui/dropdown-menu";
 
 function getStatusBadge(status: string) {
   switch (status) {

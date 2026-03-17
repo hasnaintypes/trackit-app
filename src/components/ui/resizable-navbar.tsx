@@ -9,7 +9,7 @@ import {
 } from "motion/react";
 
 import React, { useRef, useState } from "react";
-import { Logo } from "@/components/common/logo";
+import { Logo } from "@common/branding/logo";
 import Link from "next/link";
 
 interface NavbarProps {

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from "@ui/button";
 import { Eye, EyeOff } from "lucide-react";
 import {
   Field,
@@ -10,13 +10,13 @@ import {
   FieldGroup,
   FieldLabel,
   FieldSeparator,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+} from "@ui/field";
+import { Input } from "@ui/input";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { getAvatarUrl } from "@/lib/shared/avatar";
+import { getAvatarUrl } from "@shared/avatar";
 import { signupSchema } from "@/validation/auth";
 
 export function SignupForm({

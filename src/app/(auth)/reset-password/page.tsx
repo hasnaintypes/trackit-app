@@ -3,14 +3,9 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-  FieldDescription,
-} from "@/components/ui/field";
+import { Input } from "@ui/input";
+import { Button } from "@ui/button";
+import { Field, FieldGroup, FieldLabel, FieldDescription } from "@ui/field";
 import { toast } from "sonner";
 import { LockKeyholeOpen } from "lucide-react";
 

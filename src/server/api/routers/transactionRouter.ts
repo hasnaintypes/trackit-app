@@ -14,7 +14,7 @@ import { calculateNextRunAt } from "@/lib/recurrence";
 import {
   enqueueRecurringRun,
   emitTransactionProcessed,
-} from "@/lib/inngest/events";
+} from "@/constants/events";
 import {
   createTransactionSchema,
   updateTransactionSchema,
@@ -540,7 +540,7 @@ export const transactionRouter = createTRPCRouter({
       const prisma = ctx.db;
       const userId = ctx.user.id;
       // Lazy import of server-side upload helper
-      const { uploadImage } = await import("@/lib/shared/imagekit");
+      const { uploadImage } = await import("@shared/imagekit");
 
       const res = await uploadImage({
         file: input.fileDataUrl,

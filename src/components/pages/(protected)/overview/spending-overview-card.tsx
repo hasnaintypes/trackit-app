@@ -3,16 +3,16 @@
 import React, { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { CalendarDays } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { ChartConfig } from "@/components/ui/chart";
+} from "@ui/select";
+import { Skeleton } from "@ui/skeleton";
+import type { ChartConfig } from "@ui/chart";
 
 const BarChart = dynamic(
   () =>

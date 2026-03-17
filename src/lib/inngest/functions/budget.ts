@@ -1,7 +1,7 @@
 import { inngest } from "../client";
-import { TRANSACTION_PROCESSED_EVENT } from "../events";
+import { TRANSACTION_PROCESSED_EVENT } from "@/constants/events";
 import { BudgetService } from "@/server/services/budgetService";
-import { toNum } from "@/lib/shared/decimal";
+import { toNum } from "@shared/decimal";
 import { NotificationService } from "@/server/services/notificationService";
 import { NotificationType } from "@prisma/client";
 import { sendEmail } from "@/lib/email";

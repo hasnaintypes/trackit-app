@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { api } from "@/trpc/react";
-import { invalidateSessions } from "@/lib/trpc/invalidation";
+import { invalidateSessions } from "@/trpc/invalidation";
 import type { SessionItem } from "@/types/session";
 
 export function useSessions() {

@@ -1,4 +1,4 @@
-import { Input } from "@/components/ui/input";
+import { Input } from "@ui/input";
 import { SearchIcon } from "lucide-react";
 import helpContent from "@/content/site/help";
 

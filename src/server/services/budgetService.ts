@@ -1,4 +1,5 @@
 import { db } from "@/server/db";
+import { BUDGET_THRESHOLDS } from "@/constants/budget";
 import {
   format,
   startOfWeek,
@@ -10,7 +11,7 @@ import {
 } from "date-fns";
 import { NotificationService } from "./notificationService";
 import { NotificationType, type BudgetPeriod } from "@prisma/client";
-import { toNum } from "@/lib/shared/decimal";
+import { toNum } from "@shared/decimal";
 
 export class BudgetService {
   /**
@@ -216,23 +217,7 @@ export class BudgetService {
     if (total <= 0) return;
     const percent = (spent / total) * 100;
 
-    const thresholds = [
-      {
-        level: 100,
-        flag: "threshold_100_alert_sent" as const,
-        title: "Budget Limit Reached",
-      },
-      {
-        level: 90,
-        flag: "threshold_90_alert_sent" as const,
-        title: "Budget Warning (90%)",
-      },
-      {
-        level: 70,
-        flag: "threshold_70_alert_sent" as const,
-        title: "Budget Alert (70%)",
-      },
-    ];
+    const thresholds = BUDGET_THRESHOLDS;
 
     for (const t of thresholds) {
       if (percent >= t.level) {
@@ -256,7 +241,7 @@ export class BudgetService {
         // Emit event for email worker
         const { inngest } = await import("@/lib/inngest/client");
         const { BUDGET_THRESHOLD_REACHED_EVENT } = await import(
-          "@/lib/inngest/events"
+          "@/constants/events"
         );
         await inngest.send({
           name: BUDGET_THRESHOLD_REACHED_EVENT,

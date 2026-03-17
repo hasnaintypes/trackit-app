@@ -1,4 +1,4 @@
-import { ChartSkeleton } from "@/components/skeletons/chart-skeleton";
+import { ChartSkeleton } from "@skeletons/chart-skeleton";
 
 export default function AnalyticsLoading() {
   return (

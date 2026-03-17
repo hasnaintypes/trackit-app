@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "@/trpc/react";
-import { invalidateTransactions } from "@/lib/trpc/invalidation";
+import { invalidateTransactions } from "@/trpc/invalidation";
 
 export function useTransactions() {
   const utils = api.useUtils();

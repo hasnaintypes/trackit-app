@@ -2,9 +2,10 @@
 
 import React, { useRef, useState } from "react";
 import { Upload, AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { parseCSV } from "@/lib/shared/file-parser";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@ui/alert";
+import { parseCSV } from "@shared/file-parser";
+import { env } from "@/env";
+import { Skeleton } from "@ui/skeleton";
 
 interface FileUploadStepProps {
   onNext: (file: File, csvData: Record<string, string>[]) => void;
@@ -37,8 +38,8 @@ export function FileUploadStep({ onNext }: FileUploadStepProps) {
       }
 
       // Validate row count against configured maximum
-      const maxRows = process.env.NEXT_PUBLIC_GEMINI_MAX_ROWS
-        ? Number(process.env.NEXT_PUBLIC_GEMINI_MAX_ROWS)
+      const maxRows = env.NEXT_PUBLIC_GEMINI_MAX_ROWS
+        ? Number(env.NEXT_PUBLIC_GEMINI_MAX_ROWS)
         : 50;
       if (csvData.length > maxRows) {
         throw new Error(

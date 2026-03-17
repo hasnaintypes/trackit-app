@@ -10,7 +10,7 @@ import {
   MobileNavHeader,
   MobileNavToggle,
   MobileNavMenu,
-} from "@/components/ui/resizable-navbar";
+} from "@ui/resizable-navbar";
 import React, { useState } from "react";
 import { NAV_HEADER_LINKS } from "@/content/nav-links";
 import Link from "next/link";

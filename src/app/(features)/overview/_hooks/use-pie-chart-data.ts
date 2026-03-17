@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import type { Transaction } from "@/types/transaction";
-import type { ChartConfig } from "@/components/ui/chart";
+import type { ChartConfig } from "@ui/chart";
 
 interface PieChartItem {
   name: string;

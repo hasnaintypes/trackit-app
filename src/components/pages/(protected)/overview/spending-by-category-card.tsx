@@ -2,9 +2,9 @@
 
 import React, { Suspense } from "react";
 import dynamic from "next/dynamic";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { ChartConfig } from "@/components/ui/chart";
+import { Card, CardContent, CardHeader, CardTitle } from "@ui/card";
+import { Skeleton } from "@ui/skeleton";
+import type { ChartConfig } from "@ui/chart";
 
 const PieChart = dynamic(
   () =>

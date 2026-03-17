@@ -17,18 +17,18 @@ import {
   GenderOptions,
   CountryOptions,
   TimezoneOptions,
-} from "@/lib/format-options";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+} from "@/constants/formatting";
+import { Card, CardContent } from "@ui/card";
+import { Input } from "@ui/input";
+import { Button } from "@ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+} from "@ui/select";
+import { Label } from "@ui/label";
 import { CheckCircle, ImagePlus } from "lucide-react";
 import Image from "next/image";
 

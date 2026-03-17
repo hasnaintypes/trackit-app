@@ -1,6 +1,7 @@
 import { Logger as BetterStackLogger } from "@logtail/next";
+import { env } from "@/env";
 
-const isProd = process.env.NODE_ENV === "production";
+const isProd = env.NODE_ENV === "production";
 
 type LogMeta = Record<string, unknown>;
 

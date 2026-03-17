@@ -1,10 +1,10 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@ui/card";
+import { Progress } from "@ui/progress";
+import { Badge } from "@ui/badge";
 import { AlertTriangle } from "lucide-react";
-import { toNum } from "@/lib/shared/decimal";
+import { toNum } from "@shared/decimal";
 
 // Define a minimal type for the budget prop based on what we know the router returns
 type Budget = {

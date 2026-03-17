@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { authClient } from "@/lib/auth/client";
 import type { User } from "@/types/user";
 import { useUserStore } from "@/store/userStore";
-import { toError } from "@/lib/shared/error";
+import { toError } from "@shared/error";
 import { isUser } from "@/lib/utils";
 import { createLogger } from "@/lib/logging";
 

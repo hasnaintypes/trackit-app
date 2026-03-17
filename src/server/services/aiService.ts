@@ -3,8 +3,8 @@ import { db } from "@/server/db";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { env } from "@/env";
 import { createLogger } from "@/lib/logging";
-import { toNum } from "@/lib/shared/decimal";
-import { extractJsonFromAI } from "@/lib/shared/ai-utils";
+import { toNum } from "@shared/decimal";
+import { extractJsonFromAI } from "@shared/ai-utils";
 
 const logger = createLogger("aiService");
 import {
@@ -16,9 +16,12 @@ import {
   RECEIPT_PROMPT_TEMPLATE,
 } from "@/constants/prompt";
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY_MS = 1000;
-const RATE_LIMIT_DELAY_MS = 5000;
+import {
+  MAX_RETRIES,
+  RETRY_DELAY_MS,
+  RATE_LIMIT_DELAY_MS,
+  VALID_FREQUENCIES,
+} from "@/constants/ai";
 
 import type { CategoryForAI } from "@/types/category";
 import type {
@@ -381,12 +384,7 @@ export class AIService {
     transactions: TransactionForAI[],
     categories: CategoryForAI[],
   ): Promise<CategorizationResponse> {
-    const maxRows = Number(
-      env?.GEMINI_MAX_ROWS ??
-        process.env.GEMINI_MAX_ROWS ??
-        process.env.NEXT_PUBLIC_GEMINI_MAX_ROWS ??
-        50,
-    );
+    const maxRows = env.GEMINI_MAX_ROWS;
 
     if (!transactions || transactions.length === 0) {
       return { results: [] };
@@ -644,11 +642,10 @@ export class AIService {
       let recurrence: ReceiptScanResult["recurrence"] = null;
       if (obj.recurrence && typeof obj.recurrence === "object") {
         const r = obj.recurrence as Record<string, unknown>;
-        const validFrequencies = ["DAILY", "WEEKLY", "MONTHLY", "YEARLY"];
         recurrence = {
           frequency:
             typeof r.frequency === "string" &&
-            validFrequencies.includes(r.frequency)
+            (VALID_FREQUENCIES as readonly string[]).includes(r.frequency)
               ? (r.frequency as "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY")
               : null,
           interval: typeof r.interval === "number" ? r.interval : null,

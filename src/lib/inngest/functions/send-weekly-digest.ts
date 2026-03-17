@@ -1,7 +1,7 @@
 import { inngest } from "@/lib/inngest/client";
 import { createLogger } from "@/lib/logging";
 import { db } from "@/server/db";
-import { toNum } from "@/lib/shared/decimal";
+import { toNum } from "@shared/decimal";
 
 const logger = createLogger("inngest-weekly-digest");
 import { startOfWeek, endOfWeek, subWeeks, format } from "date-fns";
