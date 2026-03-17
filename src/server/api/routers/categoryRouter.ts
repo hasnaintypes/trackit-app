@@ -13,7 +13,26 @@ export const categoryRouter = createTRPCRouter({
   list: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.category.findMany({
       where: { userId: ctx.user.id, parentCategoryId: null }, // Only top-level
-      include: { children: true },
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        color: true,
+        icon: true,
+        sortOrder: true,
+        parentCategoryId: true,
+        children: {
+          select: {
+            id: true,
+            name: true,
+            type: true,
+            color: true,
+            icon: true,
+            sortOrder: true,
+            parentCategoryId: true,
+          },
+        },
+      },
       orderBy: { sortOrder: "asc" },
     });
   }),
@@ -21,6 +40,15 @@ export const categoryRouter = createTRPCRouter({
   allFlat: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.category.findMany({
       where: { userId: ctx.user.id },
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        color: true,
+        icon: true,
+        sortOrder: true,
+        parentCategoryId: true,
+      },
       orderBy: { name: "asc" },
     });
   }),
@@ -28,7 +56,19 @@ export const categoryRouter = createTRPCRouter({
   byId: protectedProcedure
     .input(categoryIdParam)
     .query(async ({ ctx, input }) => {
-      const cat = await ctx.db.category.findUnique({ where: { id: input.id } });
+      const cat = await ctx.db.category.findUnique({
+        where: { id: input.id },
+        select: {
+          id: true,
+          userId: true,
+          name: true,
+          type: true,
+          color: true,
+          icon: true,
+          sortOrder: true,
+          parentCategoryId: true,
+        },
+      });
       if (cat?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
@@ -59,6 +99,7 @@ export const categoryRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const exists = await ctx.db.category.findUnique({
         where: { id: input.id },
+        select: { userId: true },
       });
       if (exists?.userId !== ctx.user.id) {
         throw new TRPCError({
@@ -121,6 +162,7 @@ export const categoryRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const exists = await ctx.db.category.findUnique({
         where: { id: input.id },
+        select: { userId: true },
       });
       if (exists?.userId !== ctx.user.id) {
         throw new TRPCError({
@@ -155,6 +197,7 @@ export const categoryRouter = createTRPCRouter({
       .mutation(async ({ ctx, input }) => {
         const parent = await ctx.db.category.findUnique({
           where: { id: input.parentId },
+          select: { userId: true, type: true },
         });
         if (parent?.userId !== ctx.user.id) {
           throw new TRPCError({
@@ -181,6 +224,7 @@ export const categoryRouter = createTRPCRouter({
       .mutation(async ({ ctx, input }) => {
         const exists = await ctx.db.category.findUnique({
           where: { id: input.id },
+          select: { userId: true },
         });
         if (exists?.userId !== ctx.user.id) {
           throw new TRPCError({
@@ -199,6 +243,7 @@ export const categoryRouter = createTRPCRouter({
           }
           const newParent = await ctx.db.category.findUnique({
             where: { id: input.parentId },
+            select: { userId: true, parentCategoryId: true },
           });
           if (newParent?.userId !== ctx.user.id) {
             throw new TRPCError({
@@ -245,6 +290,7 @@ export const categoryRouter = createTRPCRouter({
       .mutation(async ({ ctx, input }) => {
         const exists = await ctx.db.category.findUnique({
           where: { id: input.id },
+          select: { userId: true },
         });
         if (exists?.userId !== ctx.user.id) {
           throw new TRPCError({

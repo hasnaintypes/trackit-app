@@ -49,6 +49,14 @@ export const reportRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const report = await ctx.db.report.findUnique({
         where: { id: input.id },
+        select: {
+          id: true,
+          userId: true,
+          type: true,
+          period: true,
+          data: true,
+          emailSentTo: true,
+        },
       });
 
       if (report?.userId !== ctx.user.id) {

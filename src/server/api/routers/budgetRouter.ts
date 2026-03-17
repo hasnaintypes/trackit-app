@@ -8,7 +8,17 @@ export const budgetRouter = createTRPCRouter({
   all: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.budget.findMany({
       where: { userId: ctx.user.id },
-      include: {
+      select: {
+        id: true,
+        userId: true,
+        categoryId: true,
+        amount: true,
+        period: true,
+        startDate: true,
+        endDate: true,
+        spentAmount: true,
+        createdAt: true,
+        updatedAt: true,
         category: {
           select: {
             id: true,

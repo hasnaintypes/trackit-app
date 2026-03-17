@@ -27,7 +27,11 @@ export class BudgetService {
     // 1. Find the category and its parent to support rollup
     const category = await db.category.findUnique({
       where: { id: categoryId },
-      include: { parent: true },
+      select: {
+        id: true,
+        userId: true,
+        parentCategoryId: true,
+      },
     });
 
     if (!category || category.userId !== userId) return;
@@ -38,9 +42,9 @@ export class BudgetService {
         userId,
         OR: [
           { categoryId: category.id },
-          category.parentCategoryId
-            ? { categoryId: category.parentCategoryId }
-            : {},
+          ...(category.parentCategoryId
+            ? [{ categoryId: category.parentCategoryId }]
+            : []),
         ],
       },
       select: { id: true },
@@ -57,7 +61,28 @@ export class BudgetService {
   static async reevaluateBudget(budgetId: string) {
     const budget = await db.budget.findUnique({
       where: { id: budgetId },
-      include: { category: { include: { children: true } } },
+      select: {
+        id: true,
+        userId: true,
+        categoryId: true,
+        amount: true,
+        period: true,
+        startDate: true,
+        endDate: true,
+        spentAmount: true,
+        createdAt: true,
+        updatedAt: true,
+        last_alert_period: true,
+        threshold_70_alert_sent: true,
+        threshold_90_alert_sent: true,
+        threshold_100_alert_sent: true,
+        category: {
+          select: {
+            id: true,
+            children: { select: { id: true } },
+          },
+        },
+      },
     });
 
     if (!budget) return;
@@ -257,6 +282,7 @@ export class BudgetService {
   ) {
     const prefs = await db.notificationPreferences.findUnique({
       where: { userId },
+      select: { largeTransactionThreshold: true, emailLargeTransactions: true },
     });
 
     if (!prefs?.largeTransactionThreshold || !prefs.emailLargeTransactions)
@@ -278,8 +304,14 @@ export class BudgetService {
    */
   static async checkLowBalance(userId: string, accountId: string) {
     const [prefs, account] = await Promise.all([
-      db.notificationPreferences.findUnique({ where: { userId } }),
-      db.bankAccount.findUnique({ where: { id: accountId } }),
+      db.notificationPreferences.findUnique({
+        where: { userId },
+        select: { lowBalanceThreshold: true, emailLowBalanceAlerts: true },
+      }),
+      db.bankAccount.findUnique({
+        where: { id: accountId },
+        select: { name: true, balance: true },
+      }),
     ]);
 
     if (!prefs?.lowBalanceThreshold || !prefs.emailLowBalanceAlerts || !account)

@@ -303,6 +303,18 @@ export const transactionRouter = createTRPCRouter({
       const prisma = ctx.db;
       const existing = await prisma.transaction.findUnique({
         where: { id: input.id },
+        select: {
+          userId: true,
+          accountId: true,
+          amount: true,
+          type: true,
+          categoryId: true,
+          description: true,
+          notes: true,
+          date: true,
+          isRecurring: true,
+          recurringRuleId: true,
+        },
       });
       if (existing?.userId !== ctx.user.id)
         throw new TRPCError({
@@ -542,6 +554,7 @@ export const transactionRouter = createTRPCRouter({
         // Ensure transaction belongs to user
         const existing = await prisma.transaction.findUnique({
           where: { id: input.transactionId },
+          select: { userId: true },
         });
         if (existing?.userId !== userId)
           throw new TRPCError({
@@ -563,6 +576,7 @@ export const transactionRouter = createTRPCRouter({
       const prisma = ctx.db;
       const existing = await prisma.transaction.findUnique({
         where: { id: input.id },
+        select: { userId: true, accountId: true, amount: true, type: true },
       });
       if (existing?.userId !== ctx.user.id)
         throw new TRPCError({
@@ -685,7 +699,14 @@ export const transactionRouter = createTRPCRouter({
       if (needsCategorizationIndices.length > 0) {
         const categories = await prisma.category.findMany({
           where: { userId },
-          include: { children: true },
+          select: {
+            id: true,
+            name: true,
+            type: true,
+            children: {
+              select: { id: true, name: true, type: true },
+            },
+          },
         });
 
         if (categories.length > 0) {

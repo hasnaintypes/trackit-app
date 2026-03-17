@@ -86,6 +86,15 @@ export class NotificationService {
   static async getLatestNotifications(userId: string, limit = 10) {
     return db.notification.findMany({
       where: { userId },
+      select: {
+        id: true,
+        type: true,
+        title: true,
+        message: true,
+        isRead: true,
+        metadata: true,
+        createdAt: true,
+      },
       orderBy: { createdAt: "desc" },
       take: limit,
     });

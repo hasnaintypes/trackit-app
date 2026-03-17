@@ -55,7 +55,11 @@ export class ReportService {
         db.transaction.count({ where }),
         db.budget.findMany({
           where: { userId },
-          include: { category: true },
+          select: {
+            amount: true,
+            spentAmount: true,
+            category: { select: { name: true } },
+          },
         }),
       ]);
 
@@ -128,7 +132,13 @@ export class ReportService {
   static async generateBudgetExceededReport(userId: string, budgetId: string) {
     const budget = await db.budget.findUnique({
       where: { id: budgetId },
-      include: { category: true },
+      select: {
+        id: true,
+        userId: true,
+        amount: true,
+        spentAmount: true,
+        category: { select: { name: true } },
+      },
     });
 
     if (!budget || budget.userId !== userId) {
@@ -172,6 +182,17 @@ export class ReportService {
       where: {
         userId,
         ...(filters?.type && { type: filters.type }),
+      },
+      select: {
+        id: true,
+        userId: true,
+        type: true,
+        period: true,
+        status: true,
+        data: true,
+        generatedAt: true,
+        sentAt: true,
+        emailSentTo: true,
       },
       orderBy: { generatedAt: "desc" },
       take: filters?.limit ?? 50,

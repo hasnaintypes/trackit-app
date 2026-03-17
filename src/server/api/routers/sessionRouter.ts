@@ -38,6 +38,7 @@ export const sessionRouter = createTRPCRouter({
       // Ensure the session belongs to the user
       const existing = await ctx.db.session.findUnique({
         where: { id: input.id },
+        select: { userId: true },
       });
       if (!existing || existing.userId !== userId) {
         throw new TRPCError({
