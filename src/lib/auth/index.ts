@@ -4,12 +4,13 @@ import { db as prisma } from "@/server/db";
 import { sendEmail } from "@/lib/email";
 import { renderTemplate } from "../server/utils";
 import { admin } from "better-auth/plugins";
+import { nextCookies } from "better-auth/next-js";
 import { createLogger } from "@/lib/logging";
 
 const logger = createLogger("auth");
 
 export const auth = betterAuth({
-  plugins: [admin()],
+  plugins: [admin(), nextCookies()],
   database: prismaAdapter(prisma, { provider: "postgresql" }),
   emailAndPassword: {
     enabled: true,

@@ -12,13 +12,9 @@ import {
   FieldDescription,
 } from "@/components/ui/field";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { LockKeyholeOpen } from "lucide-react";
 
-export default function ResetPasswordPage({
-  className,
-  ...props
-}: React.ComponentProps<"form">) {
+export default function ResetPasswordPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -57,12 +53,8 @@ export default function ResetPasswordPage({
   return (
     <main className="bg-background flex min-h-screen items-center justify-center px-4">
       <form
-        className={cn(
-          "animate-in fade-in-50 flex w-full max-w-md flex-col gap-8 duration-500",
-          className,
-        )}
+        className="animate-in fade-in-50 flex w-full max-w-md flex-col gap-8 duration-500"
         onSubmit={handleSubmit}
-        {...props}
       >
         <div className="flex flex-col items-center gap-2 text-center">
           <div className="bg-primary/10 text-primary mb-2 rounded-full p-3">

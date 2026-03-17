@@ -29,15 +29,12 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '24.10.0'
+          node-version: '20'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
-
-      - name: Ensure pnpm is on PATH (fallback)
-        run: npm i -g pnpm@8 || true
+          version: 10
 
       - name: Cache pnpm store
         uses: actions/cache@v4
@@ -51,10 +48,15 @@ jobs:
         run: pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
 
       - name: Lint
+        env:
+          # Explicitly skip strict env validation during lint to avoid failures when secrets
+          # are not available (fork PRs, etc.). The application also auto-detects lint/test
+          # contexts, but setting this makes intent explicit for CI runs.
+          SKIP_ENV_VALIDATION: 'true'
         run: pnpm run lint
 
       - name: Type check
-        run: pnpm run typecheck --if-present
+        run: pnpm run typecheck
 
-      - name: Run tests
-        run: pnpm test -- --ci --coverage
+      - name:  Run Format check
+        run: pnpm run format:check

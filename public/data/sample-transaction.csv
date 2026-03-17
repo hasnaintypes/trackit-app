@@ -1,0 +1,4 @@
+description,type,amount,date,notes,paymentMethod
+Monthly Salary,credit,3500,2023-01-01,January salary payment,Cash
+Coffee at Starbucks,debit,4.5,2023-01-02,Morning coffee before work,Cash
+Grocery Shopping,debit,156.78,2023-01-03,Weekly groceries at Walmart,Cash

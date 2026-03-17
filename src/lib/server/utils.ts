@@ -7,7 +7,10 @@ export function renderTemplate(
 ) {
   const templatePath = path.join(
     process.cwd(),
-    "src/templates/emails",
+    "src",
+    "lib",
+    "email",
+    "templates",
     `${templateName}.html`,
   );
   let html = fs.readFileSync(templatePath, "utf8");

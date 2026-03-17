@@ -56,8 +56,8 @@ const HeroSection = () => {
                     src={
                       p?.coverImage ??
                       (i === 0
-                        ? "/tech-professional-working.jpg"
-                        : "/team-meeting-collaboration.jpg")
+                        ? "/images/blog-post-1.png"
+                        : "/images/blog-post-2.png")
                     }
                     alt={p?.title ?? `Featured ${i + 1}`}
                     fill

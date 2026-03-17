@@ -39,10 +39,15 @@ export const AnimatedTooltip = ({
       cancelAnimationFrame(animationFrameRef.current);
     }
 
+    // Read values synchronously to avoid React synthetic event pooling
+    // (event properties are cleared after the handler returns). Capture
+    // numeric values now and use them inside the RAF callback.
+    const targetWidth = event.currentTarget?.offsetWidth ?? 0;
+    const halfWidth = targetWidth / 2;
+    const native = event.nativeEvent as unknown as { offsetX?: number };
+    const offsetX = native?.offsetX ?? 0;
+
     animationFrameRef.current = requestAnimationFrame(() => {
-      const halfWidth = event.currentTarget.offsetWidth / 2;
-      const native = event.nativeEvent as unknown as { offsetX?: number };
-      const offsetX = native.offsetX ?? 0;
       x.set(offsetX - halfWidth);
     });
   };

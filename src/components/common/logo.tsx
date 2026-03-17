@@ -1,38 +1,110 @@
 "use client";
 
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
-interface LogoProps extends React.HTMLAttributes<HTMLDivElement> {
+interface LogoProps {
   size?: number;
+  className?: string;
+  showText?: boolean;
 }
 
-export function Logo({ size = 16, className, ...props }: LogoProps) {
-  const height = size;
+export const Logo = React.memo(function Logo({
+  size = 32,
+  className,
+  showText = false,
+}: LogoProps) {
+  const [mounted, setMounted] = useState(false);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Render only light logo during SSR to avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <div className={cn("flex items-center gap-2", className)}>
+        <Image
+          src="/images/brand/logo.png"
+          alt="Trackit"
+          width={size}
+          height={size}
+          className="rounded-full"
+          unoptimized
+        />
+        {showText && <span className="text-lg font-semibold">Trackit</span>}
+      </div>
+    );
+  }
   return (
-    <div
-      className={cn("text-primary flex items-center justify-center", className)}
-      {...props}
-    >
-      {/* light */}
+    <div className={cn("flex items-center gap-2", className)}>
       <Image
-        src="/logo.png"
-        alt="logo"
-        width={height * 2}
-        height={height}
-        className="block h-auto dark:hidden"
+        src="/images/brand/logo.png"
+        alt="Trackit"
+        width={size}
+        height={size}
+        className="rounded-full dark:hidden"
+        unoptimized
       />
-
-      {/* dark */}
       <Image
-        src="/logo-dark.png"
-        alt="logo dark"
-        width={height * 2}
-        height={height}
-        className="hidden h-auto dark:block"
+        src="/images/brand/logo-dark.png"
+        alt="Trackit"
+        width={size}
+        height={size}
+        className="hidden rounded-full dark:block"
+        unoptimized
       />
+      {showText && <span className="text-lg font-semibold">Trackit</span>}
     </div>
   );
-}
+});
+
+/**
+ * LogoIcon variant for integration grids and small icon contexts.
+ */
+export const LogoIcon = React.memo(function LogoIcon({
+  className,
+}: {
+  className?: string;
+}) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Render only light logo during SSR
+  if (!mounted) {
+    return (
+      <Image
+        src="/images/brand/logo.png"
+        alt="Trackit"
+        width={28}
+        height={28}
+        className={cn("rounded-md", className)}
+        unoptimized
+      />
+    );
+  }
+  return (
+    <>
+      <Image
+        src="/images/brand/logo.png"
+        alt="Trackit"
+        width={28}
+        height={28}
+        className={cn("rounded-md dark:hidden", className)}
+        unoptimized
+      />
+      <Image
+        src="/images/brand/logo-dark.png"
+        alt="Trackit"
+        width={28}
+        height={28}
+        className={cn("hidden rounded-md dark:block", className)}
+        unoptimized
+      />
+    </>
+  );
+});

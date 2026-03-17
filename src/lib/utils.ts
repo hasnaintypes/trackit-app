@@ -8,15 +8,15 @@ export function cn(...inputs: ClassValue[]) {
 
 export function isUser(obj: unknown): obj is User {
   if (typeof obj !== "object" || obj === null) return false;
-  const u = obj as User;
+  const u = obj as Record<string, unknown>;
   return (
     typeof u.id === "string" &&
     typeof u.name === "string" &&
     typeof u.email === "string" &&
     typeof u.emailVerified === "boolean" &&
     typeof u.role === "string" &&
-    u.createdAt instanceof Date &&
-    u.updatedAt instanceof Date
+    u.createdAt != null &&
+    u.updatedAt != null
   );
 }
 

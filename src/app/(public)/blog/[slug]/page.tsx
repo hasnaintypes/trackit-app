@@ -38,7 +38,7 @@ export default function Page() {
   // (commentsByPostId + commentsById) and fallback to legacy blog.comments.
   if (!found) {
     return (
-      <div className="mx-auto max-w-4xl px-6 py-12">
+      <div className="mx-auto max-w-4xl px-6 py-16 md:py-20 lg:py-24">
         <h2 className="text-2xl font-bold">Post not found</h2>
         <p className="mt-4">
           We couldn&apos;t find the post you&apos;re looking for.
@@ -54,7 +54,7 @@ export default function Page() {
 
   return (
     <div className="bg-background min-h-screen">
-      <div className="mx-auto max-w-4xl px-6 py-12">
+      <div className="mx-auto max-w-4xl px-6 py-16 md:py-20 lg:py-24">
         <div className="mb-6">
           <Button
             variant="ghost"
@@ -78,14 +78,14 @@ export default function Page() {
           onBack={() => navigate.push("/blog")}
         />
 
-        <div className="mt-16">
+        <div className="mt-12 md:mt-16">
           <ContentSection
             content={found.content ?? []}
             coverImage={found.coverImage}
           />
         </div>
 
-        <div className="mt-16">
+        <div className="mt-12 md:mt-16">
           {/* resolve by post id -> comment ids -> comment objects */}
           <CommentSection
             comments={((): BlogComment[] => {

@@ -9,7 +9,7 @@ import {
 } from "motion/react";
 
 import React, { useRef, useState } from "react";
-import { Logo } from "../common/logo";
+import { Logo } from "@/components/common/logo";
 import Link from "next/link";
 
 interface NavbarProps {
@@ -236,8 +236,7 @@ export const NavbarLogo = () => {
       href="/"
       className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm font-normal text-black"
     >
-      <Logo />
-      <span className="font-medium text-black dark:text-white">Cashio</span>
+      <Logo showText />
     </Link>
   );
 };

@@ -5,6 +5,11 @@
 
 import "./src/env.js";
 import { withBetterStack } from "@logtail/next";
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
 
 /** @type {import("next").NextConfig} */
 
@@ -14,65 +19,50 @@ config.images = {
   remotePatterns: [
     {
       protocol: "https",
-      hostname: "cdn.dribbble.com",
-      port: "",
+      hostname: "avatars.githubusercontent.com",
+      pathname: "/**",
+    },
+    {
+      protocol: "https",
+      hostname: "avatar.iran.liara.run",
+      pathname: "/**",
+    },
+    {
+      protocol: "https",
+      hostname: "ik.imagekit.io",
+      pathname: "/**",
+    },
+    {
+      protocol: "https",
+      hostname: "api.dicebear.com",
       pathname: "/**",
     },
     {
       protocol: "https",
       hostname: "images.unsplash.com",
-      port: "",
-      pathname: "/**",
-    },
-    {
-      protocol: "https",
-      hostname: "plus.unsplash.com",
-      port: "",
-      pathname: "/**",
-    },
-    {
-      protocol: "https",
-      hostname: "avatars.githubusercontent.com",
-      port: "",
-      pathname: "/**",
-    },
-    {
-      protocol: "https",
-      hostname: "placehold.co",
-      port: "",
-      pathname: "/**",
-    },
-    {
-      protocol: "https",
-      hostname: "unsplash.com",
-      port: "",
-      pathname: "/photos/**",
-    },
-    {
-      protocol: "https",
-      hostname: "cdn.shadcnstudio.com",
-      port: "",
-      pathname: "/**",
-    },
-    {
-      protocol: "https",
-      hostname: "images.pexels.com",
-      port: "",
       pathname: "/**",
     },
     {
       protocol: "https",
       hostname: "randomuser.me",
-      port: "",
-      pathname: "/**",
-    },
-    {
-      protocol: "https",
-      hostname: "www.comarch.com",
-      port: "",
-      pathname: "/**",
+      pathname: "/api/portraits/**",
     },
   ],
 };
 
-export default withBetterStack(config);
+config.headers = async () => [
+  {
+    source: "/(.*)",
+    headers: [
+      { key: "X-Frame-Options", value: "DENY" },
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+      {
+        key: "Permissions-Policy",
+        value: "camera=(), microphone=(), geolocation=()",
+      },
+    ],
+  },
+];
+
+export default withBundleAnalyzer(withBetterStack(config));

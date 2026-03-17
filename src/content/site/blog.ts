@@ -31,15 +31,16 @@ const featuredSidebar = [
       "https://images.unsplash.com/photo-1667453466805-75bbf36e8707?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1332",
     imageAlt:
       "A padlock symbolizing Two-Factor Authentication and data security.",
-    title: "Unbreakable Finance: Why We Built Cashio on RBAC and 2FA",
-    href: "/blog/why-cashio-uses-rbac-and-2fa",
+    title: "Unbreakable Finance: Why We Built Trackit on RBAC and 2FA",
+    href: "/blog/why-trackit-uses-rbac-and-2fa",
   },
   {
     image:
       "https://www.bluetickconsultants.com/wp-content/uploads/2025/05/t3-stack.webp",
     imageAlt:
       "Diagram showing the architecture of the T3 Stack (Next.js, tRPC, Prisma).",
-    title: "Behind the Scenes: Why the T3 Stack Powers Cashio's Real-Time Sync",
+    title:
+      "Behind the Scenes: Why the T3 Stack Powers Trackit's Real-Time Sync",
     href: "/blog/t3-stack-and-real-time-sync",
   },
   {
@@ -57,7 +58,7 @@ const recentPosts: BlogCard[] = [
       "https://images.unsplash.com/photo-1652422485224-102f6784c149?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1170",
     title: "Crush Your Goals: A Practical Guide to Goal-Based Budgeting",
     excerpt:
-      "Move past simple tracking. Learn how Cashio's **goal-based budgeting** and spending limits help you achieve major financial milestones, from buying a house to early retirement.",
+      "Move past simple tracking. Learn how Trackit's **goal-based budgeting** and spending limits help you achieve major financial milestones, from buying a house to early retirement.",
     author: "Jennifer Taylor",
     href: "/blog/goal-based-budgeting-practical-guide",
   },
@@ -66,7 +67,7 @@ const recentPosts: BlogCard[] = [
       "https://images.unsplash.com/photo-1560444285-4f358dab61d1?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2094",
     title: "Global Finance Made Easy: Managing Multi-Currency Accounts",
     excerpt:
-      "Traveling or trading internationally? Understand how Cashio handles **multi-currency** management and provides **real-time exchange rate** conversion for absolute clarity.",
+      "Traveling or trading internationally? Understand how Trackit handles **multi-currency** management and provides **real-time exchange rate** conversion for absolute clarity.",
     author: "Jennifer Taylor",
     href: "/blog/managing-multi-currency-accounts",
   },
@@ -75,29 +76,29 @@ const recentPosts: BlogCard[] = [
       "https://images.unsplash.com/photo-1526841803814-753ac32aa9e2?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1170",
     title: "Set It and Forget It: Automating Recurring Transactions",
     excerpt:
-      "Tired of tracking monthly subscriptions? Discover how to use Cashio's **recurring transactions** feature for seamless, automated expense tracking and predictable cash flow.",
+      "Tired of tracking monthly subscriptions? Discover how to use Trackit's **recurring transactions** feature for seamless, automated expense tracking and predictable cash flow.",
     author: "Ryan A.",
     href: "/blog/automating-recurring-transactions",
   },
   {
-    image: "blog.png",
+    image: "/images/blog-post-1.png",
     title:
       "Integrating the Backend: Automatic Reconciliation with Stripe Webhooks",
     excerpt:
-      "A technical deep dive into how Cashio achieves instant and accurate data logging by automatically reconciling transaction data from **Stripe webhooks**.",
+      "A technical deep dive into how Trackit achieves instant and accurate data logging by automatically reconciling transaction data from **Stripe webhooks**.",
     author: "Jennifer Taylor",
     href: "/blog/automatic-reconciliation-stripe-webhooks",
   },
   {
-    image: "blog1.png",
+    image: "/images/blog-post-2.png",
     title: "The AI Difference: Smart Categorization and Anomaly Detection",
     excerpt:
-      "See how Cashio's machine learning models instantly categorize transactions and alert you to unusual spending, keeping your budget safe and accurate.",
+      "See how Trackit's machine learning models instantly categorize transactions and alert you to unusual spending, keeping your budget safe and accurate.",
     author: "Ryan A.",
     href: "/blog/ai-categorization-anomaly-detection",
   },
   {
-    image: "/blog3.png",
+    image: "/images/blog-post-3.png",
     title:
       "Trust and Transparency: The Role of Audit Logs in Financial Security",
     excerpt:
@@ -124,7 +125,7 @@ const posts: BlogPost[] = [
     content: [
       `# Beyond Budgeting: How AI Predicts Your Financial Future
 
-Traditional budgeting focuses on what you *have* spent. At **Cashio**, we believe the true power of finance lies in understanding what you *will* spend. Our proprietary AI, leveraging models like Gemini, transforms your historical transaction data into a forward-looking financial roadmap, helping you move from reactive tracking to proactive planning.
+Traditional budgeting focuses on what you *have* spent. At **Trackit**, we believe the true power of finance lies in understanding what you *will* spend. Our proprietary AI, leveraging models like Gemini, transforms your historical transaction data into a forward-looking financial roadmap, helping you move from reactive tracking to proactive planning.
 
 ---
 
@@ -162,7 +163,7 @@ Understanding the factors that contribute to our AI's predictions is key to leve
 
 Financial clarity isn't just about averages; it's about spotting the outliers. The **Anomaly Detection** system serves as your always-on financial security guard, flagging anything that deviates significantly from your established patterns.
 
-### How Cashio Spots the Unexpected
+### How Trackit Spots the Unexpected
 
 When a transaction is logged, the system doesn't just check the categoryit analyzes the merchant, the time, the location, and the amount against thousands of your previous transactions.
 
@@ -176,7 +177,7 @@ This capability is essential for catching potential fraud early and identifying 
 
 ## Conversational AI Assistant for Deep Queries
 
-Beyond the dashboard, Cashio features a **Conversational AI Assistant**your personal financial analyst available 24/7. Instead of hunting through reports, you can simply ask complex questions in natural language.
+Beyond the dashboard, Trackit features a **Conversational AI Assistant**your personal financial analyst available 24/7. Instead of hunting through reports, you can simply ask complex questions in natural language.
 
 ## AI Response Logic
 1. Parse the user's question to identify key financial metrics.
@@ -207,11 +208,11 @@ The key to successful AI-powered finance lies in understanding your audience dee
     content: [
       `# Stop Typing, Start Scanning: The Power of Gemini OCR for Expenses
 
-Manual data entry is the biggest bottleneck in personal finance management. The time spent manually logging receipts, merchants, and amounts often leads to procrastination and inaccurate budgets. **Cashio** solves this with the integration of **Gemini OCR** (Optical Character Recognition), turning a quick photo into a perfectly logged transaction.
+Manual data entry is the biggest bottleneck in personal finance management. The time spent manually logging receipts, merchants, and amounts often leads to procrastination and inaccurate budgets. **Trackit** solves this with the integration of **Gemini OCR** (Optical Character Recognition), turning a quick photo into a perfectly logged transaction.
 
 ---
 
-## The Old Way vs. The Cashio Way
+## The Old Way vs. The Trackit Way
 
 Before smart technology, keeping a precise expense record felt like a tedious chore. Our goal was simple: make expense logging faster than pulling out a pen.
 
@@ -230,7 +231,7 @@ Before smart technology, keeping a precise expense record felt like a tedious ch
 | Logging Method | Time to Complete (Avg.) | Error Rate |
 | :--- | :--- | :--- |
 | Manual Entry | 45-60 seconds | High |
-| **Cashio Gemini OCR** | **2-5 seconds** | **Near Zero** |
+| **Trackit Gemini OCR** | **2-5 seconds** | **Near Zero** |
 
 <div class="my-6"></div>
 
@@ -245,7 +246,7 @@ Before smart technology, keeping a precise expense record felt like a tedious ch
 
 ## Deep Dive: How Smart Categorization Works
 
-The real magic isn't just reading the numbers; it's understanding the context. Once the raw text is extracted, Cashio's core financial intelligence kicks in.
+The real magic isn't just reading the numbers; it's understanding the context. Once the raw text is extracted, Trackit's core financial intelligence kicks in.
 
 ### Key Data Points Extracted and Used
 
@@ -257,7 +258,7 @@ The real magic isn't just reading the numbers; it's understanding the context. O
 
 ## Integration and Real-Time Sync
 
-The final step is integrating the scanned data seamlessly into your financial dashboard. Since Cashio is built on the **T3 stack** with real-time sync, the moment you confirm the scanned transaction, it updates your budget, your visual reports, and your group balances simultaneously.
+The final step is integrating the scanned data seamlessly into your financial dashboard. Since Trackit is built on the **T3 stack** with real-time sync, the moment you confirm the scanned transaction, it updates your budget, your visual reports, and your group balances simultaneously.
 
 \`\`\`js
 // Simplified OCR Data Flow
@@ -276,7 +277,7 @@ function processOCR(data) {
 console.log('Processed Transaction:', processOCR(rawReceiptData));
 \`\`\`
 
-The key to successful financial management is reducing friction. By replacing tedious typing with instantaneous scanning, Cashio ensures your records are always up-to-date and accurate, putting true financial clarity back in your hands.
+The key to successful financial management is reducing friction. By replacing tedious typing with instantaneous scanning, Trackit ensures your records are always up-to-date and accurate, putting true financial clarity back in your hands.
 `,
     ],
   },
@@ -295,13 +296,13 @@ The key to successful financial management is reducing friction. By replacing te
     content: [
       `# No More IOUs: Mastering Group Expenses and Instant Settlements
 
-The phrase "I'll get you back later" is the foundation of many strained friendships. Managing shared expenseswhether it's a weekend trip, a household budget, or dinner with friendsis often messy, awkward, and inaccurate. **Cashio** eliminates the debt drama entirely. Our **Group & Collaboration System** is built to handle the complexities of shared finance with real-time tracking, fair splitting, and instant settlement suggestions.
+The phrase "I'll get you back later" is the foundation of many strained friendships. Managing shared expenseswhether it's a weekend trip, a household budget, or dinner with friendsis often messy, awkward, and inaccurate. **Trackit** eliminates the debt drama entirely. Our **Group & Collaboration System** is built to handle the complexities of shared finance with real-time tracking, fair splitting, and instant settlement suggestions.
 
 ---
 
 ## Shared Tracking, Zero Awkwardness
 
-Cashio turns group finance into a completely transparent, friction-free process. Setting up a group is simple: invite members and start logging transactions.
+Trackit turns group finance into a completely transparent, friction-free process. Setting up a group is simple: invite members and start logging transactions.
 
 When a transaction is entered (e.g., buying groceries for the house), you can immediately designate the payer and who owes a share. This provides an always-accurate, real-time balance that removes any guesswork or resentment.
 
@@ -311,7 +312,7 @@ When a transaction is entered (e.g., buying groceries for the house), you can im
 
 ## Advanced Splitting: Beyond the Even Divide
 
-Life isn't always split 50/50, and your finance app shouldn't be either. Cashio offers flexible methods for splitting bills that accurately reflect everyone’s contribution.
+Life isn't always split 50/50, and your finance app shouldn't be either. Trackit offers flexible methods for splitting bills that accurately reflect everyone’s contribution.
 
 ### Flexible Splitting Options:
 
@@ -327,7 +328,7 @@ Because the updates are live, every group member instantly sees their current de
 
 ## The Power of Instant Settlement with Stripe Polar
 
-The biggest challenge isn't tracking the debt; it's paying it back. Cashio solves the **"settle-up"** headache using **Stripe Polar**, our integrated payment solution that facilitates instant, secure peer-to-peer (P2P) and wallet-to-wallet transfers *directly inside the app*.
+The biggest challenge isn't tracking the debt; it's paying it back. Trackit solves the **"settle-up"** headache using **Stripe Polar**, our integrated payment solution that facilitates instant, secure peer-to-peer (P2P) and wallet-to-wallet transfers *directly inside the app*.
 
 ### How Instant Settlement Works:
 
@@ -345,7 +346,7 @@ This capability not only makes settlements fast but also guarantees your group b
 
 ## Group Reminders and Notifications
 
-Forget nagging your friends. Cashio handles the reminders for you.
+Forget nagging your friends. Trackit handles the reminders for you.
 
 * **Due Payment Alerts:** Automated notifications gently nudge members who have pending settlements.
 * **Real-Time Collaboration:** See exactly when a member pays a shared bill or accepts a transfer, ensuring complete transparency and peace of mind.
@@ -360,14 +361,14 @@ Forget nagging your friends. Cashio handles the reminders for you.
 
 <div class="my-4"></div>
 
-By combining granular tracking, flexible splitting, and **Stripe Polar's** instant settlement power, Cashio ensures that shared financial experiences remain cooperative and that your friendships remain happily free of IOUs.
+By combining granular tracking, flexible splitting, and **Stripe Polar's** instant settlement power, Trackit ensures that shared financial experiences remain cooperative and that your friendships remain happily free of IOUs.
 `,
     ],
   },
   {
     id: "post-security-rbac-2fa",
     category: "Security",
-    title: "Unbreakable Finance: Why We Built Cashio on RBAC and 2FA",
+    title: "Unbreakable Finance: Why We Built Trackit on RBAC and 2FA",
     author: {
       name: "Jennifer Taylor",
       avatar: "https://randomuser.me/api/portraits/women/3.jpg",
@@ -375,11 +376,11 @@ By combining granular tracking, flexible splitting, and **Stripe Polar's** insta
     publishedDate: "Aug 22, 2025",
     coverImage:
       "https://images.unsplash.com/photo-1667453466805-75bbf36e8707?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1332",
-    href: "/blog/why-cashio-uses-rbac-and-2fa",
+    href: "/blog/why-trackit-uses-rbac-and-2fa",
     content: [
-      `# Unbreakable Finance: Why We Built Cashio on RBAC and 2FA
+      `# Unbreakable Finance: Why We Built Trackit on RBAC and 2FA
 
-When it comes to your money, "good enough" security isn't good enough. In the modern financial landscape, data protection must be multi-layered, robust, and constantly enforced. At **Cashio**, we built our security foundation on enterprise-grade principles: **Role-Based Access Control (RBAC)** and **Two-Factor Authentication (2FA)**, ensuring that your personal and group financial data remains private, controlled, and, most importantly, secure.
+When it comes to your money, "good enough" security isn't good enough. In the modern financial landscape, data protection must be multi-layered, robust, and constantly enforced. At **Trackit**, we built our security foundation on enterprise-grade principles: **Role-Based Access Control (RBAC)** and **Two-Factor Authentication (2FA)**, ensuring that your personal and group financial data remains private, controlled, and, most importantly, secure.
 
 ## The Foundation: Why Standard Security Fails
 
@@ -404,7 +405,7 @@ RBAC ensures that users only have permission to do exactly what their role requi
 
 ### Defining Access by Role
 
-Instead of granting blanket permissions, **Cashio** defines roles with strict boundaries.
+Instead of granting blanket permissions, **Trackit** defines roles with strict boundaries.
 
 | Role | Core Access & Permissions | Sensitive Actions Enforced |
 | :--- | :--- | :--- |
@@ -436,14 +437,15 @@ Finally, we ensure resilience with continuous monitoring:
 <div class="my-4"></div>
 
 
-By making these advanced security measures the standard, **Cashio** doesn't just manage your moneyit actively protects it, giving you the confidence that your financial life is truly unbreakable.
+By making these advanced security measures the standard, **Trackit** doesn't just manage your moneyit actively protects it, giving you the confidence that your financial life is truly unbreakable.
 `,
     ],
   },
   {
     id: "post-t3-stack-sync",
     category: "Engineering",
-    title: "Behind the Scenes: Why the T3 Stack Powers Cashio's Real-Time Sync",
+    title:
+      "Behind the Scenes: Why the T3 Stack Powers Trackit's Real-Time Sync",
     author: {
       name: "Ryan A.",
       avatar: "https://randomuser.me/api/portraits/men/2.jpg",
@@ -453,9 +455,9 @@ By making these advanced security measures the standard, **Cashio** doesn't just
       "https://www.bluetickconsultants.com/wp-content/uploads/2025/05/t3-stack.webp",
     href: "/blog/t3-stack-and-real-time-sync",
     content: [
-      `# Behind the Scenes: Why the T3 Stack Powers Cashio's Real-Time Sync
+      `# Behind the Scenes: Why the T3 Stack Powers Trackit's Real-Time Sync
 
-In financial management, speed and reliability aren't optionalthey're essential. If you add a transaction, you expect your budget charts, group balances, and AI predictions to update *instantly*. This level of **real-time data sync** requires a modern, integrated, and highly efficient technology stack. At Cashio, we chose the **T3 Stack** (Next.js, tRPC, Prisma, Tailwind) as the foundation for this performance.
+In financial management, speed and reliability aren't optionalthey're essential. If you add a transaction, you expect your budget charts, group balances, and AI predictions to update *instantly*. This level of **real-time data sync** requires a modern, integrated, and highly efficient technology stack. At Trackit, we chose the **T3 Stack** (Next.js, tRPC, Prisma, Tailwind) as the foundation for this performance.
 
 ## The T3 Stack Advantage: End-to-End Type Safety
 
@@ -474,7 +476,7 @@ While the T3 stack provides the foundation, **Next.js** ensures the user experie
 
 ### Optimistic UI Updates
 
-When you log a new expense on Cashio, the transaction appears to be completed *immediately* on your screen, even before the database confirms the save. This is called **Optimistic UI**.
+When you log a new expense on Trackit, the transaction appears to be completed *immediately* on your screen, even before the database confirms the save. This is called **Optimistic UI**.
 
 * **The Result:** The dashboard feels instantaneous.
 * **How it works:** Next.js allows us to execute the UI update locally while the actual background process (sending data via tRPC to Prisma) is happening. If the database update succeeds, the temporary state is made permanent. If it fails, the change is gently rolled back and you're notified. This illusion of instant speed is vital for a smooth financial application.
@@ -485,7 +487,7 @@ When you log a new expense on Cashio, the transaction appears to be completed *i
 
 ## tRPC and Real-Time Infrastructure
 
-While tRPC typically handles request/response, it integrates seamlessly with dedicated real-time infrastructure (like Sockets or Ingest pipelines mentioned in Cashio’s architecture).
+While tRPC typically handles request/response, it integrates seamlessly with dedicated real-time infrastructure (like Sockets or Ingest pipelines mentioned in Trackit’s architecture).
 
 ### Key Performance Benefits
 
@@ -499,9 +501,9 @@ This lightweight communication layer is what enables the **live transaction sync
 
 ## Tailored Styling and PWA Readiness
 
-Finally, **Tailwind CSS** allows us to quickly build the responsive dashboard and modular navigation structure (**personal, group, and admin sections**) mentioned in our UI/UX features. It ensures consistency across light/dark modes and enables **PWA readiness** (Progressive Web App), meaning Cashio feels like a native app whether you're on a desktop or mobile device.
+Finally, **Tailwind CSS** allows us to quickly build the responsive dashboard and modular navigation structure (**personal, group, and admin sections**) mentioned in our UI/UX features. It ensures consistency across light/dark modes and enables **PWA readiness** (Progressive Web App), meaning Trackit feels like a native app whether you're on a desktop or mobile device.
 
-In summary, the T3 Stack isn't just a collection of popular technologies; it's a strategically chosen toolkit that provides the **type safety, performance, and developer experience** necessary to handle the sensitive, real-time nature of modern finance. It's the engine behind Cashio's commitment to giving you instant clarity and reliable control over your money.
+In summary, the T3 Stack isn't just a collection of popular technologies; it's a strategically chosen toolkit that provides the **type safety, performance, and developer experience** necessary to handle the sensitive, real-time nature of modern finance. It's the engine behind Trackit's commitment to giving you instant clarity and reliable control over your money.
 `,
     ],
   },
@@ -522,37 +524,37 @@ In summary, the T3 Stack isn't just a collection of popular technologies; it's a
 
 When managing shared finances in a group, the biggest pain point isn't tracking who owes whatit's the friction of actually paying. Leaving the app to open a separate bank or payment platform, manually typing in account details, and waiting days for settlement kills efficiency.
 
-At **Cashio**, we solved this by integrating **Stripe Polar**, a specialized payment technology from Stripe that allows for secure, instant, peer-to-peer (P2P) and wallet-to-wallet transfers directly within our application. Stripe Polar is the engine that transforms a suggestion to settle a debt into a resolved transfer in seconds.
+At **Trackit**, we solved this by integrating **Stripe Polar**, a specialized payment technology from Stripe that allows for secure, instant, peer-to-peer (P2P) and wallet-to-wallet transfers directly within our application. Stripe Polar is the engine that transforms a suggestion to settle a debt into a resolved transfer in seconds.
 
 ## Beyond Traditional P2P: What is Stripe Polar?
 
-Think of Stripe Polar as the invisible network enabling value to move instantly within the **Cashio** ecosystem. Unlike bank transfers (ACH/wire), which use slow, dated infrastructure, Polar leverages Stripe's global network and balance management capabilities to facilitate real-time movements.
+Think of Stripe Polar as the invisible network enabling value to move instantly within the **Trackit** ecosystem. Unlike bank transfers (ACH/wire), which use slow, dated infrastructure, Polar leverages Stripe's global network and balance management capabilities to facilitate real-time movements.
 
-### Key Benefits of Using Polar in Cashio:
+### Key Benefits of Using Polar in Trackit:
 
 1.  **Instantaneous Settlement:** Transfers are generally completed in real-time, meaning your group balance updates immediately. No more waiting 1-3 business days.
-2.  **Seamless User Experience:** Transfers happen *inside* the Cashio app. There's no need to ask for a friend's Venmo or bank account number.
+2.  **Seamless User Experience:** Transfers happen *inside* the Trackit app. There's no need to ask for a friend's Venmo or bank account number.
 3.  **Automatic Reconciliation:** As soon as a Polar transfer is completed, our system logs the event, automatically updating the relevant group debt and clearing the balances, making reconciliation instant.
 
 ## The Magic Behind Group Settlements
 
 Stripe Polar is most powerful when combined with our **Group & Collaboration System**. It turns our smart settlement suggestions into actionable, one-click solutions.
 
-When your group has accumulated several debts (e.g., Jane owes Mark, Mark owes Sarah, Sarah owes Jane), Cashio's algorithm finds the shortest path to zero balance. Once the optimal settlement path is determined, Polar takes over:
+When your group has accumulated several debts (e.g., Jane owes Mark, Mark owes Sarah, Sarah owes Jane), Trackit's algorithm finds the shortest path to zero balance. Once the optimal settlement path is determined, Polar takes over:
 
-* **Step 1: Suggestion:** Cashio recommends, "Jane should pay Mark \$50 to settle all balances."
-* **Step 2: Authorization:** Jane approves the transfer within the Cashio interface using her linked payment method.
-* **Step 3: Instant Transfer (Polar):** Stripe Polar instantly moves the funds into Mark's Cashio wallet or linked withdrawal account.
+* **Step 1: Suggestion:** Trackit recommends, "Jane should pay Mark \$50 to settle all balances."
+* **Step 2: Authorization:** Jane approves the transfer within the Trackit interface using her linked payment method.
+* **Step 3: Instant Transfer (Polar):** Stripe Polar instantly moves the funds into Mark's Trackit wallet or linked withdrawal account.
 * **Step 4: Real-Time Sync:** Both Jane and Mark's group balances are immediately updated to \$0 debt, and the activity stream reflects the completed transaction.
 
 ![Close-up of a mobile app screen showing a successful peer-to-peer payment notification](https://www.digipay.guru/static/042fac7f9cc82fbc8e9318e5b3e015b9/aa201/peer-to-peer-payment-main.jpg)
 
 ## Integration Beyond Settlements
 
-Stripe Polar is also fundamental to the **Payment Operations** feature within Cashio:
+Stripe Polar is also fundamental to the **Payment Operations** feature within Trackit:
 
-* **Instant Balance Top-Ups:** Users can instantly load their Cashio wallet balances using Stripe Polar's mechanisms.
-* **Instant Withdrawals:** Polar enables quick withdrawal of accumulated credit or funds from your Cashio wallet to your external bank account.
+* **Instant Balance Top-Ups:** Users can instantly load their Trackit wallet balances using Stripe Polar's mechanisms.
+* **Instant Withdrawals:** Polar enables quick withdrawal of accumulated credit or funds from your Trackit wallet to your external bank account.
 * **Subscription Management:** While Stripe Billing handles the recurring payments for our Pro and Enterprise tiers, the seamless fund flow managed by Stripe's underlying systemsincluding the mechanics behind Polarensures smooth subscription operations.
 
 <div class="my-4"></div>
@@ -561,7 +563,7 @@ Stripe Polar is also fundamental to the **Payment Operations** feature within Ca
 
 <div class="my-4"></div>
 
-By integrating Stripe Polar, Cashio moves beyond being just a tracking app. It becomes a fully functional, real-time financial ecosystem where tracking, splitting, and paying are all unified into one seamless, immediate experience, finally ending the era of the dreaded IOU.
+By integrating Stripe Polar, Trackit moves beyond being just a tracking app. It becomes a fully functional, real-time financial ecosystem where tracking, splitting, and paying are all unified into one seamless, immediate experience, finally ending the era of the dreaded IOU.
 `,
     ],
   },
@@ -582,7 +584,7 @@ By integrating Stripe Polar, Cashio moves beyond being just a tracking app. It b
     content: [
       `# Crush Your Goals: A Practical Guide to Goal-Based Budgeting
 
-Most people save money, but few actually *hit* their biggest goals. Why? Because traditional budgeting often treats all savings the same. **Goal-Based Budgeting (GBB)** flips this script, turning abstract savings into actionable targets with dedicated funding pathways. With Cashio's dedicated GBB features, you stop just tracking your money and start directing it toward a meaningful finish linewhether that’s a down payment, a dream vacation, or early retirement.
+Most people save money, but few actually *hit* their biggest goals. Why? Because traditional budgeting often treats all savings the same. **Goal-Based Budgeting (GBB)** flips this script, turning abstract savings into actionable targets with dedicated funding pathways. With Trackit's dedicated GBB features, you stop just tracking your money and start directing it toward a meaningful finish linewhether that’s a down payment, a dream vacation, or early retirement.
 
 ---
 
@@ -596,11 +598,11 @@ Standard budgeting often uses the "envelope system" but lacks accountability. GB
 2.  **Calculate the Commitment:** Automatically determine the precise **monthly contribution** required to meet the goal on time (\$10,000 / 10 months = \$1,000/month).
 3.  **Enforce Limits:** Set hard **spending limits** on other categories to ensure the required monthly commitment is met without fail.
 
-> Cashio makes this simple: define your goal, and the system automatically creates the monthly savings rule and tracks the required spending discipline to make it happen.
+> Trackit makes this simple: define your goal, and the system automatically creates the monthly savings rule and tracks the required spending discipline to make it happen.
 
-## Cashio’s Goal Tracking and Progress Indicators
+## Trackit’s Goal Tracking and Progress Indicators
 
-The core challenge in GBB is staying motivated and knowing, at a glance, if you are truly on track. Cashio provides real-time visibility to keep you accountable and engaged.
+The core challenge in GBB is staying motivated and knowing, at a glance, if you are truly on track. Trackit provides real-time visibility to keep you accountable and engaged.
 
 * **Visual Indicators:** Every goal is represented by a progress bar showing the percentage completed and the remaining time. **Green** means you're ahead of pace; **Yellow** means you're on target; **Red** means you need to adjust your commitment or spending this month.
 * **Predictive Modeling Integration:** Our **AI** analyzes your actual saving pace against the required pace. It can alert you weeks ahead of time if your current saving habits will lead to a **savings gap**, allowing you to course-correct immediately.
@@ -609,9 +611,9 @@ The core challenge in GBB is staying motivated and knowing, at a glance, if you 
 
 ## The Savings Funnel: Directing Cash Flow
 
-Achieving a goal means prioritizing it over immediate spending. Cashio helps you establish a savings "funnel" that ensures goal commitments are the *first* priority, not an afterthought.
+Achieving a goal means prioritizing it over immediate spending. Trackit helps you establish a savings "funnel" that ensures goal commitments are the *first* priority, not an afterthought.
 
-### Actionable Steps within Cashio:
+### Actionable Steps within Trackit:
 
 <div class="my-4"></div>
 
@@ -623,7 +625,7 @@ Achieving a goal means prioritizing it over immediate spending. Cashio helps you
 
 <div class="my-4"></div>
 
-By integrating your goals directly into your day-to-day spending limits and leveraging AI to keep you ahead of the curve, Cashio transforms wishing into achieving. Stop generalizing your savings; start crushing your goals with purpose-driven budgeting.
+By integrating your goals directly into your day-to-day spending limits and leveraging AI to keep you ahead of the curve, Trackit transforms wishing into achieving. Stop generalizing your savings; start crushing your goals with purpose-driven budgeting.
 `,
     ],
   },
@@ -642,13 +644,13 @@ By integrating your goals directly into your day-to-day spending limits and leve
     content: [
       `# Global Finance Made Easy: Managing Multi-Currency Accounts
 
-In today's global economy, managing money across borders is the norm, not the exception. Whether you're a digital nomad, a cross-border investor, or simply shopping online in a foreign currency, keeping track of your true net worth becomes complicated. **Cashio** is built to handle this complexity with its native **multi-currency** support and **real-time exchange rate conversion**, offering you a single, unified view of your entire financial world.
+In today's global economy, managing money across borders is the norm, not the exception. Whether you're a digital nomad, a cross-border investor, or simply shopping online in a foreign currency, keeping track of your true net worth becomes complicated. **Trackit** is built to handle this complexity with its native **multi-currency** support and **real-time exchange rate conversion**, offering you a single, unified view of your entire financial world.
 
 ---
 
 ## The Multi-Currency Headache: Solved
 
-If you manage a USD savings account, a EUR travel wallet, and a GBP investment portfolio, manually converting all those balances to your home currency is tedious and error-prone. Cashio eliminates this manual workload entirely.
+If you manage a USD savings account, a EUR travel wallet, and a GBP investment portfolio, manually converting all those balances to your home currency is tedious and error-prone. Trackit eliminates this manual workload entirely.
 
 ### Core Multi-Currency Features:
 
@@ -662,7 +664,7 @@ If you manage a USD savings account, a EUR travel wallet, and a GBP investment p
 
 <div class="my-4"></div>
 
-| Currency Type | Account Application | Cashio Feature |
+| Currency Type | Account Application | Trackit Feature |
 | :--- | :--- | :--- |
 | **Primary** (USD) | Home bank, salary | Reporting Currency |
 | **Secondary** (EUR) | Travel, Freelance income | Real-Time Conversion |
@@ -672,7 +674,7 @@ If you manage a USD savings account, a EUR travel wallet, and a GBP investment p
 
 The fluctuation of exchange rates is the biggest challenge in multi-currency tracking. A conversion done on Monday will be inaccurate by Friday.
 
-**Cashio** integrates with reliable financial data sources to fetch and apply exchange rates as transactions occur and as reports are generated.
+**Trackit** integrates with reliable financial data sources to fetch and apply exchange rates as transactions occur and as reports are generated.
 
 * **Transaction Logging:** When you log an expense of *100 CAD*, the system records the transaction amount *and* the precise exchange rate at the time of entry. This historical rate is locked for accuracy in auditing.
 * **Net Worth Calculation:** However, when viewing your **Net Worth Dashboard**, all foreign currency balances are converted using the *latest* available rate to give you the most accurate snapshot of your total wealth today.
@@ -701,7 +703,7 @@ When you input a transaction:
 <div class="my-4"></div>
 
 
-By consolidating your diverse financial life into one accurate, real-time dashboard, Cashio truly makes global finance easy, giving you absolute clarity no matter where your money resides.
+By consolidating your diverse financial life into one accurate, real-time dashboard, Trackit truly makes global finance easy, giving you absolute clarity no matter where your money resides.
 `,
     ],
   },
@@ -720,13 +722,13 @@ By consolidating your diverse financial life into one accurate, real-time dashbo
     content: [
       `# Set It and Forget It: Automating Recurring Transactions
 
-The core of a stable budget is predictability. While unexpected expenses happen, the vast majority of your monthly spendingrent, subscriptions, loan payments, and salaryare highly predictable. **Cashio's Recurring Transactions** feature lets you "set it and forget it," automating the logging of these predictable money movements. This eliminates manual entry for your most frequent transactions and guarantees your budget and cash flow forecasts are always accurate.
+The core of a stable budget is predictability. While unexpected expenses happen, the vast majority of your monthly spendingrent, subscriptions, loan payments, and salaryare highly predictable. **Trackit's Recurring Transactions** feature lets you "set it and forget it," automating the logging of these predictable money movements. This eliminates manual entry for your most frequent transactions and guarantees your budget and cash flow forecasts are always accurate.
 
 ---
 
 ## Why Automation is Essential for Financial Clarity
 
-Relying on bank imports for recurring items often results in slow updates or transactions being incorrectly categorized every single month. By creating a template for a recurring transaction in Cashio, you gain immediate control and consistency.
+Relying on bank imports for recurring items often results in slow updates or transactions being incorrectly categorized every single month. By creating a template for a recurring transaction in Trackit, you gain immediate control and consistency.
 
 ### Key Benefits of Automation:
 
@@ -738,7 +740,7 @@ Relying on bank imports for recurring items often results in slow updates or tra
 
 ## Setting Up Your Recurring Schedule
 
-Cashio offers powerful, flexible scheduling options that go beyond simple "monthly" settings, accommodating the actual complexity of modern billing cycles.
+Trackit offers powerful, flexible scheduling options that go beyond simple "monthly" settings, accommodating the actual complexity of modern billing cycles.
 
 ### Custom Scheduling Options:
 
@@ -757,7 +759,7 @@ The feature truly shines when it comes to reconciling your automated entries wit
 
 <div class="my-4"></div>
 
-If the bank import happens to *not* match the automated entry (e.g., your rent was delayed by a day), Cashio flags the discrepancy for your review, allowing you to catch errors or missing payments instantly.
+If the bank import happens to *not* match the automated entry (e.g., your rent was delayed by a day), Trackit flags the discrepancy for your review, allowing you to catch errors or missing payments instantly.
 
 ## Handling Complex Scenarios
 
@@ -788,26 +790,26 @@ By setting these templates, even variable bills are pre-categorized, requiring o
       avatar: "https://randomuser.me/api/portraits/women/2.jpg",
     },
     publishedDate: "Apr 20, 2025",
-    coverImage: "/blog.png",
+    coverImage: "/images/blog-post-1.png",
     href: "/blog/automatic-reconciliation-stripe-webhooks",
     content: [
       `# Integrating the Backend: Automatic Reconciliation with Stripe Webhooks
 
-In a financial application like **Cashio**, data accuracy is paramount. When a user pays for a Pro subscription or initiates an in-app settlement via **Stripe Polar**, that payment event needs to be instantly reflected in their subscription status, payment history, and group balances. Manual verification is impossible at scale. This is where **Stripe Webhooks** become the unsung hero, powering our system’s **automatic reconciliation** and ensuring your financial data is always trustworthy.
+In a financial application like **Trackit**, data accuracy is paramount. When a user pays for a Pro subscription or initiates an in-app settlement via **Stripe Polar**, that payment event needs to be instantly reflected in their subscription status, payment history, and group balances. Manual verification is impossible at scale. This is where **Stripe Webhooks** become the unsung hero, powering our system’s **automatic reconciliation** and ensuring your financial data is always trustworthy.
 
 ---
 
 ## What is a Webhook, and Why is it Essential?
 
-A webhook is a mechanism that allows one application (Stripe) to send a real-time HTTP notification to another application (**Cashio's** backend) when a specific event occurs. Think of it as an automated, personalized text message from Stripe saying, "Hey, that payment just succeeded!"
+A webhook is a mechanism that allows one application (Stripe) to send a real-time HTTP notification to another application (**Trackit's** backend) when a specific event occurs. Think of it as an automated, personalized text message from Stripe saying, "Hey, that payment just succeeded!"
 
 ### Why Webhooks Beat Polling:
 
 <div class="my-4"></div>
 
-| Method | How it Works | Advantage for Cashio |
+| Method | How it Works | Advantage for Trackit |
 | :--- | :--- | :--- |
-| **Polling** (Bad) | Cashio repeatedly asks Stripe, "Is the payment done yet? No? How about now?" | Wasteful, slow, and delays reconciliation. |
+| **Polling** (Bad) | Trackit repeatedly asks Stripe, "Is the payment done yet? No? How about now?" | Wasteful, slow, and delays reconciliation. |
 | **Webhooks** (Good) | Stripe instantly sends a specific notification when the event is *complete*. | **Real-time**, reliable, and instantly triggers our reconciliation job. |
 
 <div class="my-4"></div>
@@ -840,7 +842,7 @@ Relying on webhooks requires a robust and secure implementation to prevent data 
 * **Audit Logs:** Every successful reconciliation and every error is logged in our **Audit Logs**. This provides an immutable record for compliance checks, ensuring we can track the history of every subscription and transfer status change.
 * **Error Monitoring:** If a webhook fails to process, the system automatically alerts our development team and queues the event for retries, preventing any data from being dropped.
 
-By tightly integrating Stripe Webhooks, Cashio ensures that the complex reality of payment operations is handled reliably behind the scenes, leaving you with a clean, trustworthy, and instantly up-to-date financial dashboard.
+By tightly integrating Stripe Webhooks, Trackit ensures that the complex reality of payment operations is handled reliably behind the scenes, leaving you with a clean, trustworthy, and instantly up-to-date financial dashboard.
 `,
     ],
   },
@@ -853,12 +855,12 @@ By tightly integrating Stripe Webhooks, Cashio ensures that the complex reality 
       avatar: "https://randomuser.me/api/portraits/men/2.jpg",
     },
     publishedDate: "Apr 05, 2025",
-    coverImage: "/blog1.png",
+    coverImage: "/images/blog-post-2.png",
     href: "/blog/ai-categorization-anomaly-detection",
     content: [
       `# The AI Difference: Smart Categorization and Anomaly Detection
 
-In financial management, clean, reliable data is everything. If your transactions are wrongly categorized, your budget reports and AI predictions will be flawed. The "AI Difference" at **Cashio** lies in two powerful, interconnected features: **Smart Categorization** and **Anomaly Detection**. These systems work silently in the background, cleaning your data and flagging risks, moving your budget from merely historical to truly insightful.
+In financial management, clean, reliable data is everything. If your transactions are wrongly categorized, your budget reports and AI predictions will be flawed. The "AI Difference" at **Trackit** lies in two powerful, interconnected features: **Smart Categorization** and **Anomaly Detection**. These systems work silently in the background, cleaning your data and flagging risks, moving your budget from merely historical to truly insightful.
 
 ---
 
@@ -876,7 +878,7 @@ Manually sorting hundreds of transactions a month is exhausting. Our AI-powered 
 
 Once your data is clean, the AI's role shifts to security and compliance through **Anomaly Detection**. This system is constantly monitoring your spending patterns to identify deviations that could indicate anything from a simple budgeting error to fraudulent activity.
 
-### When Cashio Alerts You:
+### When Trackit Alerts You:
 
 * **The Big Spike:** Alerts if a category expense (e.g., "Transportation") suddenly jumps 200% above its 6-month average.
 * **Out-of-Pattern Merchant:** Flags a transaction from a vendor you've never used before, especially if the amount is high or the location is unusual.
@@ -907,7 +909,7 @@ The AI empowers you to ask complex questions and receive specific, actionable an
 
 <div class="my-4"></div>
 
-By using intelligent systems to perfect your data and guard your spending, Cashio turns a simple budgeting app into a personal financial advisor and security specialist.
+By using intelligent systems to perfect your data and guard your spending, Trackit turns a simple budgeting app into a personal financial advisor and security specialist.
 `,
     ],
   },
@@ -921,12 +923,12 @@ By using intelligent systems to perfect your data and guard your spending, Cashi
       avatar: "https://randomuser.me/api/portraits/women/2.jpg",
     },
     publishedDate: "Mar 15, 2025",
-    coverImage: "/blog3.png",
+    coverImage: "/images/blog-post-3.png",
     href: "/blog/the-role-of-audit-logs-in-financial-security",
     content: [
       `# Trust and Transparency: The Role of Audit Logs in Financial Security
 
-Security is often viewed through the lens of protectionencryption, 2FA, and firewalls. But true financial trust also requires **accountability**. When an important change happens in a secure system like **Cashio**a transaction is edited, a role is changed, or a subscription status is updatedyou need an indisputable record of who made the change, when, and from where. This is the critical, often invisible, role of the **Audit Log**.
+Security is often viewed through the lens of protectionencryption, 2FA, and firewalls. But true financial trust also requires **accountability**. When an important change happens in a secure system like **Trackit**a transaction is edited, a role is changed, or a subscription status is updatedyou need an indisputable record of who made the change, when, and from where. This is the critical, often invisible, role of the **Audit Log**.
 
 ---
 
@@ -940,9 +942,9 @@ An Audit Log is an immutable, time-stamped record of all significant security-re
 2.  **Compliance:** For any financial technology, audit trails are mandatory for meeting various data security and financial compliance standards.
 3.  **Forensics:** If a security incident or error occurs, the Audit Log is the primary tool used to reconstruct the sequence of events and identify the source of the problem.
 
-## What Cashio's Audit Log Tracks
+## What Trackit's Audit Log Tracks
 
-At Cashio, we prioritize logging all sensitive actions across your personal, group, and administrative dashboards.
+At Trackit, we prioritize logging all sensitive actions across your personal, group, and administrative dashboards.
 
 ### Key Events Logged:
 
@@ -987,7 +989,7 @@ const auditRecord = {
 logToAuditDB(auditRecord);
 \`\`\`
 
-By enforcing **Role-Based Access Control (RBAC)** to limit who can perform actions and using **2FA** to verify the identity of the actor, the Audit Log records actions taken by verified, authorized individuals. This chain of custody, from authentication to action, is what makes Cashio's security architecture truly robust and transparent.
+By enforcing **Role-Based Access Control (RBAC)** to limit who can perform actions and using **2FA** to verify the identity of the actor, the Audit Log records actions taken by verified, authorized individuals. This chain of custody, from authentication to action, is what makes Trackit's security architecture truly robust and transparent.
 `,
     ],
   },
@@ -1001,7 +1003,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/women/33.jpg",
     },
     content:
-      "This AI budgeting concept sounds fascinating  I’ve been waiting for something that predicts spending patterns like this 💡.",
+      "This AI budgeting concept sounds fascinating -- I’ve been waiting for something that predicts spending patterns like this.",
     timestamp: "3 hours ago",
     likes: 9,
     postId: "post-ai-finance-insights",
@@ -1025,7 +1027,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/women/35.jpg",
     },
     content:
-      "Group expense features are underrated  this could save a lot of awkward 'who owes who' moments 😅.",
+      "Group expense features are underrated -- this could save a lot of awkward 'who owes who' moments.",
     timestamp: "2 days ago",
     likes: 11,
     postId: "post-group-expenses",
@@ -1037,7 +1039,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/men/36.jpg",
     },
     content:
-      "Security-first design is so important in fintech. Glad to see RBAC and 2FA implemented 🔒.",
+      "Security-first design is so important in fintech. Glad to see RBAC and 2FA implemented.",
     timestamp: "4 hours ago",
     likes: 7,
     postId: "post-security-rbac-2fa",
@@ -1121,7 +1123,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/women/43.jpg",
     },
     content:
-      "Smart categorization saves me hours of cleanup. The anomaly detection sounds 🔥.",
+      "Smart categorization saves me hours of cleanup. The anomaly detection sounds impressive.",
     timestamp: "8 hours ago",
     likes: 13,
     postId: "post-ai-categorization",
@@ -1157,7 +1159,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/men/46.jpg",
     },
     content:
-      "OCR has been hit or miss in my experience. Hoping this Gemini model improves accuracy 👀.",
+      "OCR has been hit or miss in my experience. Hoping this Gemini model improves accuracy.",
     timestamp: "6 hours ago",
     likes: 3,
     postId: "post-gemini-ocr-expenses",
@@ -1181,7 +1183,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/men/48.jpg",
     },
     content:
-      "Love seeing security prioritized upfront. Finance apps need to take notes 🔐.",
+      "Love seeing security prioritized upfront. Finance apps need to take notes.",
     timestamp: "1 day ago",
     likes: 10,
     postId: "post-security-rbac-2fa",
@@ -1217,7 +1219,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/women/51.jpg",
     },
     content:
-      "Goal-based budgeting really helps visualize long-term plans. I’m using it for debt-free goals 💪.",
+      "Goal-based budgeting really helps visualize long-term plans. I’m using it for debt-free goals.",
     timestamp: "4 hours ago",
     likes: 12,
     postId: "post-goal-based-budgeting",
@@ -1265,7 +1267,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/women/55.jpg",
     },
     content:
-      "Smart categorization saved me from hours of manual cleanup. AI finally doing something useful 😄.",
+      "Smart categorization saved me from hours of manual cleanup. AI finally doing something useful.",
     timestamp: "2 days ago",
     likes: 11,
     postId: "post-ai-categorization",
@@ -1289,7 +1291,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/women/57.jpg",
     },
     content:
-      "AI-driven financial projections could really help with long-term investment planning. Curious how accurate it gets over time 🤔.",
+      "AI-driven financial projections could really help with long-term investment planning. Curious how accurate it gets over time.",
     timestamp: "5 hours ago",
     likes: 8,
     postId: "post-ai-finance-insights",
@@ -1325,7 +1327,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/men/59.jpg",
     },
     content:
-      "RBAC + 2FA combo makes total sense for fintech. Would love a post about how roles are managed internally 🔒.",
+      "RBAC + 2FA combo makes total sense for fintech. Would love a post about how roles are managed internally.",
     timestamp: "7 hours ago",
     likes: 7,
     postId: "post-security-rbac-2fa",
@@ -1349,7 +1351,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/men/60.jpg",
     },
     content:
-      "Stripe Polar’s speed still blows my mind. Real-time transfers feel almost instant ⚡.",
+      "Stripe Polar’s speed still blows my mind. Real-time transfers feel almost instant.",
     timestamp: "1 day ago",
     likes: 11,
     postId: "post-stripe-polar",
@@ -1361,7 +1363,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/women/61.jpg",
     },
     content:
-      "Goal-based budgeting feels like gamified savings  love the progress tracking element 🎯.",
+      "Goal-based budgeting feels like gamified savings -- love the progress tracking element.",
     timestamp: "4 hours ago",
     likes: 14,
     postId: "post-goal-based-budgeting",
@@ -1409,7 +1411,7 @@ const comments: BlogComment[] = [
       avatar: "https://randomuser.me/api/portraits/women/64.jpg",
     },
     content:
-      "Love that your AI detects anomalies automatically. It’s like a safety net for budgets 🧠.",
+      "Love that your AI detects anomalies automatically. It’s like a safety net for budgets.",
     timestamp: "1 day ago",
     likes: 12,
     postId: "post-ai-categorization",

@@ -1,56 +1,113 @@
-
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
+  engineType = "binary"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-model Post {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([name])
 }
 
 model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean
-  image         String?
-  role          String
-  createdAt     DateTime
-  updatedAt     DateTime
-  sessions      Session[]
-  accounts      Account[]
+  id                String                   @id
+  name              String
+  email             String                   @unique
+  emailVerified     Boolean
+  hasCompletedOnboarding Boolean @default(false)
+  image             String?
+  createdAt         DateTime
+  updatedAt         DateTime
+  banExpires        DateTime?
+  banReason         String?
+  banned            Boolean?                 @default(false)
+  gender            Gender?
+  country           Country?
+  timezone          Timezone?
+  role              String                   @default("user")
+  accounts          Account[]
+  bankAccounts      BankAccount[]
+  budgets           Budget[]
+  categories        Category[]
+  displaySettings   DisplaySettings?
+  notifications     Notification[]
+  notificationPrefs NotificationPreferences?
+  recurringRules    RecurringRule[]
+  reports           Report[]
+  sessions          Session[]
+  transactions      Transaction[]
+  userPreferences   UserPreferences?
 
-  banned     Boolean?  @default(false)
-  banReason  String?
-  banExpires DateTime?
-
-  @@unique([email])
   @@map("user")
 }
 
+model UserPreferences {
+  id              String     @id @default(cuid())
+  userId          String     @unique
+  defaultCurrency Currency   @default(USD)
+  language        Language   @default(EN)
+  dateFormat      DateFormat @default(MM_DD_YYYY)
+  timeFormat      TimeFormat @default(H12)
+  weekStartsOn    WeekDay    @default(SUNDAY)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
+
+model DisplaySettings {
+  id                String            @id @default(cuid())
+  userId            String            @unique
+  defaultView       DefaultView       @default(OVERVIEW)
+  decimalPlaces     Int               @default(2)
+  currencyPosition  CurrencyPosition  @default(BEFORE)
+  thousandSeparator ThousandSeparator @default(COMMA)
+  colorScheme       ColorScheme       @default(SYSTEM)
+  compactNumbers    Boolean           @default(false)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("display_settings")
+}
+
+model NotificationPreferences {
+  id                        String   @id @default(cuid())
+  userId                    String   @unique
+  emailTransactions         Boolean  @default(true)
+  emailBalanceAlerts        Boolean  @default(true)
+  emailSecurity             Boolean  @default(true)
+  emailMarketing            Boolean  @default(false)
+  emailAiInsights           Boolean  @default(true)
+  emailWeeklyDigest         Boolean  @default(true)
+  emailMonthlySummary       Boolean  @default(true)
+  emailLowBalanceAlerts     Boolean  @default(true)
+  emailLargeTransactions    Boolean  @default(true)
+  pushTransactions          Boolean  @default(true)
+  pushBalanceAlerts         Boolean  @default(true)
+  smsLargeTransactions      Boolean  @default(true)
+  smsSecurity               Boolean  @default(true)
+  lowBalanceThreshold       Decimal? @db.Decimal(10, 2)
+  largeTransactionThreshold Decimal? @db.Decimal(10, 2)
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+  user                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
+}
+
 model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String
-  createdAt DateTime
-  updatedAt DateTime
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  id             String   @id
+  expiresAt      DateTime
+  token          String   @unique
+  createdAt      DateTime
+  updatedAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  userId         String
   impersonatedBy String?
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([token])
+  @@index([userId])
   @@map("session")
 }
 
@@ -59,7 +116,6 @@ model Account {
   accountId             String
   providerId            String
   userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
   idToken               String?
@@ -69,7 +125,9 @@ model Account {
   password              String?
   createdAt             DateTime
   updatedAt             DateTime
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("account")
 }
 
@@ -82,4 +140,349 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model BankAccount {
+  id             String          @id @default(cuid())
+  userId         String
+  name           String
+  type           AccountType
+  currency       Currency        @default(USD)
+  balance        Decimal         @default(0) @db.Decimal(18, 2)
+  color          String?
+  icon           String?
+  isDefault      Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recurringRules RecurringRule[]
+  transactions   Transaction[]
+
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Category {
+  id               String          @id @default(cuid())
+  userId           String
+  parentCategoryId String?
+  name             String
+  color            String?
+  icon             String?
+  type             CategoryType
+  sortOrder        Int?            @default(0)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  budgets          Budget[]
+  parent           Category?       @relation("CategoryToParent", fields: [parentCategoryId], references: [id])
+  children         Category[]      @relation("CategoryToParent")
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recurringRules   RecurringRule[]
+  transactions     Transaction[]
+
+  @@index([userId])
+  @@index([parentCategoryId])
+  @@map("categories")
+}
+
+model Budget {
+  id                       String       @id @default(cuid())
+  userId                   String
+  categoryId               String
+  amount                   Decimal      @db.Decimal(18, 2)
+  period                   BudgetPeriod
+  startDate                DateTime
+  endDate                  DateTime?
+  spentAmount              Decimal      @default(0) @db.Decimal(18, 2)
+  threshold_70_alert_sent  Boolean      @default(false)
+  threshold_90_alert_sent  Boolean      @default(false)
+  threshold_100_alert_sent Boolean      @default(false)
+  last_alert_period        String?      // e.g. "2026-01" to prevent double-firing in same period
+  createdAt                DateTime     @default(now())
+  updatedAt                DateTime     @updatedAt
+  category                 Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  user                     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, categoryId, period])
+  @@index([userId])
+  @@index([categoryId])
+  @@map("budgets")
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  type        NotificationType
+  title       String
+  message     String
+  metadata    Json?    // e.g. { budgetId: "...", transactionId: "..." }
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  BUDGET_ALERT
+  TRANSACTION_RECURRING
+  SYSTEM_ALERT
+}
+
+model Report {
+  id          String       @id @default(cuid())
+  userId      String
+  type        ReportType
+  period      String       // "2026-01", "2026-W03", etc.
+  generatedAt DateTime     @default(now())
+  sentAt      DateTime?
+  status      ReportStatus @default(PENDING)
+  data        Json         // Report payload (spending breakdown, charts data, etc.)
+  emailSentTo String?
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([type])
+  @@index([period])
+  @@map("reports")
+}
+
+enum ReportType {
+  MONTHLY_SUMMARY
+  WEEKLY_DIGEST
+  BUDGET_EXCEEDED
+  SPENDING_INSIGHTS
+}
+
+enum ReportStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+
+model Transaction {
+  id                     String          @id @default(cuid())
+  userId                 String
+  accountId              String
+  categoryId             String?
+  contactId              String?
+  groupId                String?
+  amount                 Decimal         @db.Decimal(18, 2)
+  type                   TransactionType
+  description            String?
+  notes                  String?
+  date                   DateTime
+  isRecurring            Boolean         @default(false)
+  recurringRuleId        String?         @map("recurring_rule_id")
+  receipt_url            String?
+  receipt_extracted_text String?
+  ai_category_suggestion String?
+  ai_notes               String?
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
+  paymentMethod          PaymentMethod?
+  account                BankAccount     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category               Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  recurringRule          RecurringRule?  @relation(fields: [recurringRuleId], references: [id])
+  user                   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([accountId])
+  @@index([categoryId])
+  @@index([date])
+  @@index([userId, date])
+  @@map("transactions")
+}
+
+model RecurringRule {
+  id                String             @id @default(cuid())
+  userId            String
+  accountId         String
+  categoryId        String?
+  amount            Decimal            @db.Decimal(18, 2)
+  type              TransactionType
+  description       String?
+  notes             String?
+  startDate         DateTime
+  endDate           DateTime?
+  timezone          String             @default("UTC")
+  frequency         RecurringFrequency
+  interval          Int                @default(1)
+  dayOfMonth        Int?
+  dayOfWeek         Int?
+  nextRunAt         DateTime
+  lastRunAt         DateTime?
+  status            RecurringStatus    @default(ACTIVE)
+  lastTransactionId String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  account           BankAccount        @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category          Category?          @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions      Transaction[]
+
+  @@index([userId])
+  @@index([status, nextRunAt])
+  @@map("recurring_rules")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum CurrencyPosition {
+  BEFORE
+  AFTER
+}
+
+enum ThousandSeparator {
+  COMMA
+  SPACE
+  NONE
+}
+
+enum ColorScheme {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+enum DefaultView {
+  OVERVIEW
+  TRANSACTIONS
+  NETWORTH
+  PORTFOLIO
+}
+
+enum TimeFormat {
+  H12
+  H24
+}
+
+enum Currency {
+  USD
+  EUR
+  GBP
+  JPY
+  AUD
+  CAD
+  CHF
+  CNY
+  INR
+  SGD
+  PKR
+}
+
+enum Language {
+  EN
+  ES
+  FR
+  DE
+  IT
+  PT
+  JA
+  ZH
+  KO
+  AR
+}
+
+enum WeekDay {
+  SUNDAY
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+}
+
+enum Timezone {
+  UTC
+  EST
+  CST
+  MST
+  PST
+  GMT
+  CET
+  JST
+  AEST
+  IST
+}
+
+enum Country {
+  US
+  GB
+  CA
+  AU
+  DE
+  FR
+  JP
+  SG
+  IN
+  AE
+  PK
+}
+
+enum DateFormat {
+  MM_DD_YYYY
+  DD_MM_YYYY
+  YYYY_MM_DD
+}
+
+enum AccountType {
+  BANK
+  CASH
+  CREDIT
+  INVESTMENT
+  LOAN
+  OTHER
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
+  TRANSFER
+}
+
+enum BudgetPeriod {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+  CUSTOM
+}
+
+enum TransactionType {
+  DEBIT
+  CREDIT
+  TRANSFER
+}
+
+enum RecurringFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum RecurringStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+  ENDED
+}
+
+enum PaymentMethod {
+  CARD
+  CASH
+  BANK_TRANSFER
+  AUTO_DEBIT
+  UPI
+  OTHER
 }

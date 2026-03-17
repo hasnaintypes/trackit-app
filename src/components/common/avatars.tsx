@@ -7,7 +7,7 @@ const people = [
     id: 1,
     name: "John Doe",
     designation: "Software Engineer",
-    image: "https://images.pexels.com/photos/842811/pexels-photo-842811.jpeg",
+    image: "/images/avatars/avatar-1.jpeg",
   },
   {
     id: 2,

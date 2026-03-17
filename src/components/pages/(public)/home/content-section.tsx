@@ -39,16 +39,16 @@ export default function ContentSection() {
           <div className="mt-12 h-fit md:absolute md:inset-x-0 md:-inset-y-12 md:mt-0 md:mask-l-from-35% md:mask-l-to-55%">
             <div className="border-border/50 relative rounded-2xl border border-dotted p-2">
               <Image
-                src="/charts.webp"
-                className="hidden rounded-[12px] dark:block"
-                alt="payments illustration dark"
+                src="/images/screenshots/dashboard-charts-light.webp"
+                className="block rounded-[12px] shadow dark:hidden"
+                alt="payments illustration light"
                 width={1207}
                 height={929}
               />
               <Image
-                src="/charts-light.webp"
-                className="rounded-[12px] shadow dark:hidden"
-                alt="payments illustration light"
+                src="/images/screenshots/dashboard-charts-dark.webp"
+                className="hidden rounded-[12px] dark:block"
+                alt="payments illustration dark"
                 width={1207}
                 height={929}
               />
