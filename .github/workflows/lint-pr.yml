@@ -12,6 +12,10 @@ jobs:
         env:
           BRANCH_NAME: ${{ github.head_ref }}
         run: |
+          if [[ "$BRANCH_NAME" == "main" || "$BRANCH_NAME" == "develop" ]]; then
+            echo "Branch '$BRANCH_NAME' is allowed"
+            exit 0
+          fi
           if [[ ! "$BRANCH_NAME" =~ ^(feat|fix|chore|docs|refactor|test|hotfix|release)/[a-z0-9._-]+$ ]]; then
             echo "Invalid branch name: $BRANCH_NAME"
             echo "Follow pattern: <type>/<short-description>"
