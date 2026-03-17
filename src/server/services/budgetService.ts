@@ -34,7 +34,7 @@ export class BudgetService {
       },
     });
 
-    if (!category || category.userId !== userId) return;
+    if (category?.userId !== userId) return;
 
     // 2. Identify relevant budgets (on this category OR its parent)
     const budgetIds = await db.budget.findMany({

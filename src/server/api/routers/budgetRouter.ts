@@ -40,7 +40,7 @@ export const budgetRouter = createTRPCRouter({
         where: { id: input.categoryId },
         select: { userId: true },
       });
-      if (!category || category.userId !== ctx.user.id) {
+      if (category?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Category not found",
@@ -115,7 +115,7 @@ export const budgetRouter = createTRPCRouter({
         where: { id: input.id },
         select: { userId: true },
       });
-      if (!budget || budget.userId !== ctx.user.id) {
+      if (budget?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Budget not found",

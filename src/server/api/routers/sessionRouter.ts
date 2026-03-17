@@ -40,7 +40,7 @@ export const sessionRouter = createTRPCRouter({
         where: { id: input.id },
         select: { userId: true },
       });
-      if (!existing || existing.userId !== userId) {
+      if (existing?.userId !== userId) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Session not found or not owned by user",
