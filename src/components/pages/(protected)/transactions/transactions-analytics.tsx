@@ -18,6 +18,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
+import { useFormatter } from "@/hooks/use-formatter";
 
 interface TransactionsAnalyticsProps {
   chartData: { date: string; income: number; expense: number }[];
@@ -28,6 +29,8 @@ export function TransactionsAnalytics({
   chartData,
   chartConfig,
 }: TransactionsAnalyticsProps) {
+  const { formatAmount } = useFormatter();
+
   // 1. Calculate totals and trends
   const analytics = useMemo(() => {
     const totalIncome = chartData.reduce((acc, curr) => acc + curr.income, 0);
@@ -102,9 +105,7 @@ export function TransactionsAnalytics({
               <Wallet className="h-4 w-4" />
               <span>Net Balance</span>
             </div>
-            <div className="text-2xl font-bold">
-              ${netBalance.toLocaleString()}
-            </div>
+            <div className="text-2xl font-bold">{formatAmount(netBalance)}</div>
             <p className="text-muted-foreground text-xs">
               Total cash flow for this period
             </p>
@@ -117,7 +118,7 @@ export function TransactionsAnalytics({
               <span>Total Income</span>
             </div>
             <div className="text-2xl font-bold">
-              ${totals.income.toLocaleString()}
+              {formatAmount(totals.income)}
             </div>
             <div className="flex items-center text-xs text-emerald-600/80">
               {incomeTrend >= 0 ? (
@@ -142,7 +143,7 @@ export function TransactionsAnalytics({
               <span>Total Expenses</span>
             </div>
             <div className="text-2xl font-bold">
-              ${totals.expense.toLocaleString()}
+              {formatAmount(totals.expense)}
             </div>
             <div className="flex items-center text-xs text-rose-600/80">
               {expenseTrend >= 0 ? (

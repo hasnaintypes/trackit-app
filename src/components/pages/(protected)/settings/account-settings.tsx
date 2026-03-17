@@ -37,12 +37,20 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { DeleteDialog } from "@/components/common/delete-dialog";
+import { useFormatter } from "@/hooks/use-formatter";
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  wallet: Wallet,
+  "credit-card": CreditCard,
+  "piggy-bank": PiggyBank,
+};
 
 export default function AccountSettings() {
   const [open, setOpen] = useState(false);
   const [showAllAccounts, setShowAllAccounts] = useState(false);
   const { accounts, deleteAccount, updateAccount } = useAccounts();
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const { formatAmount } = useFormatter();
 
   // Logic to toggle default account — calls hook which performs optimistic update
   const handleToggleDefault = async (id: string) => {
@@ -84,13 +92,6 @@ export default function AccountSettings() {
     ? accounts
     : (accounts ?? []).slice(0, 2);
   const defaultAccount = (accounts ?? []).find((a) => a.isDefault);
-
-  const ICON_MAP: Record<string, LucideIcon> = {
-    wallet: Wallet,
-    "credit-card": CreditCard,
-    "piggy-bank": PiggyBank,
-    // add more mappings as needed
-  };
 
   return (
     <div className="flex-1 space-y-6">
@@ -182,10 +183,10 @@ export default function AccountSettings() {
                         </div>
                         <p className="text-muted-foreground text-sm capitalize">
                           {account.type.toLowerCase()} • Balance:{" "}
-                          {Number(account.balance).toLocaleString(undefined, {
-                            style: "currency",
-                            currency: account.currency ?? "USD",
-                          })}
+                          {formatAmount(
+                            Number(account.balance),
+                            account.currency ?? undefined,
+                          )}
                         </p>
                       </div>
                     </div>

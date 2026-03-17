@@ -37,35 +37,35 @@ export default function AccountsPageClient() {
   const { accounts, isLoading } = useAccounts();
   const { formatAmount } = useFormatter();
 
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [editingAccount, setEditingAccount] = useState<
-    Account | ApiAccount | null
-  >(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [modalState, setModalState] = useState<{
+    isCreateOpen: boolean;
+    editingAccount: Account | ApiAccount | null;
+    deletingId: string | null;
+  }>({ isCreateOpen: false, editingAccount: null, deletingId: null });
 
   const handleEdit = useCallback(
     (e: React.MouseEvent, account: Account | ApiAccount) => {
       e.stopPropagation();
-      setEditingAccount(account);
+      setModalState((prev) => ({ ...prev, editingAccount: account }));
     },
     [],
   );
 
   const handleDeleteClick = useCallback((e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    setDeletingId(id);
+    setModalState((prev) => ({ ...prev, deletingId: id }));
   }, []);
 
   const { deleteAccount } = useAccounts();
 
   const handleDeleteConfirm = useCallback(async () => {
-    if (!deletingId) return;
+    if (!modalState.deletingId) return;
     try {
-      await deleteAccount({ id: deletingId });
+      await deleteAccount({ id: modalState.deletingId });
     } finally {
-      setDeletingId(null);
+      setModalState((prev) => ({ ...prev, deletingId: null }));
     }
-  }, [deletingId, deleteAccount]);
+  }, [modalState.deletingId, deleteAccount]);
 
   return (
     <div className="animate-in fade-in-50 flex flex-col space-y-8 duration-500">
@@ -81,7 +81,9 @@ export default function AccountsPageClient() {
         <div className="flex items-center gap-2">
           {accounts.length > 0 && (
             <Button
-              onClick={() => setIsCreateOpen(true)}
+              onClick={() =>
+                setModalState((prev) => ({ ...prev, isCreateOpen: true }))
+              }
               className="gap-2 shadow-sm"
             >
               <PlusCircle className="h-4 w-4" />
@@ -95,7 +97,11 @@ export default function AccountsPageClient() {
         {isLoading ? (
           <AccountSkeleton />
         ) : accounts.length === 0 ? (
-          <EmptyState onCreate={() => setIsCreateOpen(true)} />
+          <EmptyState
+            onCreate={() =>
+              setModalState((prev) => ({ ...prev, isCreateOpen: true }))
+            }
+          />
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {accounts.map((account) => (
@@ -112,19 +118,29 @@ export default function AccountsPageClient() {
         )}
       </div>
 
-      <AccountForm open={isCreateOpen} onOpenChange={setIsCreateOpen} />
+      <AccountForm
+        open={modalState.isCreateOpen}
+        onOpenChange={(open) =>
+          setModalState((prev) => ({ ...prev, isCreateOpen: open }))
+        }
+      />
 
-      {editingAccount && (
+      {modalState.editingAccount && (
         <AccountForm
           open={true}
-          onOpenChange={(open) => !open && setEditingAccount(null)}
-          initialValues={mapToInitialValues(editingAccount)}
+          onOpenChange={(open) =>
+            !open &&
+            setModalState((prev) => ({ ...prev, editingAccount: null }))
+          }
+          initialValues={mapToInitialValues(modalState.editingAccount)}
         />
       )}
 
       <DeleteDialog
-        open={!!deletingId}
-        onOpenChange={(open) => !open && setDeletingId(null)}
+        open={!!modalState.deletingId}
+        onOpenChange={(open) =>
+          !open && setModalState((prev) => ({ ...prev, deletingId: null }))
+        }
         title="Delete Account"
         description="Are you sure you want to delete this account? All associated transactions will be permanently removed."
         confirmText="Delete Account"

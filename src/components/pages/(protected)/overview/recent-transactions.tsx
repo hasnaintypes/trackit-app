@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ interface RecentTransactionsProps {
   onView?: (transaction: Transaction) => void;
 }
 
-export function RecentTransactions({
+export const RecentTransactions = React.memo(function RecentTransactions({
   transactions,
   isLoading,
   onEdit,
@@ -47,4 +48,4 @@ export function RecentTransactions({
       </CardContent>
     </Card>
   );
-}
+});

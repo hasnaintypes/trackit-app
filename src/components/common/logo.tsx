@@ -1,8 +1,8 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
 
 interface LogoProps {
   size?: number;
@@ -10,7 +10,11 @@ interface LogoProps {
   showText?: boolean;
 }
 
-export function Logo({ size = 32, className, showText = false }: LogoProps) {
+export const Logo = React.memo(function Logo({
+  size = 32,
+  className,
+  showText = false,
+}: LogoProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -21,49 +25,49 @@ export function Logo({ size = 32, className, showText = false }: LogoProps) {
   if (!mounted) {
     return (
       <div className={cn("flex items-center gap-2", className)}>
-        <div className="rounded-lg bg-white/90 p-1 dark:bg-white/10">
-          <Image
-            src="/images/brand/logo.png"
-            alt="Trackit"
-            width={size}
-            height={size}
-            className="rounded-full"
-            unoptimized
-          />
-        </div>
+        <Image
+          src="/images/brand/logo.png"
+          alt="Trackit"
+          width={size}
+          height={size}
+          className="rounded-full"
+          unoptimized
+        />
         {showText && <span className="text-lg font-semibold">Trackit</span>}
       </div>
     );
   }
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <div className="rounded-lg bg-white/90 p-1 dark:bg-white/10">
-        <Image
-          src="/images/brand/logo.png"
-          alt="Trackit"
-          width={size}
-          height={size}
-          className="rounded-full dark:hidden"
-          unoptimized
-        />
-        <Image
-          src="/images/brand/logo-dark.png"
-          alt="Trackit"
-          width={size}
-          height={size}
-          className="hidden rounded-full dark:block"
-          unoptimized
-        />
-      </div>
+      <Image
+        src="/images/brand/logo.png"
+        alt="Trackit"
+        width={size}
+        height={size}
+        className="rounded-full dark:hidden"
+        unoptimized
+      />
+      <Image
+        src="/images/brand/logo-dark.png"
+        alt="Trackit"
+        width={size}
+        height={size}
+        className="hidden rounded-full dark:block"
+        unoptimized
+      />
       {showText && <span className="text-lg font-semibold">Trackit</span>}
     </div>
   );
-}
+});
 
 /**
  * LogoIcon variant for integration grids and small icon contexts.
  */
-export function LogoIcon({ className }: { className?: string }) {
+export const LogoIcon = React.memo(function LogoIcon({
+  className,
+}: {
+  className?: string;
+}) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -103,4 +107,4 @@ export function LogoIcon({ className }: { className?: string }) {
       />
     </>
   );
-}
+});

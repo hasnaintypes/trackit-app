@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Upload } from "lucide-react";
 
@@ -8,7 +9,7 @@ interface TransactionsHeaderProps {
   onImport: () => void;
 }
 
-export function TransactionsHeader({
+export const TransactionsHeader = React.memo(function TransactionsHeader({
   onAdd,
   onImport,
 }: TransactionsHeaderProps) {
@@ -40,4 +41,4 @@ export function TransactionsHeader({
       </div>
     </div>
   );
-}
+});

@@ -26,23 +26,28 @@ export default function AccountDetailPageClient() {
   const { accounts, isLoading } = useAccounts();
   const { formatAmount } = useFormatter();
   const { listQuery, remove } = useTransactions();
-  const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(20);
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 20 });
   const { data: transactionsData, isLoading: isLoadingTransactions } =
-    listQuery({ accountId: id, limit: pageSize, page: pageIndex + 1 });
-  const [openTx, setOpenTx] = useState(false);
-  const [selectedTransaction, setSelectedTransaction] =
-    useState<Transaction | null>(null);
+    listQuery({
+      accountId: id,
+      limit: pagination.pageSize,
+      page: pagination.pageIndex + 1,
+    });
+  const [txDialog, setTxDialog] = useState<{
+    open: boolean;
+    selected: Transaction | null;
+  }>({ open: false, selected: null });
 
   const handlePageChange = useCallback(
     (newPageIndex: number, newPageSize?: number) => {
-      setPageIndex(newPageIndex);
-      if (typeof newPageSize === "number" && newPageSize !== pageSize) {
-        setPageSize(newPageSize);
-        setPageIndex(0);
-      }
+      setPagination((prev) => {
+        if (typeof newPageSize === "number" && newPageSize !== prev.pageSize) {
+          return { pageIndex: 0, pageSize: newPageSize };
+        }
+        return { ...prev, pageIndex: newPageIndex };
+      });
     },
-    [pageSize],
+    [],
   );
 
   if (isLoading) {
@@ -119,7 +124,9 @@ export default function AccountDetailPageClient() {
               </p>
             </div>
 
-            <Button onClick={() => setOpenTx(true)}>
+            <Button
+              onClick={() => setTxDialog((prev) => ({ ...prev, open: true }))}
+            >
               <PlusCircle className="mr-2 h-4 w-4" />
               Add Transaction
             </Button>
@@ -128,17 +135,19 @@ export default function AccountDetailPageClient() {
       </Card>
 
       <TransactionForm
-        open={openTx}
+        open={txDialog.open}
         onOpenChange={(open) => {
-          setOpenTx(open);
-          if (!open) setSelectedTransaction(null);
+          setTxDialog((prev) => ({
+            open,
+            selected: open ? prev.selected : null,
+          }));
         }}
         accountId={account.id}
         initialValues={
-          selectedTransaction
+          txDialog.selected
             ? {
-                ...selectedTransaction,
-                paymentMethod: selectedTransaction.paymentMethod ?? undefined,
+                ...txDialog.selected,
+                paymentMethod: txDialog.selected.paymentMethod ?? undefined,
               }
             : null
         }
@@ -147,20 +156,18 @@ export default function AccountDetailPageClient() {
       <TransactionsTable
         transactions={transactionsData?.transactions ?? []}
         isLoading={isLoadingTransactions}
-        pageIndex={pageIndex}
-        pageSize={pageSize}
+        pageIndex={pagination.pageIndex}
+        pageSize={pagination.pageSize}
         totalCount={transactionsData?.totalCount ?? 0}
         onPageChange={handlePageChange}
         onEdit={(transaction) => {
-          setSelectedTransaction(transaction);
-          setOpenTx(true);
+          setTxDialog({ open: true, selected: transaction });
         }}
         onDelete={async (ids) => {
           await Promise.all(ids.map((id) => remove.mutateAsync({ id })));
         }}
         onView={(transaction) => {
-          setSelectedTransaction(transaction);
-          setOpenTx(true);
+          setTxDialog({ open: true, selected: transaction });
         }}
         accountId={account.id}
       />

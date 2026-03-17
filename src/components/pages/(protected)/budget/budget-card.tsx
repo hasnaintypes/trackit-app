@@ -5,14 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
-
-// Helper for currency formatting
-const formatCurrency = (amount: number, currency = "USD") => {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-  }).format(amount);
-};
+import { useFormatter } from "@/hooks/use-formatter";
+import type { Currency } from "@prisma/client";
 
 export interface BudgetCardProps {
   id: string;
@@ -21,7 +15,7 @@ export interface BudgetCardProps {
   amount: number;
   spent: number;
   period: string; // e.g. "MONTHLY"
-  currency?: string;
+  currency?: Currency;
 }
 
 function BudgetCardInner({
@@ -32,6 +26,7 @@ function BudgetCardInner({
   period,
   currency = "USD",
 }: BudgetCardProps) {
+  const { formatAmount } = useFormatter();
   const percent = amount > 0 ? Math.min((spent / amount) * 100, 100) : 0;
   const isOverBudget = spent > amount;
   const isWarning = !isOverBudget && percent > 85;
@@ -82,10 +77,10 @@ function BudgetCardInner({
         <div className="mb-3 flex items-end justify-between">
           <div>
             <div className="text-3xl font-bold tracking-tight">
-              {formatCurrency(spent, currency)}
+              {formatAmount(spent, currency)}
             </div>
             <p className="text-muted-foreground mt-1 text-xs font-medium tracking-wider uppercase">
-              of {formatCurrency(amount, currency)} {period.toLowerCase()} limit
+              of {formatAmount(amount, currency)} {period.toLowerCase()} limit
             </p>
           </div>
           <div className="text-right">
@@ -112,7 +107,7 @@ function BudgetCardInner({
 
         <div className="text-muted-foreground mt-4 flex justify-between text-xs">
           <span>
-            Remaining: {formatCurrency(Math.max(amount - spent, 0), currency)}
+            Remaining: {formatAmount(Math.max(amount - spent, 0), currency)}
           </span>
           <span>Reset: End of period</span>
         </div>

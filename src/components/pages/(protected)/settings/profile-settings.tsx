@@ -59,9 +59,11 @@ interface FormData {
 export default function ProfileSettings() {
   const { changePassword } = useAuth();
   const { user, isLoading, updateProfile, uploadFile } = useUser();
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+  const [loadingState, setLoadingState] = useState({
+    isChangingPassword: false,
+    isUploadingImage: false,
+    isUpdatingProfile: false,
+  });
 
   const [formData, setFormData] = useState<FormData>({
     fullName: "",
@@ -94,7 +96,7 @@ export default function ProfileSettings() {
     if (!file) return;
 
     try {
-      setIsUploadingImage(true);
+      setLoadingState((prev) => ({ ...prev, isUploadingImage: true }));
       await uploadFile(file, {
         fileName: `profile-${Date.now()}`,
         folder: "Trackit-Uploads/Profiles",
@@ -106,7 +108,7 @@ export default function ProfileSettings() {
           (error instanceof Error ? error.message : "Unknown error"),
       );
     } finally {
-      setIsUploadingImage(false);
+      setLoadingState((prev) => ({ ...prev, isUploadingImage: false }));
     }
   };
 
@@ -114,7 +116,7 @@ export default function ProfileSettings() {
 
   const handleUpdateProfile = async () => {
     try {
-      setIsUpdatingProfile(true);
+      setLoadingState((prev) => ({ ...prev, isUpdatingProfile: true }));
 
       const updateData: UpdateProfileInput = {
         name: formData.fullName,
@@ -176,7 +178,7 @@ export default function ProfileSettings() {
           (error instanceof Error ? error.message : "Unknown error"),
       );
     } finally {
-      setIsUpdatingProfile(false);
+      setLoadingState((prev) => ({ ...prev, isUpdatingProfile: false }));
     }
   };
 
@@ -208,7 +210,7 @@ export default function ProfileSettings() {
     }
 
     try {
-      setIsChangingPassword(true);
+      setLoadingState((prev) => ({ ...prev, isChangingPassword: true }));
       await changePassword(
         passwordForm.newPassword,
         passwordForm.currentPassword,
@@ -228,7 +230,7 @@ export default function ProfileSettings() {
         `Failed to update password: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     } finally {
-      setIsChangingPassword(false);
+      setLoadingState((prev) => ({ ...prev, isChangingPassword: false }));
     }
   };
 
@@ -286,10 +288,12 @@ export default function ProfileSettings() {
                 variant="outline"
                 className="gap-2 bg-transparent"
                 onClick={() => document.getElementById("profileImage")?.click()}
-                disabled={isUploadingImage}
+                disabled={loadingState.isUploadingImage}
               >
                 <Upload className="h-4 w-4" />
-                {isUploadingImage ? "Uploading..." : "Upload Image"}
+                {loadingState.isUploadingImage
+                  ? "Uploading..."
+                  : "Upload Image"}
               </Button>
               <input
                 type="file"
@@ -514,9 +518,11 @@ export default function ProfileSettings() {
             <Button
               type="submit"
               className="w-full sm:w-auto"
-              disabled={isChangingPassword}
+              disabled={loadingState.isChangingPassword}
             >
-              {isChangingPassword ? "Updating..." : "Update Password"}
+              {loadingState.isChangingPassword
+                ? "Updating..."
+                : "Update Password"}
             </Button>
           </form>
         </CardContent>
@@ -527,9 +533,9 @@ export default function ProfileSettings() {
         <Button
           size="lg"
           onClick={handleUpdateProfile}
-          disabled={isUpdatingProfile}
+          disabled={loadingState.isUpdatingProfile}
         >
-          {isUpdatingProfile ? "Updating..." : "Update Profile"}
+          {loadingState.isUpdatingProfile ? "Updating..." : "Update Profile"}
         </Button>
       </div>
     </div>
