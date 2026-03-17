@@ -3,6 +3,7 @@
 import React, { Suspense, useMemo, useCallback, useState } from "react";
 import dynamic from "next/dynamic";
 import { api } from "@/trpc/react";
+import { invalidateTransactions } from "@/lib/trpc/invalidation";
 import { useAccounts } from "@/hooks/use-accounts";
 import { useTransactions } from "@/hooks/use-transactions";
 import { useCategories } from "@/hooks/use-categories";
@@ -89,16 +90,12 @@ export default function OverviewPageClient() {
     async (ids: string[]) => {
       try {
         await Promise.all(ids.map((id) => remove.mutateAsync({ id })));
-        await Promise.all([
-          utils.transaction.list.invalidate(),
-          utils.account.list.invalidate(),
-          utils.budget.all.invalidate(),
-        ]);
+        await invalidateTransactions(utils);
       } catch {
         // deletion errors are surfaced by the mutation's own error state
       }
     },
-    [remove, utils.transaction.list, utils.account.list, utils.budget.all],
+    [remove, utils],
   );
 
   const { data: txData, isLoading: txLoading } = listQuery({ limit: 100 });

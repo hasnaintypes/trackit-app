@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { api } from "@/trpc/react";
+import { invalidateSessions } from "@/lib/trpc/invalidation";
 import type { SessionItem } from "@/types/session";
 
 export function useSessions() {
@@ -11,22 +12,19 @@ export function useSessions() {
 
   const revoke = api.session.revoke.useMutation({
     onSuccess() {
-      void utils.session.list.invalidate();
+      void invalidateSessions(utils);
     },
   });
 
   const revokeAll = api.session.revokeAll.useMutation({
     onSuccess() {
-      void utils.session.list.invalidate();
+      void invalidateSessions(utils);
     },
   });
 
   const list = listQuery.data ?? [];
 
-  const reload = useCallback(
-    () => void utils.session.list.invalidate(),
-    [utils],
-  );
+  const reload = useCallback(() => void invalidateSessions(utils), [utils]);
 
   return {
     sessions: list as SessionItem[],

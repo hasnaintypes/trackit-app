@@ -1,6 +1,7 @@
 "use client";
 
 import { api } from "@/trpc/react";
+import { invalidateSettings } from "@/lib/trpc/invalidation";
 import { toast } from "sonner";
 
 export function useSettings() {
@@ -12,7 +13,7 @@ export function useSettings() {
 
   const updateNotifications = api.settings.updateNotifications.useMutation({
     onSuccess: () => {
-      void utils.settings.getAll.invalidate();
+      void invalidateSettings(utils);
       toast.success("Notification preferences updated");
     },
     onError: (err) => {
@@ -22,7 +23,7 @@ export function useSettings() {
 
   const updateDisplay = api.settings.updateDisplay.useMutation({
     onSuccess: () => {
-      void utils.settings.getAll.invalidate();
+      void invalidateSettings(utils);
       toast.success("Display settings updated");
     },
     onError: (err) => {
@@ -32,7 +33,7 @@ export function useSettings() {
 
   const updateRegional = api.settings.updateRegional.useMutation({
     onSuccess: () => {
-      void utils.settings.getAll.invalidate();
+      void invalidateSettings(utils);
       toast.success("Regional preferences updated");
     },
     onError: (err) => {

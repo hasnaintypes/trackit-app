@@ -19,6 +19,7 @@ import { TransactionsHeader } from "@/components/pages/(protected)/transactions/
 import { TransactionsList } from "@/components/pages/(protected)/transactions/transactions-list";
 import type { Transaction } from "@/types/transaction";
 import { api } from "@/trpc/react";
+import { invalidateTransactions } from "@/lib/trpc/invalidation";
 import { createLogger } from "@/lib/logging";
 
 const logger = createLogger("transactions-page");
@@ -27,12 +28,20 @@ export default function TransactionsPageClient() {
   const { listQuery, remove } = useTransactions();
   const utils = api.useUtils();
 
-  const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(20);
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 20 });
+  const [dialogState, setDialogState] = useState<{
+    openTx: boolean;
+    openBulkImport: boolean;
+    selectedTransaction: Transaction | null;
+  }>({
+    openTx: false,
+    openBulkImport: false,
+    selectedTransaction: null,
+  });
 
   const { data: transactionsData, isLoading } = listQuery({
-    limit: pageSize,
-    page: pageIndex + 1,
+    limit: pagination.pageSize,
+    page: pagination.pageIndex + 1,
   });
 
   const transactions = useMemo(
@@ -40,89 +49,98 @@ export default function TransactionsPageClient() {
     [transactionsData?.transactions],
   );
 
-  const [openTx, setOpenTx] = useState(false);
-  const [openBulkImport, setOpenBulkImport] = useState(false);
-  const [selectedTransaction, setSelectedTransaction] =
-    useState<Transaction | null>(null);
-
   const handlePageChange = useCallback(
     (newPageIndex: number, newPageSize?: number) => {
-      setPageIndex(newPageIndex);
-      if (typeof newPageSize === "number" && newPageSize !== pageSize) {
-        setPageSize(newPageSize);
-        setPageIndex(0);
-      }
+      setPagination((prev) => {
+        if (typeof newPageSize === "number" && newPageSize !== prev.pageSize) {
+          return { pageIndex: 0, pageSize: newPageSize };
+        }
+        return { ...prev, pageIndex: newPageIndex };
+      });
     },
-    [pageSize],
+    [],
   );
 
   const handleEditTransaction = useCallback((transaction: Transaction) => {
-    setSelectedTransaction(transaction);
-    setOpenTx(true);
+    setDialogState((prev) => ({
+      ...prev,
+      openTx: true,
+      selectedTransaction: transaction,
+    }));
   }, []);
 
   const handleDeleteTransactions = useCallback(
     async (ids: string[]) => {
       try {
         await Promise.all(ids.map((id) => remove.mutateAsync({ id })));
-        await Promise.all([
-          utils.transaction.list.invalidate(),
-          utils.account.list.invalidate(),
-          utils.budget.all.invalidate(),
-        ]);
+        await invalidateTransactions(utils);
       } catch (err) {
         logger.error("Failed to delete transactions", {
           error: err instanceof Error ? err.message : String(err),
         });
       }
     },
-    [remove, utils.transaction.list, utils.account.list, utils.budget.all],
+    [remove, utils],
   );
 
   return (
     <div className="space-y-8 pt-8">
       <TransactionsHeader
         onAdd={() => {
-          setSelectedTransaction(null);
-          setOpenTx(true);
+          setDialogState((prev) => ({
+            ...prev,
+            openTx: true,
+            selectedTransaction: null,
+          }));
         }}
-        onImport={() => setOpenBulkImport(true)}
+        onImport={() =>
+          setDialogState((prev) => ({ ...prev, openBulkImport: true }))
+        }
       />
 
       <TransactionsList
         transactions={transactions}
         isLoading={isLoading}
         totalCount={transactionsData?.totalCount ?? 0}
-        pageIndex={pageIndex}
-        pageSize={pageSize}
+        pageIndex={pagination.pageIndex}
+        pageSize={pagination.pageSize}
         onEdit={handleEditTransaction}
         onDelete={handleDeleteTransactions}
         onPageChange={handlePageChange}
       />
 
       <TransactionForm
-        open={openTx}
+        open={dialogState.openTx}
         onOpenChange={(open) => {
-          setOpenTx(open);
-          if (!open) setSelectedTransaction(null);
+          setDialogState((prev) => ({
+            ...prev,
+            openTx: open,
+            selectedTransaction: open ? prev.selectedTransaction : null,
+          }));
         }}
         initialValues={
-          selectedTransaction
+          dialogState.selectedTransaction
             ? {
-                ...selectedTransaction,
-                paymentMethod: selectedTransaction.paymentMethod ?? undefined,
-                categoryId: selectedTransaction.categoryId ?? undefined,
-                notes: selectedTransaction.notes ?? undefined,
-                description: selectedTransaction.description ?? undefined,
-                receipt_url: selectedTransaction.receipt_url ?? undefined,
+                ...dialogState.selectedTransaction,
+                paymentMethod:
+                  dialogState.selectedTransaction.paymentMethod ?? undefined,
+                categoryId:
+                  dialogState.selectedTransaction.categoryId ?? undefined,
+                notes: dialogState.selectedTransaction.notes ?? undefined,
+                description:
+                  dialogState.selectedTransaction.description ?? undefined,
+                receipt_url:
+                  dialogState.selectedTransaction.receipt_url ?? undefined,
               }
             : null
         }
       />
 
       <BulkImportDialog
-        open={openBulkImport}
-        onOpenChange={setOpenBulkImport}
+        open={dialogState.openBulkImport}
+        onOpenChange={(open) =>
+          setDialogState((prev) => ({ ...prev, openBulkImport: open }))
+        }
       />
     </div>
   );

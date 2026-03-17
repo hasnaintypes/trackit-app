@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from "react";
 import { api } from "@/trpc/react";
+import { invalidateCategories } from "@/lib/trpc/invalidation";
 import { useCategories } from "@/hooks/use-categories";
 import CategoryForm from "@/components/forms/categories/category-form";
 import SubcategoryForm from "@/components/forms/categories/subcategory-form";
@@ -180,7 +181,7 @@ export default function CategoriesSettings() {
     useState<CategoryWithChildren | null>(null);
 
   const refresh = useCallback(() => {
-    void utils.category.list.invalidate();
+    void invalidateCategories(utils);
   }, [utils]);
 
   // Use the tree built by the hook so `children` arrays are already attached

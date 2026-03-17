@@ -1,19 +1,14 @@
 "use client";
 
 import { api } from "@/trpc/react";
+import { invalidateTransactions } from "@/lib/trpc/invalidation";
 
 export function useTransactions() {
   const utils = api.useUtils();
   const listQuery = api.transaction.list.useQuery;
   const getByIdQuery = api.transaction.getById.useQuery;
 
-  const invalidateAll = async () => {
-    await Promise.all([
-      utils.transaction.list.invalidate(),
-      utils.account.list.invalidate(),
-      utils.budget.all.invalidate(),
-    ]);
-  };
+  const invalidateAll = () => invalidateTransactions(utils);
 
   const create = api.transaction.create.useMutation({
     onSuccess: invalidateAll,

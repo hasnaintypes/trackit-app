@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from "react";
 import { api } from "@/trpc/react";
+import { invalidateUser } from "@/lib/trpc/invalidation";
 import { useUserStore } from "@/store/userStore";
 import type { User, ApiUser } from "@/types/user";
 
@@ -43,7 +44,7 @@ export function useUser() {
     onSuccess: (updatedUser) => {
       const typedUser = updatedUser as ApiUser;
       utils.user.getMe.setData(undefined, typedUser);
-      void utils.user.getMe.invalidate();
+      void invalidateUser(utils);
       return updatedUser;
     },
   });
@@ -53,7 +54,7 @@ export function useUser() {
       const typedUser = updatedUser as ApiUser;
       utils.user.getMe.setData(undefined, typedUser);
       setUser(mapApiToUser(typedUser));
-      void utils.user.getMe.invalidate();
+      void invalidateUser(utils);
       return updatedUser;
     },
   });

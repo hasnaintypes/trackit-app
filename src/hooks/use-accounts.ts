@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { api } from "@/trpc/react";
+import { invalidateAccounts } from "@/lib/trpc/invalidation";
 import type { ApiBankAccount } from "@/types/account";
 
 /**
@@ -19,19 +20,19 @@ export function useAccounts() {
 
   const createMutation = api.account.create.useMutation({
     async onSuccess() {
-      await utils.account.list.invalidate();
+      await invalidateAccounts(utils);
     },
   });
 
   const updateMutation = api.account.update.useMutation({
     async onSuccess() {
-      await utils.account.list.invalidate();
+      await invalidateAccounts(utils);
     },
   });
 
   const deleteMutation = api.account.delete.useMutation({
     async onSuccess() {
-      await utils.account.list.invalidate();
+      await invalidateAccounts(utils);
     },
   });
 
@@ -67,10 +68,10 @@ export function useAccounts() {
         utils.account.list.setData(undefined, () => prev);
         throw err;
       } finally {
-        await utils.account.list.invalidate();
+        await invalidateAccounts(utils);
       }
     },
-    [updateMutation, utils.account.list],
+    [updateMutation, utils],
   );
 
   return {

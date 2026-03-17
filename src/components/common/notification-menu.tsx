@@ -3,6 +3,7 @@
 import { BellIcon } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { api } from "@/trpc/react";
+import { invalidateNotifications } from "@/lib/trpc/invalidation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -35,17 +36,11 @@ export default function NotificationMenu() {
   const { data: unreadCount = 0 } = api.notification.getUnreadCount.useQuery();
 
   const markAsRead = api.notification.markAsRead.useMutation({
-    onSuccess: () => {
-      void utils.notification.getLatest.invalidate();
-      void utils.notification.getUnreadCount.invalidate();
-    },
+    onSuccess: () => void invalidateNotifications(utils),
   });
 
   const markAllAsRead = api.notification.markAllAsRead.useMutation({
-    onSuccess: () => {
-      void utils.notification.getLatest.invalidate();
-      void utils.notification.getUnreadCount.invalidate();
-    },
+    onSuccess: () => void invalidateNotifications(utils),
   });
 
   return (

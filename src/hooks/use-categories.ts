@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { api } from "@/trpc/react";
+import { invalidateCategories } from "@/lib/trpc/invalidation";
 import type { CategoryWithChildren } from "@/types/category";
 
 export function useCategories() {
@@ -18,23 +19,18 @@ export function useCategories() {
   }, [all.data]);
 
   const utils = api.useUtils();
-  const create = api.category.create.useMutation({
-    onSuccess: () => void utils.category.list.invalidate(),
-  });
-  const update = api.category.update.useMutation({
-    onSuccess: () => void utils.category.list.invalidate(),
-  });
-  const remove = api.category.delete.useMutation({
-    onSuccess: () => void utils.category.list.invalidate(),
-  });
+  const onSuccess = () => void invalidateCategories(utils);
+  const create = api.category.create.useMutation({ onSuccess });
+  const update = api.category.update.useMutation({ onSuccess });
+  const remove = api.category.delete.useMutation({ onSuccess });
   const createSubcategory = api.category.subcategory.create.useMutation({
-    onSuccess: () => void utils.category.list.invalidate(),
+    onSuccess,
   });
   const updateSubcategory = api.category.subcategory.update.useMutation({
-    onSuccess: () => void utils.category.list.invalidate(),
+    onSuccess,
   });
   const deleteSubcategory = api.category.subcategory.delete.useMutation({
-    onSuccess: () => void utils.category.list.invalidate(),
+    onSuccess,
   });
   const byId = api.category.byId.useQuery;
 

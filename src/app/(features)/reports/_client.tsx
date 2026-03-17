@@ -1,6 +1,7 @@
 "use client";
 
 import { api } from "@/trpc/react";
+import { invalidateReports } from "@/lib/trpc/invalidation";
 import { format } from "date-fns";
 import {
   Loader2,
@@ -89,8 +90,10 @@ function getReportDescription(type: string) {
 
 export default function ReportsPageClient() {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
-  const [typeFilter, setTypeFilter] = useState<string>("all");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState({
+    typeFilter: "all",
+    searchQuery: "",
+  });
   const utils = api.useUtils();
 
   const { data, isLoading } = api.report.list.useQuery({ limit: 100 });
@@ -98,7 +101,7 @@ export default function ReportsPageClient() {
   const generateMutation = api.report.generate.useMutation({
     onSuccess: () => {
       toast.success("Report generated successfully");
-      void utils.report.list.invalidate();
+      void invalidateReports(utils);
     },
     onError: (err) => {
       toast.error(err.message);
@@ -126,18 +129,18 @@ export default function ReportsPageClient() {
     });
   };
 
-  const reports = data?.items ?? [];
-
   const filteredReports = useMemo(() => {
+    const reports = data?.items ?? [];
     return reports.filter((r) => {
-      const matchesType = typeFilter === "all" || r.type === typeFilter;
+      const matchesType =
+        filters.typeFilter === "all" || r.type === filters.typeFilter;
       const label = r.type.replace(/_/g, " ").toLowerCase();
       const matchesSearch =
-        label.includes(searchQuery.toLowerCase()) ||
-        r.period.toLowerCase().includes(searchQuery.toLowerCase());
+        label.includes(filters.searchQuery.toLowerCase()) ||
+        r.period.toLowerCase().includes(filters.searchQuery.toLowerCase());
       return matchesType && matchesSearch;
     });
-  }, [reports, typeFilter, searchQuery]);
+  }, [data?.items, filters]);
 
   if (isLoading) {
     return (
@@ -180,8 +183,13 @@ export default function ReportsPageClient() {
               <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
               <Input
                 placeholder="Search here..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={filters.searchQuery}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    searchQuery: e.target.value,
+                  }))
+                }
                 className="bg-muted/30 ring-offset-background focus-visible:ring-ring h-10 border-none pl-9 focus-visible:ring-1"
               />
             </div>
@@ -205,37 +213,63 @@ export default function ReportsPageClient() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem
-                  onClick={() => setTypeFilter("all")}
-                  className={typeFilter === "all" ? "bg-accent" : ""}
+                  onClick={() =>
+                    setFilters((prev) => ({ ...prev, typeFilter: "all" }))
+                  }
+                  className={filters.typeFilter === "all" ? "bg-accent" : ""}
                 >
                   All Types
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => setTypeFilter("MONTHLY_SUMMARY")}
+                  onClick={() =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      typeFilter: "MONTHLY_SUMMARY",
+                    }))
+                  }
                   className={
-                    typeFilter === "MONTHLY_SUMMARY" ? "bg-accent" : ""
+                    filters.typeFilter === "MONTHLY_SUMMARY" ? "bg-accent" : ""
                   }
                 >
                   Monthly Summary
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => setTypeFilter("WEEKLY_DIGEST")}
-                  className={typeFilter === "WEEKLY_DIGEST" ? "bg-accent" : ""}
+                  onClick={() =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      typeFilter: "WEEKLY_DIGEST",
+                    }))
+                  }
+                  className={
+                    filters.typeFilter === "WEEKLY_DIGEST" ? "bg-accent" : ""
+                  }
                 >
                   Weekly Digest
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => setTypeFilter("BUDGET_EXCEEDED")}
+                  onClick={() =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      typeFilter: "BUDGET_EXCEEDED",
+                    }))
+                  }
                   className={
-                    typeFilter === "BUDGET_EXCEEDED" ? "bg-accent" : ""
+                    filters.typeFilter === "BUDGET_EXCEEDED" ? "bg-accent" : ""
                   }
                 >
                   Budget Exceeded
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => setTypeFilter("SPENDING_INSIGHTS")}
+                  onClick={() =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      typeFilter: "SPENDING_INSIGHTS",
+                    }))
+                  }
                   className={
-                    typeFilter === "SPENDING_INSIGHTS" ? "bg-accent" : ""
+                    filters.typeFilter === "SPENDING_INSIGHTS"
+                      ? "bg-accent"
+                      : ""
                   }
                 >
                   Spending Insights

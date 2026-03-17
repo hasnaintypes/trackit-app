@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { api } from "@/trpc/react";
+import { invalidateBudgets } from "@/lib/trpc/invalidation";
 import { toast } from "sonner";
 import { Loader2, Plus } from "lucide-react";
 import { useState } from "react";
@@ -68,7 +69,7 @@ export function CreateBudgetDialog() {
       toast.success("Budget created successfully");
       setOpen(false);
       form.reset();
-      void utils.budget.invalidate(); // Refresh the list
+      void invalidateBudgets(utils);
     },
     onError: (error) => {
       toast.error(`Failed to create budget: ${error.message}`);
