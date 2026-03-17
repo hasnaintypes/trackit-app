@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import dynamic from "next/dynamic";
 import { createLogger } from "@/lib/logging";
 import { useAccounts } from "@/hooks/use-accounts";
@@ -95,7 +95,9 @@ export default function AccountSettings() {
 
   return (
     <div className="flex-1 space-y-6">
-      <AccountForm open={open} onOpenChange={setOpen} />
+      <Suspense fallback={null}>
+        <AccountForm open={open} onOpenChange={setOpen} />
+      </Suspense>
 
       {accounts.length > 0 && (
         <div className="flex justify-end">

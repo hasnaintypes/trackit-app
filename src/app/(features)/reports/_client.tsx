@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { api } from "@/trpc/react";
 import { invalidateReports } from "@/lib/trpc/invalidation";
 import { format } from "date-fns";
@@ -14,7 +15,7 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { Report } from "@prisma/client";
 
 import { Button } from "@/components/ui/button";
@@ -117,17 +118,39 @@ export default function ReportsPageClient() {
     },
   });
 
-  const handleResend = (id: string) => {
-    resendMutation.mutate({ id });
-  };
+  const handleResend = useCallback(
+    (id: string) => {
+      resendMutation.mutate({ id });
+    },
+    [resendMutation],
+  );
 
-  const handleGenerateMonthly = () => {
+  const handleGenerateMonthly = useCallback(() => {
     const currentPeriod = format(new Date(), "yyyy-MM");
     generateMutation.mutate({
       type: "MONTHLY_SUMMARY",
       period: currentPeriod,
     });
-  };
+  }, [generateMutation]);
+
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFilters((prev) => ({ ...prev, searchQuery: e.target.value }));
+    },
+    [],
+  );
+
+  const handleExport = useCallback(() => {
+    toast.info("Export feature coming soon");
+  }, []);
+
+  const handleFilterChange = useCallback((typeFilter: string) => {
+    setFilters((prev) => ({ ...prev, typeFilter }));
+  }, []);
+
+  const handleClosePreview = useCallback(() => {
+    setSelectedReport(null);
+  }, []);
 
   const filteredReports = useMemo(() => {
     const reports = data?.items ?? [];
@@ -184,19 +207,14 @@ export default function ReportsPageClient() {
               <Input
                 placeholder="Search here..."
                 value={filters.searchQuery}
-                onChange={(e) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    searchQuery: e.target.value,
-                  }))
-                }
+                onChange={handleSearchChange}
                 className="bg-muted/30 ring-offset-background focus-visible:ring-ring h-10 border-none pl-9 focus-visible:ring-1"
               />
             </div>
             <Button
               variant="outline"
               className="hover:bg-muted/50 h-10 gap-2 border-dashed shadow-xs"
-              onClick={() => toast.info("Export feature coming soon")}
+              onClick={handleExport}
             >
               <Download className="h-4 w-4" />
               <span className="hidden sm:inline">Export</span>
@@ -213,20 +231,13 @@ export default function ReportsPageClient() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem
-                  onClick={() =>
-                    setFilters((prev) => ({ ...prev, typeFilter: "all" }))
-                  }
+                  onClick={() => handleFilterChange("all")}
                   className={filters.typeFilter === "all" ? "bg-accent" : ""}
                 >
                   All Types
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      typeFilter: "MONTHLY_SUMMARY",
-                    }))
-                  }
+                  onClick={() => handleFilterChange("MONTHLY_SUMMARY")}
                   className={
                     filters.typeFilter === "MONTHLY_SUMMARY" ? "bg-accent" : ""
                   }
@@ -234,12 +245,7 @@ export default function ReportsPageClient() {
                   Monthly Summary
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      typeFilter: "WEEKLY_DIGEST",
-                    }))
-                  }
+                  onClick={() => handleFilterChange("WEEKLY_DIGEST")}
                   className={
                     filters.typeFilter === "WEEKLY_DIGEST" ? "bg-accent" : ""
                   }
@@ -247,12 +253,7 @@ export default function ReportsPageClient() {
                   Weekly Digest
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      typeFilter: "BUDGET_EXCEEDED",
-                    }))
-                  }
+                  onClick={() => handleFilterChange("BUDGET_EXCEEDED")}
                   className={
                     filters.typeFilter === "BUDGET_EXCEEDED" ? "bg-accent" : ""
                   }
@@ -260,12 +261,7 @@ export default function ReportsPageClient() {
                   Budget Exceeded
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      typeFilter: "SPENDING_INSIGHTS",
-                    }))
-                  }
+                  onClick={() => handleFilterChange("SPENDING_INSIGHTS")}
                   className={
                     filters.typeFilter === "SPENDING_INSIGHTS"
                       ? "bg-accent"
@@ -457,7 +453,7 @@ export default function ReportsPageClient() {
             )}
           </div>
           <div className="bg-card flex justify-end gap-3 border-t p-4">
-            <Button variant="outline" onClick={() => setSelectedReport(null)}>
+            <Button variant="outline" onClick={handleClosePreview}>
               Close Preview
             </Button>
             <Button

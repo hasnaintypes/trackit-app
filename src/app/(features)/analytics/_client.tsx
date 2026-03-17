@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { Suspense, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useTransactions } from "@/hooks/use-transactions";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -107,15 +107,19 @@ export default function AnalyticsPageClient() {
           </Select>
         </CardHeader>
         <CardContent>
-          <AreaChart
-            data={areaChartData}
-            config={areaConfig}
-            dataKeyIncome="income"
-            dataKeyExpense="expense"
-            labelKey="date"
-            className="h-[400px] w-full"
-            valueFormatter={(val) => formatAmount(val)}
-          />
+          <Suspense
+            fallback={<Skeleton className="h-[400px] w-full rounded-xl" />}
+          >
+            <AreaChart
+              data={areaChartData}
+              config={areaConfig}
+              dataKeyIncome="income"
+              dataKeyExpense="expense"
+              labelKey="date"
+              className="h-[400px] w-full"
+              valueFormatter={(val) => formatAmount(val)}
+            />
+          </Suspense>
         </CardContent>
       </Card>
     </div>

@@ -6,7 +6,7 @@ import { Moon, Sun } from "lucide-react";
 
 import { Switch } from "@/components/ui/switch";
 
-export default function ThemeSwitcher() {
+function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -39,3 +39,5 @@ export default function ThemeSwitcher() {
     </div>
   );
 }
+
+export default React.memo(ThemeSwitcher);

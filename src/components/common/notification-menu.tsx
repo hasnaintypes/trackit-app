@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useCallback } from "react";
 import { BellIcon } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { api } from "@/trpc/react";
@@ -28,7 +29,7 @@ function Dot({ className }: { className?: string }) {
   );
 }
 
-export default function NotificationMenu() {
+function NotificationMenuInner() {
   const utils = api.useUtils();
   const { data: notifications = [] } = api.notification.getLatest.useQuery({
     limit: 10,
@@ -42,6 +43,17 @@ export default function NotificationMenu() {
   const markAllAsRead = api.notification.markAllAsRead.useMutation({
     onSuccess: () => void invalidateNotifications(utils),
   });
+
+  const handleMarkAllAsRead = useCallback(() => {
+    markAllAsRead.mutate();
+  }, [markAllAsRead]);
+
+  const handleMarkAsRead = useCallback(
+    (id: string) => {
+      markAsRead.mutate({ id });
+    },
+    [markAsRead],
+  );
 
   return (
     <Popover>
@@ -70,7 +82,7 @@ export default function NotificationMenu() {
           {unreadCount > 0 && (
             <button
               className="text-xs font-medium hover:underline"
-              onClick={() => markAllAsRead.mutate()}
+              onClick={handleMarkAllAsRead}
               disabled={markAllAsRead.isPending}
             >
               Mark all as read
@@ -97,7 +109,7 @@ export default function NotificationMenu() {
                   <div className="flex-1 space-y-1">
                     <button
                       className="text-foreground/80 text-left after:absolute after:inset-0"
-                      onClick={() => markAsRead.mutate({ id: notification.id })}
+                      onClick={() => handleMarkAsRead(notification.id)}
                     >
                       <span className="text-foreground font-medium">
                         {notification.title}
@@ -127,3 +139,5 @@ export default function NotificationMenu() {
     </Popover>
   );
 }
+
+export default React.memo(NotificationMenuInner);

@@ -11,11 +11,11 @@ import {
   MobileNavToggle,
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
-import { useState } from "react";
+import React, { useState } from "react";
 import { NAV_HEADER_LINKS } from "@/content/nav-links";
 import Link from "next/link";
 
-export function Header() {
+function HeaderInner() {
   const navItems = NAV_HEADER_LINKS;
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -87,3 +87,5 @@ export function Header() {
     </header>
   );
 }
+
+export const Header = React.memo(HeaderInner);

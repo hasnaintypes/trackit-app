@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { Suspense, useState, useMemo, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useTransactions } from "@/hooks/use-transactions";
 
@@ -69,6 +69,30 @@ export default function TransactionsPageClient() {
     }));
   }, []);
 
+  const handleAdd = useCallback(() => {
+    setDialogState((prev) => ({
+      ...prev,
+      openTx: true,
+      selectedTransaction: null,
+    }));
+  }, []);
+
+  const handleImport = useCallback(() => {
+    setDialogState((prev) => ({ ...prev, openBulkImport: true }));
+  }, []);
+
+  const handleTxOpenChange = useCallback((open: boolean) => {
+    setDialogState((prev) => ({
+      ...prev,
+      openTx: open,
+      selectedTransaction: open ? prev.selectedTransaction : null,
+    }));
+  }, []);
+
+  const handleBulkImportOpenChange = useCallback((open: boolean) => {
+    setDialogState((prev) => ({ ...prev, openBulkImport: open }));
+  }, []);
+
   const handleDeleteTransactions = useCallback(
     async (ids: string[]) => {
       try {
@@ -85,18 +109,7 @@ export default function TransactionsPageClient() {
 
   return (
     <div className="space-y-8 pt-8">
-      <TransactionsHeader
-        onAdd={() => {
-          setDialogState((prev) => ({
-            ...prev,
-            openTx: true,
-            selectedTransaction: null,
-          }));
-        }}
-        onImport={() =>
-          setDialogState((prev) => ({ ...prev, openBulkImport: true }))
-        }
-      />
+      <TransactionsHeader onAdd={handleAdd} onImport={handleImport} />
 
       <TransactionsList
         transactions={transactions}
@@ -109,39 +122,35 @@ export default function TransactionsPageClient() {
         onPageChange={handlePageChange}
       />
 
-      <TransactionForm
-        open={dialogState.openTx}
-        onOpenChange={(open) => {
-          setDialogState((prev) => ({
-            ...prev,
-            openTx: open,
-            selectedTransaction: open ? prev.selectedTransaction : null,
-          }));
-        }}
-        initialValues={
-          dialogState.selectedTransaction
-            ? {
-                ...dialogState.selectedTransaction,
-                paymentMethod:
-                  dialogState.selectedTransaction.paymentMethod ?? undefined,
-                categoryId:
-                  dialogState.selectedTransaction.categoryId ?? undefined,
-                notes: dialogState.selectedTransaction.notes ?? undefined,
-                description:
-                  dialogState.selectedTransaction.description ?? undefined,
-                receipt_url:
-                  dialogState.selectedTransaction.receipt_url ?? undefined,
-              }
-            : null
-        }
-      />
+      <Suspense fallback={null}>
+        <TransactionForm
+          open={dialogState.openTx}
+          onOpenChange={handleTxOpenChange}
+          initialValues={
+            dialogState.selectedTransaction
+              ? {
+                  ...dialogState.selectedTransaction,
+                  paymentMethod:
+                    dialogState.selectedTransaction.paymentMethod ?? undefined,
+                  categoryId:
+                    dialogState.selectedTransaction.categoryId ?? undefined,
+                  notes: dialogState.selectedTransaction.notes ?? undefined,
+                  description:
+                    dialogState.selectedTransaction.description ?? undefined,
+                  receipt_url:
+                    dialogState.selectedTransaction.receipt_url ?? undefined,
+                }
+              : null
+          }
+        />
+      </Suspense>
 
-      <BulkImportDialog
-        open={dialogState.openBulkImport}
-        onOpenChange={(open) =>
-          setDialogState((prev) => ({ ...prev, openBulkImport: open }))
-        }
-      />
+      <Suspense fallback={null}>
+        <BulkImportDialog
+          open={dialogState.openBulkImport}
+          onOpenChange={handleBulkImportOpenChange}
+        />
+      </Suspense>
     </div>
   );
 }

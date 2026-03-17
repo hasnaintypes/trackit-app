@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { LogOutIcon, Settings } from "lucide-react";
 import useUser from "@/hooks/use-user";
@@ -19,16 +20,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 
-export default function UserMenu() {
+function UserMenuInner() {
   const router = useRouter();
   const persistedUser = useUserStore((s) => s.user);
   const { user: apiUser } = useUser();
   const user = persistedUser ?? apiUser;
   const { signOut } = useAuth();
 
-  const handleSettings = () => router.push("/settings");
+  const handleSettings = useCallback(() => router.push("/settings"), [router]);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       // Navigate immediately so the user is redirected without waiting
       // for the signOut network call to finish. Fire-and-forget signOut
@@ -42,7 +43,7 @@ export default function UserMenu() {
     } catch {
       toast.error("Failed to log out. Please try again.");
     }
-  };
+  }, [router, signOut]);
 
   const initials =
     (user?.name ?? "")
@@ -106,3 +107,5 @@ export default function UserMenu() {
     </DropdownMenu>
   );
 }
+
+export default React.memo(UserMenuInner);

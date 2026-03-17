@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { Suspense, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,28 @@ export default function AccountDetailPageClient() {
     open: boolean;
     selected: Transaction | null;
   }>({ open: false, selected: null });
+
+  const handleOpenTxDialog = useCallback(() => {
+    setTxDialog((prev) => ({ ...prev, open: true }));
+  }, []);
+
+  const handleTxDialogOpenChange = useCallback((open: boolean) => {
+    setTxDialog((prev) => ({
+      open,
+      selected: open ? prev.selected : null,
+    }));
+  }, []);
+
+  const handleEditTx = useCallback((transaction: Transaction) => {
+    setTxDialog({ open: true, selected: transaction });
+  }, []);
+
+  const handleDeleteTx = useCallback(
+    async (ids: string[]) => {
+      await Promise.all(ids.map((id) => remove.mutateAsync({ id })));
+    },
+    [remove],
+  );
 
   const handlePageChange = useCallback(
     (newPageIndex: number, newPageSize?: number) => {
@@ -124,9 +146,7 @@ export default function AccountDetailPageClient() {
               </p>
             </div>
 
-            <Button
-              onClick={() => setTxDialog((prev) => ({ ...prev, open: true }))}
-            >
+            <Button onClick={handleOpenTxDialog}>
               <PlusCircle className="mr-2 h-4 w-4" />
               Add Transaction
             </Button>
@@ -134,24 +154,21 @@ export default function AccountDetailPageClient() {
         </CardContent>
       </Card>
 
-      <TransactionForm
-        open={txDialog.open}
-        onOpenChange={(open) => {
-          setTxDialog((prev) => ({
-            open,
-            selected: open ? prev.selected : null,
-          }));
-        }}
-        accountId={account.id}
-        initialValues={
-          txDialog.selected
-            ? {
-                ...txDialog.selected,
-                paymentMethod: txDialog.selected.paymentMethod ?? undefined,
-              }
-            : null
-        }
-      />
+      <Suspense fallback={null}>
+        <TransactionForm
+          open={txDialog.open}
+          onOpenChange={handleTxDialogOpenChange}
+          accountId={account.id}
+          initialValues={
+            txDialog.selected
+              ? {
+                  ...txDialog.selected,
+                  paymentMethod: txDialog.selected.paymentMethod ?? undefined,
+                }
+              : null
+          }
+        />
+      </Suspense>
 
       <TransactionsTable
         transactions={transactionsData?.transactions ?? []}
@@ -160,15 +177,9 @@ export default function AccountDetailPageClient() {
         pageSize={pagination.pageSize}
         totalCount={transactionsData?.totalCount ?? 0}
         onPageChange={handlePageChange}
-        onEdit={(transaction) => {
-          setTxDialog({ open: true, selected: transaction });
-        }}
-        onDelete={async (ids) => {
-          await Promise.all(ids.map((id) => remove.mutateAsync({ id })));
-        }}
-        onView={(transaction) => {
-          setTxDialog({ open: true, selected: transaction });
-        }}
+        onEdit={handleEditTx}
+        onDelete={handleDeleteTx}
+        onView={handleEditTx}
         accountId={account.id}
       />
     </div>

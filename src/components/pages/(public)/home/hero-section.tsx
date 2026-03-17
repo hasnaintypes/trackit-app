@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight, CirclePlay } from "lucide-react";
@@ -7,7 +8,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { hero } from "@content/site/home";
 
-const HeroSection = () => {
+const HeroSectionInner = () => {
   const data = hero;
 
   return (
@@ -56,4 +57,5 @@ const HeroSection = () => {
   );
 };
 
+const HeroSection = React.memo(HeroSectionInner);
 export default HeroSection;

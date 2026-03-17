@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Building2,
   Lightbulb,
@@ -48,7 +49,7 @@ const rightFeatures: FeatureItem[] = featuresContent.rightFeatures.map((f) => ({
   cornerStyle: f.cornerStyle,
 }));
 
-const FeatureCard = ({ feature }: { feature: FeatureItem }) => {
+const FeatureCardInner = ({ feature }: { feature: FeatureItem }) => {
   const Icon = feature.icon;
 
   return (
@@ -74,6 +75,8 @@ const FeatureCard = ({ feature }: { feature: FeatureItem }) => {
     </div>
   );
 };
+
+const FeatureCard = React.memo(FeatureCardInner);
 
 export default function FeatureCards() {
   return (

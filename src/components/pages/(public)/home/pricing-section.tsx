@@ -1,3 +1,4 @@
+import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -7,7 +8,7 @@ import type { Plan } from "@/types/site";
 import { pricing as pricingContent } from "@content/site/home";
 
 const plans: Plan[] = pricingContent.plans;
-const PricingSection = () => {
+const PricingSectionInner = () => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
       <h1 className="text-center text-5xl font-semibold tracking-tighter">
@@ -57,4 +58,5 @@ const PricingSection = () => {
   );
 };
 
+const PricingSection = React.memo(PricingSectionInner);
 export default PricingSection;
