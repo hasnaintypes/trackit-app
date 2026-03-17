@@ -38,22 +38,6 @@ export const processRecurringTransaction = inngest.createFunction(
 
     const runAt = new Date();
 
-    // Create the transaction for this recurrence instance
-    const createdTx = await db.transaction.create({
-      data: {
-        userId: rule.userId,
-        accountId: rule.accountId,
-        categoryId: rule.categoryId ?? null,
-        amount: rule.amount,
-        type: rule.type,
-        description: rule.description ?? null,
-        notes: rule.notes ?? null,
-        date: runAt,
-        isRecurring: true,
-        recurringRuleId: rule.id,
-      },
-    });
-
     const cfg: RecurrenceConfig = {
       frequency: rule.frequency as RecurrenceConfig["frequency"],
       interval: rule.interval ?? 1,
@@ -78,16 +62,33 @@ export const processRecurringTransaction = inngest.createFunction(
 
     const nextRunAt = calculateNextRunAt(cfg, runAt);
 
-    // Persist updates to the rule. Only include `nextRunAt` when we computed a new value;
-    // otherwise leave it untouched (schema requires nextRunAt to be non-nullable).
-    const updateData = {
-      lastRunAt: runAt,
-      lastTransactionId: createdTx.id,
-      status: nextRunAt ? RecurringStatus.ACTIVE : RecurringStatus.ENDED,
-      ...(nextRunAt && { nextRunAt }),
-    };
+    // Atomically create transaction and update rule to prevent duplicates on crash
+    await db.$transaction(async (tx) => {
+      const created = await tx.transaction.create({
+        data: {
+          userId: rule.userId,
+          accountId: rule.accountId,
+          categoryId: rule.categoryId ?? null,
+          amount: rule.amount,
+          type: rule.type,
+          description: rule.description ?? null,
+          notes: rule.notes ?? null,
+          date: runAt,
+          isRecurring: true,
+          recurringRuleId: rule.id,
+        },
+      });
 
-    await db.recurringRule.update({ where: { id: rule.id }, data: updateData });
+      await tx.recurringRule.update({
+        where: { id: rule.id },
+        data: {
+          lastRunAt: runAt,
+          lastTransactionId: created.id,
+          status: nextRunAt ? RecurringStatus.ACTIVE : RecurringStatus.ENDED,
+          ...(nextRunAt && { nextRunAt }),
+        },
+      });
+    });
 
     // Schedule the next occurrence, if any
     if (nextRunAt) {

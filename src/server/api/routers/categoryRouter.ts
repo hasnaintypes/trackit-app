@@ -119,21 +119,24 @@ export const categoryRouter = createTRPCRouter({
             message: "Cannot set category as its own parent",
           });
         }
+        const allCategories = await ctx.db.category.findMany({
+          where: { userId: ctx.user.id },
+          select: { id: true, parentCategoryId: true },
+        });
+        const parentMap = new Map(
+          allCategories.map((c) => [c.id, c.parentCategoryId]),
+        );
         let ancestorId: string | null = input.parentCategoryId;
         while (ancestorId) {
-          const ancestor: { parentCategoryId: string | null } | null =
-            await ctx.db.category.findUnique({
-              where: { id: ancestorId },
-              select: { parentCategoryId: true },
-            });
-          if (!ancestor) break;
-          if (ancestor.parentCategoryId === input.id) {
+          const parentId = parentMap.get(ancestorId);
+          if (parentId === undefined) break;
+          if (parentId === input.id) {
             throw new TRPCError({
               code: "BAD_REQUEST",
               message: "Cannot create a circular parent-child relationship",
             });
           }
-          ancestorId = ancestor.parentCategoryId;
+          ancestorId = parentId;
         }
       }
 
@@ -252,6 +255,13 @@ export const categoryRouter = createTRPCRouter({
             });
           }
           // Prevent cycle: check that newParent is not a descendant of this category
+          const allCategories = await ctx.db.category.findMany({
+            where: { userId: ctx.user.id },
+            select: { id: true, parentCategoryId: true },
+          });
+          const parentMap = new Map(
+            allCategories.map((c) => [c.id, c.parentCategoryId]),
+          );
           let ancestorId: string | null = newParent.parentCategoryId;
           while (ancestorId) {
             if (ancestorId === input.id) {
@@ -260,11 +270,7 @@ export const categoryRouter = createTRPCRouter({
                 message: "Cannot create a circular parent-child relationship",
               });
             }
-            const ancestor = await ctx.db.category.findUnique({
-              where: { id: ancestorId },
-              select: { parentCategoryId: true },
-            });
-            ancestorId = ancestor?.parentCategoryId ?? null;
+            ancestorId = parentMap.get(ancestorId) ?? null;
           }
         }
 

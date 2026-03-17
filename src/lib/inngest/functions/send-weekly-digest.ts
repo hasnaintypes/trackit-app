@@ -57,43 +57,61 @@ export const sendWeeklyDigest = inngest.createFunction(
 
       for (const user of users) {
         try {
-          // Get week's transactions
-          const transactions = await db.transaction.findMany({
-            where: {
-              userId: user.id,
-              date: {
-                gte: weekStart,
-                lte: weekEnd,
-              },
-            },
-            include: {
-              category: true,
-            },
-          });
+          const dateFilter = {
+            userId: user.id,
+            date: { gte: weekStart, lte: weekEnd },
+          };
 
-          const totalIncome = transactions
-            .filter((t) => t.type === "CREDIT")
-            .reduce((sum, t) => sum + toNum(t.amount), 0);
+          const [
+            incomeResult,
+            expenseResult,
+            spendingByCategory,
+            transactionCount,
+          ] = await Promise.all([
+            db.transaction.aggregate({
+              where: { ...dateFilter, type: "CREDIT" },
+              _sum: { amount: true },
+            }),
+            db.transaction.aggregate({
+              where: { ...dateFilter, type: "DEBIT" },
+              _sum: { amount: true },
+            }),
+            db.transaction.groupBy({
+              by: ["categoryId"],
+              where: { ...dateFilter, type: "DEBIT" },
+              _sum: { amount: true },
+            }),
+            db.transaction.count({ where: dateFilter }),
+          ]);
 
-          const totalExpenses = transactions
-            .filter((t) => t.type === "DEBIT")
-            .reduce((sum, t) => sum + toNum(t.amount), 0);
+          const totalIncome = incomeResult._sum.amount
+            ? toNum(incomeResult._sum.amount)
+            : 0;
+          const totalExpenses = expenseResult._sum.amount
+            ? toNum(expenseResult._sum.amount)
+            : 0;
 
-          const categorySpending = transactions
-            .filter((t) => t.type === "DEBIT")
-            .reduce(
-              (acc, t) => {
-                const category = t.category?.name ?? "Uncategorized";
-                acc[category] = (acc[category] ?? 0) + toNum(t.amount);
-                return acc;
-              },
-              {} as Record<string, number>,
-            );
+          const catIds = spendingByCategory
+            .map((g) => g.categoryId)
+            .filter((id): id is string => id !== null);
+          const cats =
+            catIds.length > 0
+              ? await db.category.findMany({
+                  where: { id: { in: catIds } },
+                  select: { id: true, name: true },
+                })
+              : [];
+          const catNameMap = new Map(cats.map((c) => [c.id, c.name]));
 
-          const topCategories = Object.entries(categorySpending)
-            .sort(([, a], [, b]) => b - a)
-            .slice(0, 5)
-            .map(([name, amount]) => ({ name, amount }));
+          const topCategories = spendingByCategory
+            .map((g) => ({
+              name: g.categoryId
+                ? (catNameMap.get(g.categoryId) ?? "Uncategorized")
+                : "Uncategorized",
+              amount: g._sum.amount ? toNum(g._sum.amount) : 0,
+            }))
+            .sort((a, b) => b.amount - a.amount)
+            .slice(0, 5);
 
           // Create report record
           await db.report.create({
@@ -109,7 +127,7 @@ export const sendWeeklyDigest = inngest.createFunction(
                 totalIncome,
                 totalExpenses,
                 netSavings: totalIncome - totalExpenses,
-                transactionCount: transactions.length,
+                transactionCount,
                 topCategories,
               },
             },

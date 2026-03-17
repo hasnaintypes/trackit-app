@@ -15,6 +15,10 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const config = {};
 
+config.outputFileTracingIncludes = {
+  "/api/**": ["./src/lib/email/templates/**"],
+};
+
 config.images = {
   remotePatterns: [
     {
