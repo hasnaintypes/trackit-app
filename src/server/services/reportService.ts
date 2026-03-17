@@ -141,7 +141,7 @@ export class ReportService {
       },
     });
 
-    if (!budget || budget.userId !== userId) {
+    if (budget?.userId !== userId) {
       throw new TRPCError({ code: "NOT_FOUND", message: "Budget not found" });
     }
 
