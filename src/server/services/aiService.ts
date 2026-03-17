@@ -105,13 +105,21 @@ export class AIService {
     const [transactions, budgets] = await Promise.all([
       db.transaction.findMany({
         where: { userId },
-        include: { category: true },
+        select: {
+          type: true,
+          amount: true,
+          category: { select: { name: true } },
+        },
         orderBy: { date: "desc" },
         take: 100,
       }),
       db.budget.findMany({
         where: { userId },
-        include: { category: true },
+        select: {
+          amount: true,
+          period: true,
+          category: { select: { name: true } },
+        },
       }),
     ]);
 
@@ -166,7 +174,11 @@ export class AIService {
         userId,
         date: { gte: startDate, lte: endDate },
       },
-      include: { category: true },
+      select: {
+        type: true,
+        amount: true,
+        category: { select: { name: true } },
+      },
     });
 
     const totalSpent = transactions
@@ -202,7 +214,13 @@ export class AIService {
   static async detectAnomalies(userId: string) {
     const transactions = await db.transaction.findMany({
       where: { userId },
-      include: { category: true },
+      select: {
+        type: true,
+        amount: true,
+        date: true,
+        description: true,
+        category: { select: { name: true } },
+      },
       orderBy: { date: "desc" },
       take: 50,
     });
@@ -269,14 +287,23 @@ export class AIService {
   static async getFinancialAdvice(userId: string) {
     const user = await db.user.findUnique({
       where: { id: userId },
-      include: {
+      select: {
+        id: true,
         transactions: {
           orderBy: { date: "desc" },
           take: 50,
-          include: { category: true },
+          select: {
+            type: true,
+            amount: true,
+            category: { select: { name: true } },
+          },
         },
         budgets: {
-          include: { category: true },
+          select: {
+            id: true,
+            amount: true,
+            category: { select: { name: true } },
+          },
         },
       },
     });
@@ -315,8 +342,6 @@ export class AIService {
     transactions: TransactionForAI[],
     categories: CategoryForAI[],
   ): Promise<CategorizationResponse> {
-    const modelName = getModelName();
-
     const maxRows = Number(
       env?.GEMINI_MAX_ROWS ??
         process.env.GEMINI_MAX_ROWS ??
@@ -348,43 +373,9 @@ export class AIService {
       JSON.stringify(categories, null, 2),
     ).replace("{{transactions}}", JSON.stringify(transactions, null, 2));
 
-    let lastError: Error | null = null;
-
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-      try {
-        const genAI = getGenAI();
-        const model = genAI.getGenerativeModel({ model: modelName });
-
-        const result = await model.generateContent(prompt);
-        const geminiResponse = result.response;
-        const text = geminiResponse.text();
-
-        if (!text) {
-          throw new Error("AI returned empty response");
-        }
-
-        const parsedResponse = this.parseAIResponse(text, transactions.length);
-        return parsedResponse;
-      } catch (error) {
-        lastError = error instanceof Error ? error : new Error(String(error));
-
-        if (
-          lastError.message.includes("Failed to parse") ||
-          lastError.message.includes("Invalid response")
-        ) {
-          throw lastError;
-        }
-
-        if (attempt < MAX_RETRIES) {
-          await sleep(RETRY_DELAY_MS * attempt);
-        }
-      }
-    }
-
-    throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message: `Failed to categorize transactions after ${MAX_RETRIES} attempts: ${lastError?.message ?? "Unknown error"}`,
-    });
+    return callGeminiWithRetry(prompt, (text) =>
+      this.parseAIResponse(text, transactions.length),
+    );
   }
 
   /**
@@ -395,8 +386,6 @@ export class AIService {
     imageUrl?: string | null;
     categories?: CategoryForAI[] | null;
   }): Promise<ReceiptScanResult> {
-    const modelName = getModelName();
-
     const inputText = options.extractedText ?? "";
     const imageUrl = options.imageUrl ?? "";
 
@@ -425,27 +414,8 @@ export class AIService {
       prompt = prompt.replace("{{categories}}", "[]");
     }
 
-    let lastError: Error | null = null;
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-      try {
-        const genAI = getGenAI();
-        const model = genAI.getGenerativeModel({ model: modelName });
-
-        const result = await model.generateContent(prompt);
-        const geminiResponse = result.response;
-        const text = geminiResponse.text();
-        if (!text) throw new Error("AI returned empty response");
-
-        const parsed = this.parseReceiptAIResponse(text);
-        return parsed;
-      } catch (err) {
-        lastError = err instanceof Error ? err : new Error(String(err));
-        if (attempt < MAX_RETRIES) await sleep(RETRY_DELAY_MS * attempt);
-      }
-    }
-
-    throw new Error(
-      `Failed to scan receipt after ${MAX_RETRIES} attempts: ${lastError?.message ?? "Unknown"}`,
+    return callGeminiWithRetry(prompt, (text) =>
+      this.parseReceiptAIResponse(text),
     );
   }
 
