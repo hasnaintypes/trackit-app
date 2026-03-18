@@ -1,10 +1,10 @@
 import { useState, useCallback } from "react";
 import { authClient } from "@/lib/auth/client";
 import type { User } from "@/types/user";
-import { useUserStore } from "@/store/userStore";
 import { toError } from "@shared/error";
 import { isUser } from "@/lib/utils";
 import { createLogger } from "@/lib/logging";
+import { api } from "@/trpc/react";
 
 const logger = createLogger("use-auth");
 
@@ -27,10 +27,11 @@ interface SignInPayload {
 export function useAuth() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
+  const utils = api.useUtils();
 
-  const user = useUserStore((s) => s.user);
-  const setPersistedUser = useUserStore((s) => s.setUser);
-  const clearPersistedUser = useUserStore((s) => s.clear);
+  const invalidateUserCache = useCallback(() => {
+    void utils.user.getMe.invalidate();
+  }, [utils]);
 
   const fetchUser = useCallback(async () => {
     setLoading(true);
@@ -38,8 +39,7 @@ export function useAuth() {
       const { data: session, error } = await authClient.getSession();
       if (error) throw toError(error);
       const maybeUser = session?.user ?? null;
-      const finalUser = isUser(maybeUser) ? maybeUser : null;
-      setPersistedUser(finalUser);
+      invalidateUserCache();
       logger.info("Fetched user session", { user: maybeUser });
     } catch (err) {
       setError(toError(err));
@@ -49,7 +49,7 @@ export function useAuth() {
     } finally {
       setLoading(false);
     }
-  }, [setPersistedUser]);
+  }, [invalidateUserCache]);
 
   const signUp = useCallback(
     async (payload: SignUpPayload): Promise<User | null> => {
@@ -68,7 +68,6 @@ export function useAuth() {
         if (result.error) throw toError(result.error);
         await fetchUser();
         const maybeUser = "user" in result ? result.user : null;
-        setPersistedUser(isUser(maybeUser) ? maybeUser : null);
         logger.info("User signed up", { user: maybeUser });
         return isUser(maybeUser) ? maybeUser : null;
       } catch (err) {
@@ -82,7 +81,7 @@ export function useAuth() {
         setLoading(false);
       }
     },
-    [fetchUser, setPersistedUser],
+    [fetchUser],
   );
 
   const signIn = useCallback(
@@ -107,7 +106,6 @@ export function useAuth() {
         if (result.error) throw toError(result.error);
         await fetchUser();
         const maybeUser = "user" in result ? result.user : null;
-        setPersistedUser(isUser(maybeUser) ? maybeUser : null);
         logger.info("User signed in", { user: maybeUser });
         return isUser(maybeUser) ? maybeUser : null;
       } catch (err) {
@@ -121,15 +119,15 @@ export function useAuth() {
         setLoading(false);
       }
     },
-    [fetchUser, setPersistedUser],
+    [fetchUser],
   );
 
   const signOut = useCallback(async (): Promise<void> => {
     setLoading(true);
     try {
-      clearPersistedUser();
+      utils.user.getMe.setData(undefined, undefined);
       await authClient.signOut({
-        fetchOptions: { onSuccess: () => clearPersistedUser() },
+        fetchOptions: { onSuccess: () => invalidateUserCache() },
       });
       logger.info("User signed out");
     } catch (err) {
@@ -142,7 +140,7 @@ export function useAuth() {
     } finally {
       setLoading(false);
     }
-  }, [clearPersistedUser]);
+  }, [utils, invalidateUserCache]);
 
   const sendVerificationEmail = useCallback(
     async (email: string, callbackURL?: string): Promise<void> => {
@@ -231,7 +229,6 @@ export function useAuth() {
   );
 
   return {
-    user,
     loading,
     error,
     signUp,

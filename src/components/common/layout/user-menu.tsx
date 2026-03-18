@@ -4,7 +4,6 @@ import React, { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { LogOutIcon, Settings } from "lucide-react";
 import useUser from "@/hooks/use-user";
-import { useUserStore } from "@/store/userStore";
 import { useAuth } from "@/hooks/use-auth";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@ui/avatar";
@@ -22,9 +21,7 @@ import { toast } from "sonner";
 
 function UserMenuInner() {
   const router = useRouter();
-  const persistedUser = useUserStore((s) => s.user);
-  const { user: apiUser } = useUser();
-  const user = persistedUser ?? apiUser;
+  const { user } = useUser();
   const { signOut } = useAuth();
 
   const handleSettings = useCallback(() => router.push("/settings"), [router]);
