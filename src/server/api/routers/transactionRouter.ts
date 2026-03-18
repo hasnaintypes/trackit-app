@@ -533,7 +533,11 @@ export const transactionRouter = createTRPCRouter({
       z.object({
         transactionId: z.string().optional(),
         fileDataUrl: z.string().min(1).max(10_000_000), // ~7.5MB base64 limit
-        fileName: z.string().optional(),
+        fileName: z
+          .string()
+          .regex(/^[\w\-.]+$/, "Invalid file name characters")
+          .max(255)
+          .optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {

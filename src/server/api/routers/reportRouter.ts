@@ -1,6 +1,6 @@
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { createLogger } from "@/lib/logging";
-import { sendEmail } from "@/lib/email";
+import { sendTemplateEmail } from "@/lib/email";
 
 const logger = createLogger("reportRouter");
 import { TRPCError } from "@trpc/server";
@@ -63,15 +63,30 @@ export const reportRouter = createTRPCRouter({
         throw new TRPCError({ code: "NOT_FOUND", message: "Report not found" });
       }
 
+      const userEmail = ctx.user.email;
+      if (!userEmail) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "No email address on account",
+        });
+      }
+
       // Use the actual email service to resend
       try {
-        await sendEmail({
-          to: ctx.user.email ?? report.emailSentTo ?? "",
+        await sendTemplateEmail({
+          to: userEmail,
           subject: `Report: ${report.type} - ${report.period}`,
-          html: `<p>Report content for ${report.type}</p><pre>${JSON.stringify(report.data, null, 2)}</pre>`,
+          template: "monthly-summary",
+          data: {
+            userName: ctx.user.name ?? "User",
+            period: report.period,
+            ...(typeof report.data === "object" && report.data !== null
+              ? (report.data as Record<string, unknown>)
+              : {}),
+          },
         });
 
-        await ReportService.markAsSent(report.id, ctx.user.email ?? "");
+        await ReportService.markAsSent(report.id, userEmail);
 
         return { success: true };
       } catch (error) {
