@@ -6,9 +6,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@ui/button";
 import { cn } from "@/lib/utils";
 import { AlertTriangle } from "lucide-react";
-import { createLogger } from "@/lib/logging";
-
-const logger = createLogger("error-page");
 
 export default function ErrorPage({
   error,
@@ -40,9 +37,7 @@ export default function ErrorPage({
         },
       );
     } catch (e) {
-      logger.error("Failed to log error", {
-        error: e instanceof Error ? e.message : String(e),
-      });
+      console.error("Failed to log error", e);
     }
   }, [
     error.cause,

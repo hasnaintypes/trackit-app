@@ -4,6 +4,7 @@ import {
   updateDisplaySchema,
   updateRegionalSchema,
 } from "@/validation/settings";
+import { toNum } from "@shared/decimal";
 
 export const settingsRouter = createTRPCRouter({
   getAll: protectedProcedure.query(async ({ ctx }) => {
@@ -28,7 +29,20 @@ export const settingsRouter = createTRPCRouter({
       }),
     ]);
 
-    return { preferences, display, notifications };
+    // Convert Decimal fields to numbers so they serialize across RSC → Client boundary
+    return {
+      preferences,
+      display,
+      notifications: {
+        ...notifications,
+        lowBalanceThreshold: notifications.lowBalanceThreshold
+          ? toNum(notifications.lowBalanceThreshold)
+          : null,
+        largeTransactionThreshold: notifications.largeTransactionThreshold
+          ? toNum(notifications.largeTransactionThreshold)
+          : null,
+      },
+    };
   }),
 
   updateNotifications: protectedProcedure
