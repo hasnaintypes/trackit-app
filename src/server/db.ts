@@ -69,7 +69,26 @@ const globalForPrisma = globalThis as unknown as {
   prisma: ReturnType<typeof createPrismaClient> | undefined;
 };
 
-export const db = globalForPrisma.prisma ?? createPrismaClient();
+/**
+ * Lazy-initialized Prisma client.
+ *
+ * During Next.js builds the module graph is evaluated but no actual DB queries
+ * run.  Eager construction would fail in CI where DATABASE_URL is absent and
+ * the Prisma "client" engine requires an adapter.  The Proxy defers creation
+ * until the first property access at runtime.
+ */
+function getOrCreateClient(): PrismaClient {
+  if (!globalForPrisma.prisma) {
+    globalForPrisma.prisma = createPrismaClient();
+    logger.info("Prisma client initialized", {
+      env: process.env.NODE_ENV,
+    });
+  }
+  return globalForPrisma.prisma;
+}
 
-if (env.NODE_ENV !== "production") globalForPrisma.prisma = db;
-logger.info("Prisma client initialized", { env: env.NODE_ENV });
+export const db: PrismaClient = new Proxy({} as PrismaClient, {
+  get(_target, prop) {
+    return getOrCreateClient()[prop as keyof PrismaClient];
+  },
+});
