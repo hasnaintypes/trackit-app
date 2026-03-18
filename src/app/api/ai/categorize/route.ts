@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { createLogger } from "@/lib/logging";
 import { AIService } from "@/server/services/aiService";
 
+export const dynamic = "force-dynamic";
+
 const logger = createLogger("ai-categorize-route");
 import type { TransactionForAI } from "@/types/ai";
 import type { CategoryForAI } from "@/types/category";
