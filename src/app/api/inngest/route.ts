@@ -9,6 +9,7 @@ import { generateMonthlyReport } from "@/lib/inngest/functions/generate-monthly-
 import { sendWeeklyDigest } from "@/lib/inngest/functions/send-weekly-digest";
 import { sendBudgetAlertEmail } from "@/lib/inngest/functions/send-budget-alert-email";
 import { sendAiInsights } from "@/lib/inngest/functions/send-ai-insights";
+import { sendTransactionAlertEmail } from "@/lib/inngest/functions/send-transaction-alert-email";
 
 export const { GET, POST, PUT } = serve({
   client: inngest,
@@ -20,5 +21,6 @@ export const { GET, POST, PUT } = serve({
     sendWeeklyDigest,
     sendBudgetAlertEmail,
     sendAiInsights,
+    sendTransactionAlertEmail,
   ],
 });

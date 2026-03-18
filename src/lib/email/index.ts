@@ -190,21 +190,3 @@ export async function sendWeeklyDigest(
     data,
   });
 }
-
-export async function sendTransactionAlert(
-  to: string,
-  data: {
-    userName: string;
-    amount: number;
-    description: string;
-    date: string;
-    category: string;
-  },
-) {
-  await sendTemplateEmail({
-    to,
-    subject: `Large Transaction Alert: $${data.amount}`,
-    template: "transaction-alert",
-    data,
-  });
-}

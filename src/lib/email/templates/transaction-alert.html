@@ -106,7 +106,7 @@
   >
     <!-- Preheader -->
     <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all">
-      Large transaction detected: ${{amount}} &mdash; {{description}}
+      Large transaction of ${{amount}} detected on your account
       &#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;
     </div>
 
@@ -170,7 +170,7 @@
                     letter-spacing: 0.3px;
                   "
                 >
-                  Large Transaction Alert
+                  Transaction Alert
                 </p>
               </td>
             </tr>
@@ -211,11 +211,13 @@
                   "
                   class="text-secondary"
                 >
-                  A large transaction was detected on your account. Please
-                  review the details below.
+                  A large transaction of
+                  <strong style="color: #ef4444">${{amount}}</strong> has been
+                  recorded on your account, exceeding your alert threshold of
+                  ${{threshold}}.
                 </p>
 
-                <!-- Transaction card -->
+                <!-- Transaction details card -->
                 <table
                   role="presentation"
                   width="100%"
@@ -231,160 +233,115 @@
                   class="card-bg"
                 >
                   <tr>
-                    <td style="padding: 24px">
-                      <!-- Amount hero -->
-                      <p
-                        style="
-                          margin: 0 0 4px;
-                          font-size: 11px;
-                          font-weight: 700;
-                          color: #6b7280;
-                          text-transform: uppercase;
-                          letter-spacing: 0.8px;
-                        "
-                        class="text-muted"
-                      >
-                        Amount
-                      </p>
-                      <p
-                        style="
-                          margin: 0 0 20px;
-                          font-size: 32px;
-                          font-weight: 700;
-                          color: #111827;
-                          letter-spacing: -0.5px;
-                        "
-                        class="text-primary"
-                      >
-                        ${{amount}}
-                      </p>
-
-                      <!-- Details -->
+                    <td style="padding: 20px 24px">
                       <table
                         role="presentation"
                         width="100%"
                         cellpadding="0"
                         cellspacing="0"
                         border="0"
-                        style="border-top: 1px solid #e5e7eb"
                       >
                         <tr>
-                          <td style="padding: 14px 0 12px">
-                            <p
-                              style="
-                                margin: 0 0 2px;
-                                font-size: 11px;
-                                font-weight: 700;
-                                color: #6b7280;
-                                text-transform: uppercase;
-                                letter-spacing: 0.8px;
-                              "
-                              class="text-muted"
-                            >
-                              Description
-                            </p>
-                            <p
-                              style="
-                                margin: 0;
-                                font-size: 15px;
-                                font-weight: 500;
-                                color: #111827;
-                              "
-                              class="text-primary"
-                            >
-                              {{description}}
-                            </p>
+                          <td
+                            style="
+                              padding-bottom: 14px;
+                              font-size: 13px;
+                              color: #6b7280;
+                            "
+                            class="text-muted"
+                          >
+                            Amount
+                          </td>
+                          <td
+                            style="
+                              padding-bottom: 14px;
+                              font-size: 22px;
+                              font-weight: 700;
+                              text-align: right;
+                              color: #ef4444;
+                            "
+                          >
+                            ${{amount}}
                           </td>
                         </tr>
                         <tr>
-                          <td style="padding: 0 0 12px">
-                            <p
-                              style="
-                                margin: 0 0 2px;
-                                font-size: 11px;
-                                font-weight: 700;
-                                color: #6b7280;
-                                text-transform: uppercase;
-                                letter-spacing: 0.8px;
-                              "
-                              class="text-muted"
-                            >
-                              Date
-                            </p>
-                            <p
-                              style="
-                                margin: 0;
-                                font-size: 15px;
-                                font-weight: 500;
-                                color: #111827;
-                              "
-                              class="text-primary"
-                            >
-                              {{date}}
-                            </p>
+                          <td
+                            style="
+                              padding: 14px 0;
+                              font-size: 13px;
+                              color: #6b7280;
+                              border-top: 1px solid #e5e7eb;
+                            "
+                            class="text-muted"
+                          >
+                            Description
+                          </td>
+                          <td
+                            style="
+                              padding: 14px 0;
+                              font-size: 15px;
+                              font-weight: 600;
+                              text-align: right;
+                              color: #111827;
+                              border-top: 1px solid #e5e7eb;
+                            "
+                            class="text-primary"
+                          >
+                            {{description}}
                           </td>
                         </tr>
                         <tr>
-                          <td>
-                            <p
-                              style="
-                                margin: 0 0 2px;
-                                font-size: 11px;
-                                font-weight: 700;
-                                color: #6b7280;
-                                text-transform: uppercase;
-                                letter-spacing: 0.8px;
-                              "
-                              class="text-muted"
-                            >
-                              Category
-                            </p>
-                            <p
-                              style="
-                                margin: 0;
-                                font-size: 15px;
-                                font-weight: 500;
-                                color: #111827;
-                              "
-                              class="text-primary"
-                            >
-                              {{category}}
-                            </p>
+                          <td
+                            style="
+                              padding: 14px 0;
+                              font-size: 13px;
+                              color: #6b7280;
+                              border-top: 1px solid #e5e7eb;
+                            "
+                            class="text-muted"
+                          >
+                            Date
+                          </td>
+                          <td
+                            style="
+                              padding: 14px 0;
+                              font-size: 15px;
+                              font-weight: 600;
+                              text-align: right;
+                              color: #4b5563;
+                              border-top: 1px solid #e5e7eb;
+                            "
+                            class="text-secondary"
+                          >
+                            {{date}}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td
+                            style="
+                              padding-top: 14px;
+                              font-size: 13px;
+                              color: #6b7280;
+                              border-top: 1px solid #e5e7eb;
+                            "
+                            class="text-muted"
+                          >
+                            Alert Threshold
+                          </td>
+                          <td
+                            style="
+                              padding-top: 14px;
+                              font-size: 15px;
+                              font-weight: 600;
+                              text-align: right;
+                              color: #10b981;
+                              border-top: 1px solid #e5e7eb;
+                            "
+                          >
+                            ${{threshold}}
                           </td>
                         </tr>
                       </table>
-                    </td>
-                  </tr>
-                </table>
-
-                <!-- Warning box -->
-                <table
-                  role="presentation"
-                  width="100%"
-                  cellpadding="0"
-                  cellspacing="0"
-                  border="0"
-                  style="
-                    background-color: #fef2f2;
-                    border: 1px solid #fecaca;
-                    border-radius: 8px;
-                    margin-bottom: 32px;
-                  "
-                  class="card-bg"
-                >
-                  <tr>
-                    <td style="padding: 16px 20px">
-                      <p
-                        style="
-                          margin: 0;
-                          font-size: 13px;
-                          line-height: 1.6;
-                          color: #991b1b;
-                        "
-                      >
-                        If you don't recognize this transaction, please review
-                        it immediately and contact support if needed.
-                      </p>
                     </td>
                   </tr>
                 </table>
@@ -416,7 +373,7 @@
                           text-decoration: none;
                           border-radius: 8px;
                         "
-                        >View Transaction</a
+                        >View Transactions</a
                       >
                     </td>
                   </tr>
@@ -444,7 +401,8 @@
                   "
                   class="text-muted"
                 >
-                  You received this because transaction alerts are enabled.
+                  You received this because large transaction alerts are
+                  enabled.
                 </p>
                 <p
                   style="margin: 0 0 12px; font-size: 12px; color: #9ca3af"

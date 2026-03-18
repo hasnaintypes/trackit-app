@@ -281,6 +281,9 @@ export class BudgetService {
         title: "Large Transaction Detected",
         message: `A transaction for ${amount.toFixed(2)} (${description}) exceeds your set threshold of ${threshold.toFixed(2)}.`,
       });
+
+      const { emitTransactionAlert } = await import("@/constants/events");
+      await emitTransactionAlert({ userId, amount, description, threshold });
     }
   }
 
