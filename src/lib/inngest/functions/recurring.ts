@@ -1,5 +1,6 @@
 import { inngest } from "../client";
 import { RECURRING_EVENT, enqueueRecurringRun } from "@/constants/events";
+import { RecurringSchema } from "@/constants/event-schemas";
 import { createLogger } from "@/lib/logging";
 import { db } from "@/server/db";
 
@@ -7,7 +8,6 @@ const logger = createLogger("inngest-recurring");
 import { calculateNextRunAt } from "@/lib/recurrence";
 import { sendEmail } from "@/lib/email";
 import { toNum } from "@shared/decimal";
-import type { RecurringRule } from "@prisma/client";
 import { RecurringStatus } from "@prisma/client";
 import type { RecurrenceConfig } from "@/types/recurrence";
 
@@ -18,19 +18,32 @@ export const processRecurringTransaction = inngest.createFunction(
   },
   { event: RECURRING_EVENT },
   async ({ event }) => {
-    const ruleId = (event.data as { ruleId?: string } | undefined)?.ruleId;
-    if (!ruleId) return;
+    const { ruleId } = RecurringSchema.parse(event.data);
 
-    const rawRule = await db.recurringRule.findUnique({
+    const rule = await db.recurringRule.findUnique({
       where: { id: ruleId },
-      include: { user: true },
+      select: {
+        id: true,
+        userId: true,
+        accountId: true,
+        categoryId: true,
+        amount: true,
+        type: true,
+        description: true,
+        notes: true,
+        frequency: true,
+        interval: true,
+        dayOfMonth: true,
+        dayOfWeek: true,
+        startDate: true,
+        endDate: true,
+        nextRunAt: true,
+        status: true,
+        user: { select: { email: true } },
+      },
     });
-    if (!rawRule) return;
-    if (rawRule.status !== RecurringStatus.ACTIVE) return;
-
-    const rule = rawRule as RecurringRule & {
-      user?: { email?: string | null } | null;
-    };
+    if (!rule) return;
+    if (rule.status !== RecurringStatus.ACTIVE) return;
 
     if (rule.nextRunAt > new Date()) {
       return;
@@ -131,7 +144,14 @@ export const notifyUpcomingRecurring = inngest.createFunction(
             lte: tomorrow,
           },
         },
-        include: { user: true },
+        select: {
+          id: true,
+          userId: true,
+          description: true,
+          amount: true,
+          nextRunAt: true,
+          user: { select: { email: true } },
+        },
       });
     });
 

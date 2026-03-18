@@ -5,8 +5,7 @@ import { toNum } from "@shared/decimal";
 
 const logger = createLogger("inngest-weekly-digest");
 import { startOfWeek, endOfWeek, subWeeks, format } from "date-fns";
-import { sendEmail } from "@/lib/email";
-import { getTemplate } from "@/lib/email/template-cache";
+import { sendEmail, compileTemplate } from "@/lib/email";
 import { env } from "@/env";
 
 interface DigestResult {
@@ -162,8 +161,6 @@ export const sendWeeklyDigest = inngest.createFunction(
     });
 
     await step.run("send-emails", async () => {
-      const template = await getTemplate("weekly-digest.html");
-
       for (const result of results) {
         if (!result.success) continue;
 
@@ -171,48 +168,24 @@ export const sendWeeklyDigest = inngest.createFunction(
         if (!user) continue;
 
         try {
-          const res = result;
-          let emailHtml = template
-            .replace(/{{userName}}/g, user.name)
-            .replace(/{{period}}/g, period)
-            .replace(/{{totalIncome}}/g, (res.totalIncome ?? 0).toFixed(2))
-            .replace(/{{totalExpenses}}/g, (res.totalExpenses ?? 0).toFixed(2))
-            .replace(
-              /{{netSavings}}/g,
-              ((res.totalIncome ?? 0) - (res.totalExpenses ?? 0)).toFixed(2),
-            )
-            .replace(
-              /{{netSavingsColor}}/g,
-              (res.totalIncome ?? 0) - (res.totalExpenses ?? 0) >= 0
-                ? "#10b981"
-                : "#ef4444",
-            )
-            .replace(/{{appUrl}}/g, env.NEXT_PUBLIC_APP_URL ?? "")
-            .replace(
-              /{{aiAnomalies}}/g,
-              (res as { anomalies?: string | null }).anomalies ??
-                "No unusual activity detected this week.",
-            );
+          const netSavings =
+            (result.totalIncome ?? 0) - (result.totalExpenses ?? 0);
 
-          const topCategoriesHtml = (res.topCategories ?? [])
-            .map(
-              (cat: { name: string; amount: number }) => `
-              <tr>
-                <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7;">
-                  <span style="font-size: 14px; color: #18181b;">${cat.name}</span>
-                </td>
-                <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; text-align: right;">
-                  <span style="font-size: 14px; font-weight: 500; color: #18181b;">$${cat.amount.toFixed(2)}</span>
-                </td>
-              </tr>
-            `,
-            )
-            .join("");
-
-          emailHtml = emailHtml.replace(
-            /{{#each topCategories}}[\s\S]*?{{\/each}}/,
-            topCategoriesHtml,
-          );
+          const emailHtml = await compileTemplate("weekly-digest.html", {
+            userName: user.name,
+            period,
+            totalIncome: (result.totalIncome ?? 0).toFixed(2),
+            totalExpenses: (result.totalExpenses ?? 0).toFixed(2),
+            netSavings: netSavings.toFixed(2),
+            netSavingsColor: netSavings >= 0 ? "#10b981" : "#ef4444",
+            appUrl: env.NEXT_PUBLIC_APP_URL ?? "",
+            aiAnomalies:
+              result.anomalies ?? "No unusual activity detected this week.",
+            topCategories: (result.topCategories ?? []).map((cat) => ({
+              name: cat.name,
+              amount: cat.amount.toFixed(2),
+            })),
+          });
 
           await sendEmail({
             to: user.email,

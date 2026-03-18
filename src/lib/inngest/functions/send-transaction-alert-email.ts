@@ -1,7 +1,9 @@
 import { inngest } from "@/lib/inngest/client";
+import { NonRetriableError } from "inngest";
 import { createLogger } from "@/lib/logging";
 import { db } from "@/server/db";
 import { TRANSACTION_ALERT_EVENT } from "@/constants/events";
+import { TransactionAlertSchema } from "@/constants/event-schemas";
 import { sendTemplateEmail } from "@/lib/email";
 
 const logger = createLogger("inngest-transaction-alert");
@@ -18,12 +20,8 @@ export const sendTransactionAlertEmail = inngest.createFunction(
   { event: TRANSACTION_ALERT_EVENT },
 
   async ({ event, step }) => {
-    const { userId, amount, description, threshold } = event.data as {
-      userId: string;
-      amount: number;
-      description: string;
-      threshold: number;
-    };
+    const { userId, amount, description, threshold } =
+      TransactionAlertSchema.parse(event.data);
 
     const user = await step.run("fetch-user", async () => {
       return db.user.findUnique({
@@ -33,8 +31,9 @@ export const sendTransactionAlertEmail = inngest.createFunction(
     });
 
     if (!user) {
-      logger.error("User not found for transaction alert", { userId });
-      return;
+      throw new NonRetriableError(
+        `User ${userId} not found for transaction alert`,
+      );
     }
 
     await step.run("send-email", async () => {

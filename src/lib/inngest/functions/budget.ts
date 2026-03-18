@@ -1,11 +1,11 @@
 import { inngest } from "../client";
 import { TRANSACTION_PROCESSED_EVENT } from "@/constants/events";
+import { TransactionProcessedSchema } from "@/constants/event-schemas";
 import { BudgetService } from "@/server/services/budgetService";
 import { toNum } from "@shared/decimal";
 import { NotificationService } from "@/server/services/notificationService";
 import { NotificationType } from "@prisma/client";
-import { sendEmail } from "@/lib/email";
-import { getTemplate } from "@/lib/email/template-cache";
+import { sendEmail, compileTemplate } from "@/lib/email";
 import { env } from "@/env";
 import { db } from "@/server/db";
 import { AIService } from "@/server/services/aiService";
@@ -19,13 +19,7 @@ export const evaluateBudgetOnTransaction = inngest.createFunction(
   { event: TRANSACTION_PROCESSED_EVENT },
   async ({ event, step }) => {
     const { userId, categoryId, date, accountId, transactionId } =
-      event.data as {
-        userId: string;
-        transactionId: string;
-        accountId: string;
-        categoryId: string | null;
-        date: string;
-      };
+      TransactionProcessedSchema.parse(event.data);
 
     // 1. Core Budget Re-evaluation
     if (categoryId) {
@@ -33,7 +27,7 @@ export const evaluateBudgetOnTransaction = inngest.createFunction(
         await BudgetService.evaluateBudgets({
           userId,
           categoryId,
-          date: new Date(date),
+          date,
         });
       });
     }
@@ -42,6 +36,7 @@ export const evaluateBudgetOnTransaction = inngest.createFunction(
     await step.run("check-thresholds", async () => {
       const transaction = await db.transaction.findUnique({
         where: { id: transactionId },
+        select: { amount: true, description: true },
       });
       if (transaction) {
         await BudgetService.checkLargeTransaction(
@@ -77,22 +72,17 @@ export const evaluateBudgetOnTransaction = inngest.createFunction(
           });
 
           // 2. Immediate Email Alert
-          let template = await getTemplate("ai-insight.html");
-
-          template = template
-            .replace(/{{userName}}/g, user.name ?? "there")
-            .replace(
-              /{{aiContent}}/g,
-              `${severe.reason}. We recommend reviewing your recent transactions for accuracy.`,
-            )
-            .replace(/{{appUrl}}/g, env.NEXT_PUBLIC_APP_URL ?? "")
-            .replace("{{#if hasAnomalies}}", "")
-            .replace("{{/if}}", "");
+          const emailHtml = await compileTemplate("ai-insight.html", {
+            userName: user.name ?? "there",
+            aiContent: `${severe.reason}. We recommend reviewing your recent transactions for accuracy.`,
+            appUrl: env.NEXT_PUBLIC_APP_URL ?? "",
+            hasAnomalies: true,
+          });
 
           await sendEmail({
             to: user.email,
             subject: "High Priority: Unusual Activity Detected",
-            html: template,
+            html: emailHtml,
           });
         }
       }

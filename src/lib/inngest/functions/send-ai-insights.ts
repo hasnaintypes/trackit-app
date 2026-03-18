@@ -3,8 +3,7 @@ import { createLogger } from "@/lib/logging";
 import { db } from "@/server/db";
 
 const logger = createLogger("inngest-ai-insights");
-import { sendEmail } from "@/lib/email";
-import { getTemplate } from "@/lib/email/template-cache";
+import { sendEmail, compileTemplate } from "@/lib/email";
 import { env } from "@/env";
 import { format, subDays } from "date-fns";
 
@@ -59,19 +58,17 @@ export const sendAiInsights = inngest.createFunction(
 
         if (insights) {
           await step.run(`send-email-${user.id}`, async () => {
-            // Read template from cache
-            let template = await getTemplate("ai-insight.html");
-
-            template = template
-              .replace(/{{userName}}/g, user.name ?? "there")
-              .replace(/{{aiContent}}/g, insights)
-              .replace(/{{appUrl}}/g, env.NEXT_PUBLIC_APP_URL ?? "")
-              .replace(/{{#if hasAnomalies}}[\s\S]*?{{\/if}}/, ""); // Cleanup if tag not used
+            const emailHtml = await compileTemplate("ai-insight.html", {
+              userName: user.name ?? "there",
+              aiContent: insights,
+              appUrl: env.NEXT_PUBLIC_APP_URL ?? "",
+              hasAnomalies: false,
+            });
 
             await sendEmail({
               to: user.email,
               subject: "Your AI Spending Analysis",
-              html: template,
+              html: emailHtml,
             });
           });
           results.push({ userId: user.id, success: true });
