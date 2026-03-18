@@ -1,3 +1,31 @@
+# [1.2.0](https://github.com/hasnaintypes/trackit-app/compare/v1.1.0...v1.2.0) (2026-03-18)
+
+### Bug Fixes
+
+- add error boundaries and fix useIsMobile hydration mismatch ([aa6880b](https://github.com/hasnaintypes/trackit-app/commit/aa6880b0ad901dedfe731952f99f72986dc91d00))
+- **ai:** strip raw response from errors, add date filter to anomalies, and isFinite guard ([9e5acd5](https://github.com/hasnaintypes/trackit-app/commit/9e5acd5450369f863244b414c758ca66c80cd0b2))
+- **build:** add force-dynamic to AI API routes to prevent Prisma errors during static generation ([554af6b](https://github.com/hasnaintypes/trackit-app/commit/554af6ba8a7ced9b090732eef7bd90a58cf0620c))
+- **db:** lazy-initialize PrismaClient to prevent build failures in CI ([68094bc](https://github.com/hasnaintypes/trackit-app/commit/68094bc33c2d4cc2f07f63ee80c769774054aecd))
+- **email:** add compileTemplate helper, email validation, template whitelist, and HTTP status in errors ([412ae5e](https://github.com/hasnaintypes/trackit-app/commit/412ae5e57e86b19b43b74b394ea1268316846e6f))
+- **inngest:** add Zod event validation, NonRetriableError, Handlebars migration, and select clauses ([e2212b3](https://github.com/hasnaintypes/trackit-app/commit/e2212b32e1b6fa57573dd16c9c88f4d02bb868aa))
+- **lint:** use optional chain in checkLowBalance ownership check ([4de207c](https://github.com/hasnaintypes/trackit-app/commit/4de207cdcec934cf92b8f765a34b025ab99eb7fc))
+- **logging:** use process.env.NODE_ENV instead of T3 env for client compatibility ([68b520e](https://github.com/hasnaintypes/trackit-app/commit/68b520ef504eee41daad5fcf161758fb165203d2))
+- resolve client-side env access in error page and Decimal serialization in settings ([1d62bbb](https://github.com/hasnaintypes/trackit-app/commit/1d62bbb8ab4cf3d867b0e3d5137d38a86f1f9f34))
+- **routers:** move ownership checks into WHERE clause for account and category lookups ([dc206b3](https://github.com/hasnaintypes/trackit-app/commit/dc206b31d1fed60c6fc65fe49d9124fc99793d28))
+- **security:** add category ownership validation, open redirect guard, and auth rate limiting ([7d87d71](https://github.com/hasnaintypes/trackit-app/commit/7d87d71b20053ba2493853e1661dffe77a3260bc))
+- upgrade Next.js to 15.5.9 and React to 19.2.4 ([b82e39b](https://github.com/hasnaintypes/trackit-app/commit/b82e39b0eb007bebfadad3f0afcb420092e4e97d))
+
+### Features
+
+- implement transaction alert email pipeline ([edf1acf](https://github.com/hasnaintypes/trackit-app/commit/edf1acfd84518d872f0c4707bb9155e3704d488d))
+
+### Performance Improvements
+
+- add database indexes and constraints ([4d05b52](https://github.com/hasnaintypes/trackit-app/commit/4d05b529e3df606588541eab7f36b700c3cb75b4))
+- add React.memo, useCallback, and Suspense across client components ([675a19c](https://github.com/hasnaintypes/trackit-app/commit/675a19ca03b0a334700b003b84601f49c771d6bd))
+- **budget:** fix N+1 in evaluateBudgets and add ownership check to checkLowBalance ([33eaa49](https://github.com/hasnaintypes/trackit-app/commit/33eaa49d3b98213e0c03dd78928502e0955cf55a))
+- optimize backend with DB aggregations, N+1 fix, and worker reliability ([ee9f456](https://github.com/hasnaintypes/trackit-app/commit/ee9f456d399f3a3c26901e5754943c9047876259))
+
 # [1.1.0](https://github.com/hasnaintypes/trackit-app/compare/v1.0.0...v1.1.0) (2026-03-17)
 
 ### Bug Fixes
