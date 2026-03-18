@@ -20,6 +20,7 @@ interface SendTemplateEmailOptions {
     | "monthly-summary"
     | "weekly-digest"
     | "transaction-alert"
+    | "ai-insight"
     | "verification"
     | "password-reset";
   data: Record<string, unknown>;
@@ -42,7 +43,7 @@ async function sendViaResend(
   });
   if (!response.ok) {
     const error = await response.text();
-    throw new Error(`Resend API error: ${error}`);
+    throw new Error(`Resend API error (${response.status}): ${error}`);
   }
 }
 
@@ -66,12 +67,19 @@ async function sendViaSmtp(
   await transporter.sendMail({ from, to, subject, html });
 }
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 // --- Smart sendEmail: try Resend first, fall back to SMTP ---
 export async function sendEmail({
   to,
   subject,
   html,
 }: SendEmailOptions): Promise<void> {
+  if (!EMAIL_REGEX.test(to)) {
+    logger.error("Invalid email address", { to });
+    throw new Error(`Invalid email address: ${to}`);
+  }
+
   const hasResend = !!env.RESEND_API_KEY && !!env.EMAIL_FROM;
   const hasSmtp = !!env.SMTP_HOST && !!env.SMTP_USER && !!env.SMTP_PASS;
 
@@ -98,6 +106,18 @@ export async function sendEmail({
   throw new Error(
     "No email transport configured. Set RESEND_API_KEY or SMTP_HOST.",
   );
+}
+
+/**
+ * Compile an HTML template file with Handlebars data.
+ * Use this instead of importing Handlebars directly in workers.
+ */
+export async function compileTemplate(
+  templateFile: string,
+  data: Record<string, unknown>,
+): Promise<string> {
+  const source = await getTemplate(templateFile);
+  return Handlebars.compile(source)(data);
 }
 
 /**
