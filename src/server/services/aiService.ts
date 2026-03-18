@@ -253,8 +253,9 @@ export class AIService {
    * Detect anomalous transactions
    */
   static async detectAnomalies(userId: string) {
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const transactions = await db.transaction.findMany({
-      where: { userId },
+      where: { userId, date: { gte: thirtyDaysAgo } },
       select: {
         type: true,
         amount: true,
@@ -565,7 +566,7 @@ export class AIService {
     } catch (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: `Failed to parse AI response: ${error instanceof Error ? error.message : "Unknown parsing error"}. Raw response: ${jsonText.substring(0, 200)}...`,
+        message: `Failed to parse AI response: ${error instanceof Error ? error.message : "Unknown parsing error"}`,
       });
     }
   }
@@ -671,7 +672,10 @@ export class AIService {
             ? null
             : undefined;
       let categoryConfidence: number | null | undefined = undefined;
-      if (typeof obj.categoryConfidence === "number") {
+      if (
+        typeof obj.categoryConfidence === "number" &&
+        Number.isFinite(obj.categoryConfidence)
+      ) {
         let conf = Math.round(obj.categoryConfidence);
         if (conf < 0) conf = 0;
         if (conf > 100) conf = 100;
@@ -774,7 +778,7 @@ export class AIService {
     } catch (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: `Failed to parse receipt AI response: ${error instanceof Error ? error.message : String(error)}. Raw: ${jsonText.substring(0, 200)}...`,
+        message: `Failed to parse receipt AI response: ${error instanceof Error ? error.message : String(error)}`,
       });
     }
   }
