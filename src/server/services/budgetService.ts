@@ -356,8 +356,7 @@ export class BudgetService {
     if (
       !prefs?.lowBalanceThreshold ||
       !prefs.emailLowBalanceAlerts ||
-      !account ||
-      account.userId !== userId
+      account?.userId !== userId
     )
       return;
 
