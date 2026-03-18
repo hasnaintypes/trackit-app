@@ -43,6 +43,16 @@ function isAuthPath(pathname: string) {
   return AUTH_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
 }
 
+/** Guard against open redirect attacks — only allow relative paths. */
+function isValidRedirectPath(path: string): boolean {
+  return (
+    path.startsWith("/") &&
+    !path.startsWith("//") &&
+    !path.includes(":\\") &&
+    !/^\/[^/]*@/.test(path)
+  );
+}
+
 /**
  * Heuristic check for an authenticated request.
  *
@@ -100,7 +110,9 @@ export function middleware(req: NextRequest) {
   if (!isAuth) {
     const url = req.nextUrl.clone();
     url.pathname = "/sign-in";
-    url.searchParams.set("redirectTo", pathname);
+    if (isValidRedirectPath(pathname)) {
+      url.searchParams.set("redirectTo", pathname);
+    }
     return NextResponse.redirect(url);
   }
 

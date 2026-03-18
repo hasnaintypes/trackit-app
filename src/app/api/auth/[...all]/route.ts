@@ -1,13 +1,44 @@
 import { auth } from "@/lib/auth";
 import { toNextJsHandler } from "better-auth/next-js";
 import { createLogger } from "@/lib/logging";
+import { checkRateLimit } from "@/server/api/rateLimit";
 
 const logger = createLogger("api:auth");
+
+const AUTH_RATE_LIMIT_MAX = 10;
+
+function getClientIp(req: Request): string {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0]?.trim() ?? "unknown";
+  return "unknown";
+}
 
 function logHandlerWrapper<
   T extends (req: Request, ...args: unknown[]) => Promise<Response>,
 >(handler: T): T {
   return (async (req: Request, ...args: unknown[]) => {
+    const ip = getClientIp(req);
+
+    // Rate limit auth endpoints by IP
+    const { allowed, resetAt } = await checkRateLimit(
+      ip,
+      "auth",
+      AUTH_RATE_LIMIT_MAX,
+    );
+    if (!allowed) {
+      logger.warn("Auth rate limit exceeded", { ip });
+      return new Response(
+        JSON.stringify({ error: "Too many requests. Please try again later." }),
+        {
+          status: 429,
+          headers: {
+            "Content-Type": "application/json",
+            "Retry-After": String(Math.ceil((resetAt - Date.now()) / 1000)),
+          },
+        },
+      );
+    }
+
     logger.info("Auth API called", { method: req.method, url: req.url });
     try {
       return await handler(req, ...args);
