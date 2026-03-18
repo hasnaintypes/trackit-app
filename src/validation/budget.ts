@@ -3,7 +3,7 @@ import { BudgetPeriod } from "@prisma/client";
 
 export const createBudgetSchema = z.object({
   categoryId: z.string().min(1),
-  amount: z.number().min(0),
+  amount: z.number().min(0.01, "Budget amount must be positive"),
   period: z.nativeEnum(BudgetPeriod),
   startDate: z.date(),
   endDate: z.date().optional(),

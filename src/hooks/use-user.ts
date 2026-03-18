@@ -1,21 +1,12 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { api } from "@/trpc/react";
-import { invalidateUser } from "@/lib/trpc/invalidation";
-import { useUserStore } from "@/store/userStore";
-import type { User, ApiUser } from "@/types/user";
-
-function mapApiToUser(apiUser: ApiUser): User {
-  return {
-    ...apiUser,
-    createdAt: new Date(apiUser.createdAt),
-    updatedAt: new Date(apiUser.updatedAt),
-    banExpires: apiUser.banExpires ? new Date(apiUser.banExpires) : null,
-  };
-}
+import { invalidateUser } from "@/trpc/invalidation";
+import type { ApiUser } from "@/types/user";
 
 /**
  * useUser hook
  *
+ * Single source of truth for user data via React Query / tRPC.
  * - reads the current user via `api.user.getMe`
  * - exposes `updateProfile` and `uploadProfileImage` helpers
  * - provides a convenience `uploadFile` that accepts a File and performs
@@ -25,18 +16,6 @@ export function useUser() {
   const getMe = api.user.getMe.useQuery(undefined, {
     staleTime: 1000 * 60 * 5,
   });
-
-  const setUser = useUserStore((s) => s.setUser);
-
-  useEffect(() => {
-    if (!getMe.data) {
-      setUser(null);
-      return;
-    }
-
-    const typedUser = getMe.data as ApiUser;
-    setUser(mapApiToUser(typedUser));
-  }, [getMe.data, setUser]);
 
   const utils = api.useUtils();
 
@@ -53,7 +32,6 @@ export function useUser() {
     onSuccess: (updatedUser) => {
       const typedUser = updatedUser as ApiUser;
       utils.user.getMe.setData(undefined, typedUser);
-      setUser(mapApiToUser(typedUser));
       void invalidateUser(utils);
       return updatedUser;
     },

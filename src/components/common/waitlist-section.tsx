@@ -1,9 +1,9 @@
 "use client";
 import React, { useState } from "react";
 
-import { Avatars } from "@component/common";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Avatars } from "@common/index";
+import { Button } from "@ui/button";
+import { Input } from "@ui/input";
 import { toast } from "sonner";
 
 const WaitlistSection = () => {

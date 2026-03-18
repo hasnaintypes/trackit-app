@@ -3,12 +3,12 @@
 import React, { Suspense } from "react";
 import dynamic from "next/dynamic";
 import { api } from "@/trpc/react";
-import { toNum } from "@/lib/shared/decimal";
+import { toNum } from "@shared/decimal";
 import { Loader2, Wallet } from "lucide-react";
 import { BudgetCard } from "@/components/pages/(protected)/budget/budget-card";
 import { CreateBudgetDialog } from "@/components/pages/(protected)/budget/create-budget-dialog";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { ChartConfig } from "@/components/ui/chart";
+import { Skeleton } from "@ui/skeleton";
+import type { ChartConfig } from "@ui/chart";
 
 const GenericRadarChart = dynamic(
   () =>

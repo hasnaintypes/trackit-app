@@ -12,7 +12,6 @@ export function useFormatter() {
     overrideCurrency?: Currency,
   ) => {
     if (isLoading || !settings) {
-      // Return a basic fallback while loading
       return new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: overrideCurrency ?? "USD",

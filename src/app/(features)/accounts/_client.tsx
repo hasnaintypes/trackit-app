@@ -1,18 +1,18 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { Suspense, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { Wallet, PlusCircle } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@ui/button";
+import { Skeleton } from "@ui/skeleton";
 
 const AccountForm = dynamic(
   () => import("@/components/forms/accounts/account-form"),
   { ssr: false, loading: () => null },
 );
-import { DeleteDialog } from "@/components/common/delete-dialog";
+import { DeleteDialog } from "@common/delete-dialog";
 import { useAccounts } from "@/hooks/use-accounts";
 import { useFormatter } from "@/hooks/use-formatter";
 import type { BankAccount as Account } from "@/types/account";
@@ -42,6 +42,26 @@ export default function AccountsPageClient() {
     editingAccount: Account | ApiAccount | null;
     deletingId: string | null;
   }>({ isCreateOpen: false, editingAccount: null, deletingId: null });
+
+  const handleOpenCreate = useCallback(() => {
+    setModalState((prev) => ({ ...prev, isCreateOpen: true }));
+  }, []);
+
+  const handleCreateOpenChange = useCallback((open: boolean) => {
+    setModalState((prev) => ({ ...prev, isCreateOpen: open }));
+  }, []);
+
+  const handleEditOpenChange = useCallback((open: boolean) => {
+    if (!open) {
+      setModalState((prev) => ({ ...prev, editingAccount: null }));
+    }
+  }, []);
+
+  const handleDeleteOpenChange = useCallback((open: boolean) => {
+    if (!open) {
+      setModalState((prev) => ({ ...prev, deletingId: null }));
+    }
+  }, []);
 
   const handleEdit = useCallback(
     (e: React.MouseEvent, account: Account | ApiAccount) => {
@@ -80,12 +100,7 @@ export default function AccountsPageClient() {
         </div>
         <div className="flex items-center gap-2">
           {accounts.length > 0 && (
-            <Button
-              onClick={() =>
-                setModalState((prev) => ({ ...prev, isCreateOpen: true }))
-              }
-              className="gap-2 shadow-sm"
-            >
+            <Button onClick={handleOpenCreate} className="gap-2 shadow-sm">
               <PlusCircle className="h-4 w-4" />
               Add Account
             </Button>
@@ -97,11 +112,7 @@ export default function AccountsPageClient() {
         {isLoading ? (
           <AccountSkeleton />
         ) : accounts.length === 0 ? (
-          <EmptyState
-            onCreate={() =>
-              setModalState((prev) => ({ ...prev, isCreateOpen: true }))
-            }
-          />
+          <EmptyState onCreate={handleOpenCreate} />
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {accounts.map((account) => (
@@ -118,29 +129,26 @@ export default function AccountsPageClient() {
         )}
       </div>
 
-      <AccountForm
-        open={modalState.isCreateOpen}
-        onOpenChange={(open) =>
-          setModalState((prev) => ({ ...prev, isCreateOpen: open }))
-        }
-      />
+      <Suspense fallback={null}>
+        <AccountForm
+          open={modalState.isCreateOpen}
+          onOpenChange={handleCreateOpenChange}
+        />
+      </Suspense>
 
       {modalState.editingAccount && (
-        <AccountForm
-          open={true}
-          onOpenChange={(open) =>
-            !open &&
-            setModalState((prev) => ({ ...prev, editingAccount: null }))
-          }
-          initialValues={mapToInitialValues(modalState.editingAccount)}
-        />
+        <Suspense fallback={null}>
+          <AccountForm
+            open={true}
+            onOpenChange={handleEditOpenChange}
+            initialValues={mapToInitialValues(modalState.editingAccount)}
+          />
+        </Suspense>
       )}
 
       <DeleteDialog
         open={!!modalState.deletingId}
-        onOpenChange={(open) =>
-          !open && setModalState((prev) => ({ ...prev, deletingId: null }))
-        }
+        onOpenChange={handleDeleteOpenChange}
         title="Delete Account"
         description="Are you sure you want to delete this account? All associated transactions will be permanently removed."
         confirmText="Delete Account"

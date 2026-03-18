@@ -11,7 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from "@ui/alert-dialog";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { createLogger } from "@/lib/logging";

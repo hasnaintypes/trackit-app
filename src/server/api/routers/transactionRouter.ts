@@ -14,7 +14,7 @@ import { calculateNextRunAt } from "@/lib/recurrence";
 import {
   enqueueRecurringRun,
   emitTransactionProcessed,
-} from "@/lib/inngest/events";
+} from "@/constants/events";
 import {
   createTransactionSchema,
   updateTransactionSchema,
@@ -533,14 +533,18 @@ export const transactionRouter = createTRPCRouter({
       z.object({
         transactionId: z.string().optional(),
         fileDataUrl: z.string().min(1).max(10_000_000), // ~7.5MB base64 limit
-        fileName: z.string().optional(),
+        fileName: z
+          .string()
+          .regex(/^[\w\-.]+$/, "Invalid file name characters")
+          .max(255)
+          .optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const prisma = ctx.db;
       const userId = ctx.user.id;
       // Lazy import of server-side upload helper
-      const { uploadImage } = await import("@/lib/shared/imagekit");
+      const { uploadImage } = await import("@shared/imagekit");
 
       const res = await uploadImage({
         file: input.fileDataUrl,

@@ -1,13 +1,13 @@
 import { inngest } from "../client";
-import { RECURRING_EVENT, enqueueRecurringRun } from "../events";
+import { RECURRING_EVENT, enqueueRecurringRun } from "@/constants/events";
+import { RecurringSchema } from "@/constants/event-schemas";
 import { createLogger } from "@/lib/logging";
 import { db } from "@/server/db";
 
 const logger = createLogger("inngest-recurring");
 import { calculateNextRunAt } from "@/lib/recurrence";
 import { sendEmail } from "@/lib/email";
-import { toNum } from "@/lib/shared/decimal";
-import type { RecurringRule } from "@prisma/client";
+import { toNum } from "@shared/decimal";
 import { RecurringStatus } from "@prisma/client";
 import type { RecurrenceConfig } from "@/types/recurrence";
 
@@ -18,41 +18,38 @@ export const processRecurringTransaction = inngest.createFunction(
   },
   { event: RECURRING_EVENT },
   async ({ event }) => {
-    const ruleId = (event.data as { ruleId?: string } | undefined)?.ruleId;
-    if (!ruleId) return;
+    const { ruleId } = RecurringSchema.parse(event.data);
 
-    const rawRule = await db.recurringRule.findUnique({
+    const rule = await db.recurringRule.findUnique({
       where: { id: ruleId },
-      include: { user: true },
+      select: {
+        id: true,
+        userId: true,
+        accountId: true,
+        categoryId: true,
+        amount: true,
+        type: true,
+        description: true,
+        notes: true,
+        frequency: true,
+        interval: true,
+        dayOfMonth: true,
+        dayOfWeek: true,
+        startDate: true,
+        endDate: true,
+        nextRunAt: true,
+        status: true,
+        user: { select: { email: true } },
+      },
     });
-    if (!rawRule) return;
-    if (rawRule.status !== RecurringStatus.ACTIVE) return;
-
-    const rule = rawRule as RecurringRule & {
-      user?: { email?: string | null } | null;
-    };
+    if (!rule) return;
+    if (rule.status !== RecurringStatus.ACTIVE) return;
 
     if (rule.nextRunAt > new Date()) {
       return;
     }
 
     const runAt = new Date();
-
-    // Create the transaction for this recurrence instance
-    const createdTx = await db.transaction.create({
-      data: {
-        userId: rule.userId,
-        accountId: rule.accountId,
-        categoryId: rule.categoryId ?? null,
-        amount: rule.amount,
-        type: rule.type,
-        description: rule.description ?? null,
-        notes: rule.notes ?? null,
-        date: runAt,
-        isRecurring: true,
-        recurringRuleId: rule.id,
-      },
-    });
 
     const cfg: RecurrenceConfig = {
       frequency: rule.frequency as RecurrenceConfig["frequency"],
@@ -78,16 +75,33 @@ export const processRecurringTransaction = inngest.createFunction(
 
     const nextRunAt = calculateNextRunAt(cfg, runAt);
 
-    // Persist updates to the rule. Only include `nextRunAt` when we computed a new value;
-    // otherwise leave it untouched (schema requires nextRunAt to be non-nullable).
-    const updateData = {
-      lastRunAt: runAt,
-      lastTransactionId: createdTx.id,
-      status: nextRunAt ? RecurringStatus.ACTIVE : RecurringStatus.ENDED,
-      ...(nextRunAt && { nextRunAt }),
-    };
+    // Atomically create transaction and update rule to prevent duplicates on crash
+    await db.$transaction(async (tx) => {
+      const created = await tx.transaction.create({
+        data: {
+          userId: rule.userId,
+          accountId: rule.accountId,
+          categoryId: rule.categoryId ?? null,
+          amount: rule.amount,
+          type: rule.type,
+          description: rule.description ?? null,
+          notes: rule.notes ?? null,
+          date: runAt,
+          isRecurring: true,
+          recurringRuleId: rule.id,
+        },
+      });
 
-    await db.recurringRule.update({ where: { id: rule.id }, data: updateData });
+      await tx.recurringRule.update({
+        where: { id: rule.id },
+        data: {
+          lastRunAt: runAt,
+          lastTransactionId: created.id,
+          status: nextRunAt ? RecurringStatus.ACTIVE : RecurringStatus.ENDED,
+          ...(nextRunAt && { nextRunAt }),
+        },
+      });
+    });
 
     // Schedule the next occurrence, if any
     if (nextRunAt) {
@@ -130,7 +144,14 @@ export const notifyUpcomingRecurring = inngest.createFunction(
             lte: tomorrow,
           },
         },
-        include: { user: true },
+        select: {
+          id: true,
+          userId: true,
+          description: true,
+          amount: true,
+          nextRunAt: true,
+          user: { select: { email: true } },
+        },
       });
     });
 

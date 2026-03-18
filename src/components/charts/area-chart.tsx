@@ -13,7 +13,7 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart";
+} from "@ui/chart";
 import { cn } from "@/lib/utils";
 
 interface AreaChartProps {

@@ -6,29 +6,27 @@ import type {
   Country,
   Timezone,
   UpdateProfileInput,
-  User as UserType,
 } from "@/types/user";
 
 import { useState, useEffect } from "react";
 import { useUser } from "@/hooks/use-user";
-import { useUserStore } from "@/store/userStore";
 import { toast } from "sonner";
 import {
   GenderOptions,
   CountryOptions,
   TimezoneOptions,
-} from "@/lib/format-options";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+} from "@/constants/formatting";
+import { Card, CardContent } from "@ui/card";
+import { Input } from "@ui/input";
+import { Button } from "@ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+} from "@ui/select";
+import { Label } from "@ui/label";
 import { CheckCircle, ImagePlus } from "lucide-react";
 import Image from "next/image";
 
@@ -54,17 +52,14 @@ export default function EditProfileSection() {
   });
 
   useEffect(() => {
-    const storeUser = useUserStore.getState().user;
-    const activeUser = user ?? storeUser;
-
-    if (activeUser) {
+    if (user) {
       setFormData((prev) => ({
         ...prev,
-        fullName: activeUser.name ?? "",
-        email: activeUser.email ?? "",
-        gender: activeUser.gender ?? prev.gender,
-        country: activeUser.country ?? prev.country,
-        timezone: activeUser.timezone ?? prev.timezone,
+        fullName: user.name ?? "",
+        email: user.email ?? "",
+        gender: user.gender! ?? prev.gender,
+        country: user.country! ?? prev.country,
+        timezone: user.timezone! ?? prev.timezone,
       }));
     }
   }, [user]);
@@ -90,8 +85,6 @@ export default function EditProfileSection() {
     }
   };
 
-  const setStoreUser = useUserStore((state) => state.setUser);
-
   const handleUpdateProfile = async () => {
     try {
       setIsUpdatingProfile(true);
@@ -103,48 +96,7 @@ export default function EditProfileSection() {
         timezone: formData.timezone ?? undefined,
       };
 
-      const updatedUser = await updateProfile(updateData);
-
-      if (updatedUser) {
-        const api = updatedUser as unknown as Record<string, unknown>;
-        const idVal = api.id;
-        const createdVal = api.createdAt;
-        const updatedVal = api.updatedAt;
-        const banExpiresVal = api.banExpires;
-
-        const mappedUser: UserType = {
-          id:
-            typeof idVal === "string" || typeof idVal === "number"
-              ? String(idVal)
-              : "",
-          name: (api.name as string) ?? "",
-          email: (api.email as string) ?? "",
-          emailVerified: Boolean(api.emailVerified ?? false),
-          image: (api.image as string) ?? "",
-          gender: (api.gender as Gender) ?? null,
-          country: (api.country as Country) ?? null,
-          timezone: (api.timezone as Timezone) ?? null,
-          banned: Boolean(api.banned ?? false),
-          banReason: (api.banReason as string) ?? null,
-          banExpires:
-            typeof banExpiresVal === "string" ||
-            typeof banExpiresVal === "number"
-              ? new Date(String(banExpiresVal))
-              : null,
-          role: (api.role as string) ?? "user",
-          hasCompletedOnboarding: Boolean(api.hasCompletedOnboarding ?? false),
-          createdAt:
-            typeof createdVal === "string" || typeof createdVal === "number"
-              ? new Date(String(createdVal))
-              : new Date(),
-          updatedAt:
-            typeof updatedVal === "string" || typeof updatedVal === "number"
-              ? new Date(String(updatedVal))
-              : new Date(),
-        };
-
-        setStoreUser(mappedUser);
-      }
+      await updateProfile(updateData);
 
       toast.success("Profile updated successfully");
     } catch (error) {

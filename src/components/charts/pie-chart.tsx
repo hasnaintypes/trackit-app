@@ -7,7 +7,7 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart";
+} from "@ui/chart";
 
 interface PieChartProps {
   data: Record<string, unknown>[];

@@ -1,4 +1,4 @@
-import { AccountsSkeleton } from "@/components/skeletons/accounts-skeleton";
+import { AccountsSkeleton } from "@skeletons/accounts-skeleton";
 
 export default function AccountsLoading() {
   return <AccountsSkeleton />;

@@ -1,6 +1,6 @@
 "use client";
 
-import { TransactionsTable } from "@/components/common/transactions-table";
+import { TransactionsTable } from "@common/transactions-table";
 import type { Transaction } from "@/types/transaction";
 
 interface TransactionsListProps {

@@ -1,6 +1,6 @@
-import { StatsSkeleton } from "@/components/skeletons/stats-skeleton";
-import { ChartSkeleton } from "@/components/skeletons/chart-skeleton";
-import { TableSkeleton } from "@/components/skeletons/table-skeleton";
+import { StatsSkeleton } from "@skeletons/stats-skeleton";
+import { ChartSkeleton } from "@skeletons/chart-skeleton";
+import { TableSkeleton } from "@skeletons/table-skeleton";
 
 export default function OverviewLoading() {
   return (

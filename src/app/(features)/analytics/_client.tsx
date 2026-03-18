@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { Suspense, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useTransactions } from "@/hooks/use-transactions";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@ui/skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from "@ui/card";
 
 const AreaChart = dynamic(
   () =>
@@ -19,8 +19,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import type { ChartConfig } from "@/components/ui/chart";
+} from "@ui/select";
+import type { ChartConfig } from "@ui/chart";
 import { subMonths, format } from "date-fns";
 import { useFormatter } from "@/hooks/use-formatter";
 import { CalendarDays } from "lucide-react";
@@ -107,15 +107,19 @@ export default function AnalyticsPageClient() {
           </Select>
         </CardHeader>
         <CardContent>
-          <AreaChart
-            data={areaChartData}
-            config={areaConfig}
-            dataKeyIncome="income"
-            dataKeyExpense="expense"
-            labelKey="date"
-            className="h-[400px] w-full"
-            valueFormatter={(val) => formatAmount(val)}
-          />
+          <Suspense
+            fallback={<Skeleton className="h-[400px] w-full rounded-xl" />}
+          >
+            <AreaChart
+              data={areaChartData}
+              config={areaConfig}
+              dataKeyIncome="income"
+              dataKeyExpense="expense"
+              labelKey="date"
+              className="h-[400px] w-full"
+              valueFormatter={(val) => formatAmount(val)}
+            />
+          </Suspense>
         </CardContent>
       </Card>
     </div>

@@ -1,4 +1,4 @@
-import { Logo, ThemeSwitcher } from "@component/common";
+import { Logo, ThemeSwitcher } from "@common/index";
 import Link from "next/link";
 import { NAV_FOOTER_LINKS, SOCIAL_LINKS } from "@/content/nav-links";
 import { Github } from "lucide-react";

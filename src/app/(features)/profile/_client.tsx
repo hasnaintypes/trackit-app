@@ -1,9 +1,9 @@
 "use client";
 
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useCallback, useState } from "react";
 import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@ui/skeleton";
 import { UserPen, Bell, ShieldCheck, CreditCard } from "lucide-react";
 
 const sectionFallback = <Skeleton className="h-96 w-full rounded-xl" />;
@@ -37,6 +37,10 @@ type SectionId = (typeof sections)[number]["id"];
 export default function ProfilePageClient() {
   const [activeSection, setActiveSection] = useState<SectionId>("edit-profile");
 
+  const handleSectionChange = useCallback((id: SectionId) => {
+    setActiveSection(id);
+  }, []);
+
   return (
     <div className="flex flex-col gap-6 lg:flex-row">
       {/* Sidebar Navigation */}
@@ -48,7 +52,7 @@ export default function ProfilePageClient() {
             return (
               <button
                 key={section.id}
-                onClick={() => setActiveSection(section.id)}
+                onClick={() => handleSectionChange(section.id)}
                 className={cn(
                   "flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium transition-colors",
                   isActive

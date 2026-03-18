@@ -4,13 +4,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { api } from "@/trpc/react";
-import { invalidateBudgets } from "@/lib/trpc/invalidation";
+import { invalidateBudgets } from "@/trpc/invalidation";
 import { toast } from "sonner";
 import { Loader2, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { BudgetPeriod } from "@prisma/client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@ui/button";
 import {
   Form,
   FormControl,
@@ -18,16 +18,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@ui/form";
+import { Input } from "@ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
+} from "@ui/select";
+import { Card, CardContent } from "@ui/card";
 
 const createBudgetSchema = z.object({
   categoryId: z.string().min(1, "Category is required"),

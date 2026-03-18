@@ -1,6 +1,6 @@
 import { ArrowRightIcon } from "lucide-react";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { Button } from "@ui/button";
 import {
   Card,
   CardContent,
@@ -8,7 +8,7 @@ import {
   CardDescription,
   CardHeader,
   CardFooter,
-} from "@/components/ui/card";
+} from "@ui/card";
 import { blog as siteBlog } from "@content/site/blog";
 import type { BlogCard as ContentBlogCard } from "@/types";
 

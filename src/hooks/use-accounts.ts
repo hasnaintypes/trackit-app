@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { api } from "@/trpc/react";
-import { invalidateAccounts } from "@/lib/trpc/invalidation";
+import { invalidateAccounts } from "@/trpc/invalidation";
 import type { ApiBankAccount } from "@/types/account";
 
 /**

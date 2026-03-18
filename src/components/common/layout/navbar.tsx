@@ -1,23 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { Logo } from "@/components/common/logo";
-import NotificationMenu from "@/components/common/notification-menu";
-import UserMenu from "@/components/common/user-menu";
-import ThemeSwitcherButton from "@/components/common/theme-switcher-button";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Logo } from "@common/branding/logo";
+import NotificationMenu from "@common/layout/notification-menu";
+import UserMenu from "@common/layout/user-menu";
+import ThemeSwitcherButton from "@common/theme/theme-switcher-button";
+import { Button } from "@ui/button";
+import { Input } from "@ui/input";
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-} from "@/components/ui/navigation-menu";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@ui/navigation-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@ui/popover";
 import {
   CommandDialog,
   CommandEmpty,
@@ -26,7 +22,7 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/command";
+} from "@ui/command";
 import {
   Search,
   Menu,

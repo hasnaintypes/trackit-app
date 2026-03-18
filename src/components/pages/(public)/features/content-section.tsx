@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@ui/button";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { featuresContent } from "@content/site/features";

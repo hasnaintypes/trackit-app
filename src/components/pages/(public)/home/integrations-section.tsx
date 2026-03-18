@@ -6,9 +6,9 @@ import {
   VSCodium,
   MediaWiki,
 } from "public/images/logos";
-import { LogoIcon } from "@/components/common/logo";
+import { LogoIcon } from "@common/branding/logo";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from "@ui/button";
 import Link from "next/link";
 import type { IntegrationContent } from "@/types/site";
 import { integrations as integrationsContent } from "@content/site/home";

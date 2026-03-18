@@ -1,17 +1,17 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@ui/button";
+import { Alert, AlertDescription } from "@ui/alert";
 import { AlertTriangle } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import { Separator } from "@ui/separator";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@ui/select";
 import { useAccounts } from "@/hooks/use-accounts";
 import type { ImportError, ImportTransaction } from "@/types/bulk-import";
 

@@ -51,7 +51,7 @@ export class NotificationService {
         }
 
         if (shouldEmail) {
-          const { enqueueEmail } = await import("@/lib/inngest/events");
+          const { enqueueEmail } = await import("@/constants/events");
           await enqueueEmail({
             to: user.email,
             subject: title,

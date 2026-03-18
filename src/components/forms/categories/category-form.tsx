@@ -12,32 +12,32 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+} from "@ui/form";
+import { Input } from "@ui/input";
+import { Button } from "@ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@ui/select";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
+} from "@ui/dialog";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetDescription,
-} from "@/components/ui/sheet";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
+} from "@ui/sheet";
+import { Separator } from "@ui/separator";
+import { ScrollArea } from "@ui/scroll-area";
 import {
   Loader2,
   Palette,
@@ -60,8 +60,8 @@ import {
 import { useCategories } from "@/hooks/use-categories";
 
 // Custom Pickers
-import { IconPicker } from "@/components/common/icon-picker";
-import { ColorPicker } from "@/components/common/color-picker";
+import { IconPicker } from "@common/pickers/icon-picker";
+import { ColorPicker } from "@common/pickers/color-picker";
 import { createLogger } from "@/lib/logging";
 
 const logger = createLogger("category-form");

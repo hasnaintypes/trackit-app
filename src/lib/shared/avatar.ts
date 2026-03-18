@@ -1,13 +1,7 @@
 import type { Gender } from "@/types/user";
+import { DEFAULT_AVATARS } from "@/constants/defaults";
 
-/**
- * Default avatar URLs for the application.
- * These are used as fallbacks when no custom avatar is provided.
- */
-export const DEFAULT_AVATARS = {
-  BOY: "https://avatar.iran.liara.run/public/boy",
-  GIRL: "https://avatar.iran.liara.run/public/girl",
-} as const;
+export { DEFAULT_AVATARS } from "@/constants/defaults";
 
 /**
  * Generate a URL for a user's avatar using their name

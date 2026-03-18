@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@ui/button";
+import { Textarea } from "@ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@ui/avatar";
 import { Heart, MessageCircle, Send } from "lucide-react";
 
 import type { BlogComment } from "@/types/site";

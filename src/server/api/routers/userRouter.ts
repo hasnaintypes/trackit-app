@@ -4,7 +4,7 @@ import {
   publicProcedure,
   protectedProcedure,
 } from "@/server/api/trpc";
-import { uploadForProfile } from "@/lib/shared/imagekit";
+import { uploadForProfile } from "@shared/imagekit";
 import { TRPCError } from "@trpc/server";
 import type { Prisma } from "@prisma/client";
 import {
@@ -49,7 +49,7 @@ export const DEFAULT_AVATAR_GIRL = "https://avatar.iran.liara.run/public/girl";
  * @param {string | null | undefined} gender - User gender string (expected values: "MALE", "FEMALE", "OTHER")
  * @returns {string} - Resolved avatar URL
  */
-import { getAvatarUrl } from "@/lib/shared/avatar";
+import { getAvatarUrl } from "@shared/avatar";
 
 export const userRouter = createTRPCRouter({
   /**

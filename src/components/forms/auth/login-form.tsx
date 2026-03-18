@@ -2,22 +2,21 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from "@ui/button";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
   FieldSeparator,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+} from "@ui/field";
+import { Input } from "@ui/input";
 import { useState, useEffect } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useUserStore } from "@/store/userStore";
 import { loginSchema } from "@/validation/auth";
 
 export function LoginForm({
@@ -44,8 +43,7 @@ export function LoginForm({
 
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
-  const { signIn, requestPasswordReset, refetch: authRefetch } = useAuth();
-  const setUser = useUserStore((s) => s.setUser);
+  const { signIn, requestPasswordReset } = useAuth();
 
   const handleForgotPassword = async () => {
     if (!email) {
@@ -79,24 +77,12 @@ export function LoginForm({
     setLoading(true);
     const loadingToastId = toast.loading("Logging in...");
     try {
-      const returnedUser = await signIn({
+      await signIn({
         email,
         password,
         rememberMe,
         callbackURL: "/overview",
       });
-
-      if (returnedUser) {
-        setUser(returnedUser);
-      } else {
-        try {
-          await authRefetch();
-        } catch {
-          // Failed to refetch auth state after login
-        }
-        const persisted = useUserStore.getState().user;
-        if (persisted) setUser(persisted);
-      }
 
       toast.success("Logged in successfully");
       router.push("/overview");

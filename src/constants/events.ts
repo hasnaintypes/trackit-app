@@ -1,9 +1,10 @@
-import { inngest } from "./client";
+import { inngest } from "@/lib/inngest/client";
 
 export const RECURRING_EVENT = "recurring/run";
 export const TRANSACTION_PROCESSED_EVENT = "transaction/processed";
 export const SEND_EMAIL_EVENT = "notification/send-email";
 export const BUDGET_THRESHOLD_REACHED_EVENT = "budget/threshold.reached";
+export const TRANSACTION_ALERT_EVENT = "transaction/large-transaction.detected";
 
 type InngestSendOptions = {
   delayUntil?: string;
@@ -27,6 +28,18 @@ export async function emitTransactionProcessed(params: {
 }) {
   await inngest.send({
     name: TRANSACTION_PROCESSED_EVENT,
+    data: params,
+  });
+}
+
+export async function emitTransactionAlert(params: {
+  userId: string;
+  amount: number;
+  description: string;
+  threshold: number;
+}) {
+  await inngest.send({
+    name: TRANSACTION_ALERT_EVENT,
     data: params,
   });
 }

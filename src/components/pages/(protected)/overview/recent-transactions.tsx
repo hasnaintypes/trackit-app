@@ -3,9 +3,9 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TransactionsTable } from "@/components/common/transactions-table";
+import { Button } from "@ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@ui/card";
+import { TransactionsTable } from "@common/transactions-table";
 import type { Transaction } from "@/types/transaction";
 
 interface RecentTransactionsProps {

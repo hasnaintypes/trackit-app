@@ -1,4 +1,4 @@
-import { TableSkeleton } from "@/components/skeletons/table-skeleton";
+import { TableSkeleton } from "@skeletons/table-skeleton";
 
 export default function ReportsLoading() {
   return (

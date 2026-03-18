@@ -1,5 +1,7 @@
 import { Logger as BetterStackLogger } from "@logtail/next";
 
+// Use process.env directly so this module is safe to import in client components.
+// The T3 `env` helper restricts server-only vars and would throw on the client.
 const isProd = process.env.NODE_ENV === "production";
 
 type LogMeta = Record<string, unknown>;

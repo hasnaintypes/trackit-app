@@ -1,13 +1,14 @@
 import { inngest } from "@/lib/inngest/client";
+import { NonRetriableError } from "inngest";
 import { createLogger } from "@/lib/logging";
 import { db } from "@/server/db";
-import { toNum } from "@/lib/shared/decimal";
+import { toNum } from "@shared/decimal";
 
 const logger = createLogger("inngest-budget-alert");
-import { sendEmail } from "@/lib/email";
-import { getTemplate } from "@/lib/email/template-cache";
+import { sendEmail, compileTemplate } from "@/lib/email";
 import { env } from "@/env";
-import { BUDGET_THRESHOLD_REACHED_EVENT } from "@/lib/inngest/events";
+import { BUDGET_THRESHOLD_REACHED_EVENT } from "@/constants/events";
+import { BudgetThresholdSchema } from "@/constants/event-schemas";
 
 /**
  * Send Budget Alert Email
@@ -21,20 +22,26 @@ export const sendBudgetAlertEmail = inngest.createFunction(
   { event: BUDGET_THRESHOLD_REACHED_EVENT },
 
   async ({ event, step }) => {
-    const { budgetId, userId, threshold } = event.data as {
-      budgetId: string;
-      userId: string;
-      threshold: number;
-    };
+    const { budgetId, userId, threshold } = BudgetThresholdSchema.parse(
+      event.data,
+    );
 
     const budget = await step.run("fetch-budget", async () => {
       return db.budget.findUnique({
         where: { id: budgetId },
-        include: {
-          category: true,
+        select: {
+          id: true,
+          userId: true,
+          spentAmount: true,
+          amount: true,
+          category: { select: { name: true } },
           user: {
-            include: {
-              notificationPrefs: true,
+            select: {
+              name: true,
+              email: true,
+              notificationPrefs: {
+                select: { emailBalanceAlerts: true },
+              },
             },
           },
         },
@@ -42,11 +49,11 @@ export const sendBudgetAlertEmail = inngest.createFunction(
     });
 
     if (!budget) {
-      throw new Error(`Budget ${budgetId} not found`);
+      throw new NonRetriableError(`Budget ${budgetId} not found`);
     }
 
     if (budget.userId !== userId) {
-      throw new Error(`Budget does not belong to user ${userId}`);
+      throw new NonRetriableError(`Budget does not belong to user ${userId}`);
     }
 
     await step.run("send-email", async () => {
@@ -56,11 +63,9 @@ export const sendBudgetAlertEmail = inngest.createFunction(
       const percentage = (spent / limit) * 100;
       const remaining = Math.max(0, limit - spent);
 
-      // Read budget alert template from cache
-      let template = await getTemplate("budget-alert.html");
-
       // Fetch AI recommendations if threshold is high
-      let recommendations = "";
+      let aiRecommendations =
+        "Stay mindful of your spending to keep within your budget targets.";
       if (threshold >= 90) {
         try {
           const { AIService } = await import("@/server/services/aiService");
@@ -71,7 +76,7 @@ export const sendBudgetAlertEmail = inngest.createFunction(
             typeof aiResult === "object" &&
             "recommendations" in aiResult
           ) {
-            recommendations = Array.isArray(aiResult.recommendations)
+            aiRecommendations = Array.isArray(aiResult.recommendations)
               ? aiResult.recommendations.join("\n")
               : String(aiResult.recommendations);
           }
@@ -82,19 +87,16 @@ export const sendBudgetAlertEmail = inngest.createFunction(
         }
       }
 
-      template = template
-        .replace(/{{userName}}/g, budget.user.name)
-        .replace(/{{categoryName}}/g, budget.category.name)
-        .replace(/{{percentage}}/g, percentage.toFixed(0))
-        .replace(/{{spent}}/g, spent.toFixed(2))
-        .replace(/{{limit}}/g, limit.toFixed(2))
-        .replace(/{{remaining}}/g, remaining.toFixed(2))
-        .replace(/{{appUrl}}/g, env.NEXT_PUBLIC_APP_URL ?? "")
-        .replace(
-          /{{aiRecommendations}}/g,
-          recommendations ||
-            "Stay mindful of your spending to keep within your budget targets.",
-        );
+      const template = await compileTemplate("budget-alert.html", {
+        userName: budget.user.name,
+        categoryName: budget.category.name,
+        percentage: percentage.toFixed(0),
+        spent: spent.toFixed(2),
+        limit: limit.toFixed(2),
+        remaining: remaining.toFixed(2),
+        appUrl: env.NEXT_PUBLIC_APP_URL ?? "",
+        aiRecommendations,
+      });
 
       try {
         if (budget.user.notificationPrefs?.emailBalanceAlerts) {

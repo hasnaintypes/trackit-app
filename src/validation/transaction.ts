@@ -17,13 +17,16 @@ export const createTransactionSchema = z.object({
     .min(1)
     .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
       message: "Amount must be a positive number",
+    })
+    .refine((val) => /^\d+(\.\d{1,2})?$/.test(val), {
+      message: "Amount can have at most 2 decimal places",
     }),
   type: z.enum(["DEBIT", "CREDIT", "TRANSFER"]),
   categoryId: z.string().nullable().optional(),
   contactId: z.string().nullable().optional(),
   groupId: z.string().nullable().optional(),
-  description: z.string().nullable().optional(),
-  notes: z.string().nullable().optional(),
+  description: z.string().max(1000).nullable().optional(),
+  notes: z.string().max(2000).nullable().optional(),
   date: z.string().optional(),
   isRecurring: z.boolean().optional(),
   recurrence: recurrenceSchema.optional(),
@@ -42,13 +45,16 @@ export const updateTransactionSchema = z.object({
     .refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
       message: "Amount must be a positive number",
     })
+    .refine((val) => /^\d+(\.\d{1,2})?$/.test(val), {
+      message: "Amount can have at most 2 decimal places",
+    })
     .optional(),
   type: z.enum(["DEBIT", "CREDIT", "TRANSFER"]).optional(),
   categoryId: z.string().nullable().optional(),
   contactId: z.string().nullable().optional(),
   groupId: z.string().nullable().optional(),
-  description: z.string().nullable().optional(),
-  notes: z.string().nullable().optional(),
+  description: z.string().max(1000).nullable().optional(),
+  notes: z.string().max(2000).nullable().optional(),
   date: z.string().optional(),
   isRecurring: z.boolean().optional(),
   recurrence: recurrenceSchema.optional(),
@@ -61,10 +67,10 @@ export const updateTransactionSchema = z.object({
 
 export const transactionListInput = z.object({
   accountId: z.string().optional(),
-  limit: z.number().int().min(1).max(1000).default(20),
+  limit: z.number().int().min(1).max(100).default(20),
   cursor: z.string().optional(),
   page: z.number().int().min(1).optional(),
-  q: z.string().optional(),
+  q: z.string().max(200).optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
 });

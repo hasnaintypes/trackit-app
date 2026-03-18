@@ -1,7 +1,7 @@
 import { Facebook, Twitter, Linkedin } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@ui/avatar";
+import { Badge } from "@ui/badge";
 import type { BlogPost } from "@/types/site";
 import Link from "next/link";
 import { SOCIAL_LINKS } from "@/content/nav-links";

@@ -1,7 +1,6 @@
 import { db } from "@/server/db";
 import { subMonths, format } from "date-fns";
-import { sendEmail } from "@/lib/email";
-import { getTemplate } from "@/lib/email/template-cache";
+import { sendEmail, compileTemplate } from "@/lib/email";
 import { env } from "@/env";
 import { createLogger } from "@/lib/logging";
 import { inngest } from "../client";
@@ -90,22 +89,18 @@ export const generateMonthlyReport = inngest.createFunction(
       const { ReportService } = await import("@/server/services/reportService");
 
       for (const result of results) {
-        const res = result as {
-          success: boolean;
-          reportId: string | null;
-          insights: string | null;
-        };
-        if (!res.success || !res.reportId) continue;
+        if (!result.success || !result.reportId) continue;
+        const res = result;
 
-        const report = (await db.report.findUnique({
+        const report = await db.report.findUnique({
           where: { id: res.reportId },
-          include: { user: true },
-        })) as unknown as {
-          user: { name: string | null; email: string | null };
-          id: string;
-          period: string;
-          data: Record<string, unknown>;
-        } | null;
+          select: {
+            id: true,
+            period: true,
+            data: true,
+            user: { select: { name: true, email: true } },
+          },
+        });
 
         if (!report) continue;
 
@@ -117,51 +112,27 @@ export const generateMonthlyReport = inngest.createFunction(
             topCategories: Array<{ name: string; amount: number }>;
           };
 
-          // Read monthly summary template from cache
-          let template = await getTemplate("monthly-summary.html");
-
-          // Replace variables with actual data
-          template = template
-            .replace(/{{userName}}/g, report.user.name ?? "User")
-            .replace(/{{period}}/g, report.period)
-            .replace(/{{totalIncome}}/g, reportData.totalIncome.toFixed(2))
-            .replace(/{{totalExpenses}}/g, reportData.totalExpenses.toFixed(2))
-            .replace(/{{netSavings}}/g, reportData.netSavings.toFixed(2))
-            .replace(
-              /{{netSavingsColor}}/g,
-              reportData.netSavings >= 0 ? "#10b981" : "#ef4444",
-            )
-            .replace(/{{appUrl}}/g, env.NEXT_PUBLIC_APP_URL ?? "")
-            .replace(
-              /{{aiInsights}}/g,
+          // Compile monthly summary template
+          const emailHtml = await compileTemplate("monthly-summary.html", {
+            userName: report.user.name ?? "User",
+            period: report.period,
+            totalIncome: reportData.totalIncome.toFixed(2),
+            totalExpenses: reportData.totalExpenses.toFixed(2),
+            netSavings: reportData.netSavings.toFixed(2),
+            netSavingsColor: reportData.netSavings >= 0 ? "#10b981" : "#ef4444",
+            appUrl: env.NEXT_PUBLIC_APP_URL ?? "",
+            aiInsights:
               res.insights ?? "No AI insights available for this period.",
-            );
-
-          // Replace topCategories loop
-          const topCategoriesHtml = reportData.topCategories
-            .map(
-              (cat) => `
-              <tr>
-                <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7;">
-                  <span style="font-size: 14px; color: #18181b;">${cat.name}</span>
-                </td>
-                <td style="padding: 12px 0; border-bottom: 1px solid #e4e4e7; text-align: right;">
-                  <span style="font-size: 14px; font-weight: 500; color: #18181b;">$${cat.amount.toFixed(2)}</span>
-                </td>
-              </tr>
-            `,
-            )
-            .join("");
-
-          template = template.replace(
-            /{{#each topCategories}}[\s\S]*?{{\/each}}/,
-            topCategoriesHtml,
-          );
+            topCategories: reportData.topCategories.map((cat) => ({
+              name: cat.name,
+              amount: cat.amount.toFixed(2),
+            })),
+          });
 
           await sendEmail({
             to: report.user.email ?? "",
             subject: `Monthly Financial Summary - ${report.period}`,
-            html: template,
+            html: emailHtml,
           });
 
           await ReportService.markAsSent(report.id, report.user.email ?? "");

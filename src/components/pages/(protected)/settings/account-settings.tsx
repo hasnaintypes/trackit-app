@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import dynamic from "next/dynamic";
 import { createLogger } from "@/lib/logging";
 import { useAccounts } from "@/hooks/use-accounts";
@@ -17,10 +17,10 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
+} from "@ui/card";
+import { Button } from "@ui/button";
+import { Switch } from "@ui/switch";
+import { Badge } from "@ui/badge";
 import {
   Plus,
   ChevronDown,
@@ -36,7 +36,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { DeleteDialog } from "@/components/common/delete-dialog";
+import { DeleteDialog } from "@common/delete-dialog";
 import { useFormatter } from "@/hooks/use-formatter";
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -95,7 +95,9 @@ export default function AccountSettings() {
 
   return (
     <div className="flex-1 space-y-6">
-      <AccountForm open={open} onOpenChange={setOpen} />
+      <Suspense fallback={null}>
+        <AccountForm open={open} onOpenChange={setOpen} />
+      </Suspense>
 
       {accounts.length > 0 && (
         <div className="flex justify-end">

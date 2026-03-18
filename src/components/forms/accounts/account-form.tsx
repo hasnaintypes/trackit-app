@@ -13,31 +13,31 @@ import {
   FormControl,
   FormMessage,
   FormDescription,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
+} from "@ui/form";
+import { Input } from "@ui/input";
+import { Button } from "@ui/button";
+import { Switch } from "@ui/switch";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@ui/select";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
+} from "@ui/dialog";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetDescription,
-} from "@/components/ui/sheet";
+} from "@ui/sheet";
 import {
   createAccountSchema,
   type CreateAccountInput,
@@ -49,8 +49,8 @@ import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 // Import Custom Pickers
-import { IconPicker } from "../../common/icon-picker";
-import { ColorPicker } from "../../common/color-picker";
+import { IconPicker } from "@common/pickers/icon-picker";
+import { ColorPicker } from "@common/pickers/color-picker";
 import { createLogger } from "@/lib/logging";
 
 const logger = createLogger("account-form");

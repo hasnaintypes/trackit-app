@@ -1,4 +1,5 @@
 import { db } from "@/server/db";
+import { BUDGET_THRESHOLDS } from "@/constants/budget";
 import {
   format,
   startOfWeek,
@@ -9,8 +10,33 @@ import {
   endOfYear,
 } from "date-fns";
 import { NotificationService } from "./notificationService";
-import { NotificationType, type BudgetPeriod } from "@prisma/client";
-import { toNum } from "@/lib/shared/decimal";
+import {
+  NotificationType,
+  type BudgetPeriod,
+  type Prisma,
+} from "@prisma/client";
+import { toNum } from "@shared/decimal";
+
+type BudgetWithCategory = {
+  id: string;
+  userId: string;
+  categoryId: string;
+  amount: Prisma.Decimal;
+  period: BudgetPeriod;
+  startDate: Date;
+  endDate: Date | null;
+  spentAmount: Prisma.Decimal;
+  createdAt: Date;
+  updatedAt: Date;
+  last_alert_period: string | null;
+  threshold_70_alert_sent: boolean;
+  threshold_90_alert_sent: boolean;
+  threshold_100_alert_sent: boolean;
+  category: {
+    id: string;
+    children: { id: string }[];
+  };
+};
 
 export class BudgetService {
   /**
@@ -36,8 +62,8 @@ export class BudgetService {
 
     if (category?.userId !== userId) return;
 
-    // 2. Identify relevant budgets (on this category OR its parent)
-    const budgetIds = await db.budget.findMany({
+    // 2. Identify relevant budgets (on this category OR its parent) — load full data to avoid N+1
+    const budgets = await db.budget.findMany({
       where: {
         userId,
         OR: [
@@ -47,20 +73,6 @@ export class BudgetService {
             : []),
         ],
       },
-      select: { id: true },
-    });
-
-    // 3. Trigger evaluation for each relevant budget in parallel
-    await Promise.all(budgetIds.map((b) => this.reevaluateBudget(b.id)));
-  }
-
-  /**
-   * Recalculates spent amount for a specific budget and triggers alerts.
-   * Always calculates for the CURRENT active period (Now).
-   */
-  static async reevaluateBudget(budgetId: string) {
-    const budget = await db.budget.findUnique({
-      where: { id: budgetId },
       select: {
         id: true,
         userId: true,
@@ -84,6 +96,46 @@ export class BudgetService {
         },
       },
     });
+
+    // 3. Trigger evaluation for each relevant budget in parallel (pass cached data)
+    await Promise.all(budgets.map((b) => this.reevaluateBudget(b.id, b)));
+  }
+
+  /**
+   * Recalculates spent amount for a specific budget and triggers alerts.
+   * Always calculates for the CURRENT active period (Now).
+   */
+  static async reevaluateBudget(
+    budgetId: string,
+    cachedBudget?: BudgetWithCategory | null,
+  ) {
+    const budget =
+      cachedBudget ??
+      (await db.budget.findUnique({
+        where: { id: budgetId },
+        select: {
+          id: true,
+          userId: true,
+          categoryId: true,
+          amount: true,
+          period: true,
+          startDate: true,
+          endDate: true,
+          spentAmount: true,
+          createdAt: true,
+          updatedAt: true,
+          last_alert_period: true,
+          threshold_70_alert_sent: true,
+          threshold_90_alert_sent: true,
+          threshold_100_alert_sent: true,
+          category: {
+            select: {
+              id: true,
+              children: { select: { id: true } },
+            },
+          },
+        },
+      }));
 
     if (!budget) return;
 
@@ -216,23 +268,7 @@ export class BudgetService {
     if (total <= 0) return;
     const percent = (spent / total) * 100;
 
-    const thresholds = [
-      {
-        level: 100,
-        flag: "threshold_100_alert_sent" as const,
-        title: "Budget Limit Reached",
-      },
-      {
-        level: 90,
-        flag: "threshold_90_alert_sent" as const,
-        title: "Budget Warning (90%)",
-      },
-      {
-        level: 70,
-        flag: "threshold_70_alert_sent" as const,
-        title: "Budget Alert (70%)",
-      },
-    ];
+    const thresholds = BUDGET_THRESHOLDS;
 
     for (const t of thresholds) {
       if (percent >= t.level) {
@@ -256,7 +292,7 @@ export class BudgetService {
         // Emit event for email worker
         const { inngest } = await import("@/lib/inngest/client");
         const { BUDGET_THRESHOLD_REACHED_EVENT } = await import(
-          "@/lib/inngest/events"
+          "@/constants/events"
         );
         await inngest.send({
           name: BUDGET_THRESHOLD_REACHED_EVENT,
@@ -296,6 +332,9 @@ export class BudgetService {
         title: "Large Transaction Detected",
         message: `A transaction for ${amount.toFixed(2)} (${description}) exceeds your set threshold of ${threshold.toFixed(2)}.`,
       });
+
+      const { emitTransactionAlert } = await import("@/constants/events");
+      await emitTransactionAlert({ userId, amount, description, threshold });
     }
   }
 
@@ -310,11 +349,16 @@ export class BudgetService {
       }),
       db.bankAccount.findUnique({
         where: { id: accountId },
-        select: { name: true, balance: true },
+        select: { userId: true, name: true, balance: true },
       }),
     ]);
 
-    if (!prefs?.lowBalanceThreshold || !prefs.emailLowBalanceAlerts || !account)
+    if (
+      !prefs?.lowBalanceThreshold ||
+      !prefs.emailLowBalanceAlerts ||
+      !account ||
+      account.userId !== userId
+    )
       return;
 
     const threshold = toNum(prefs.lowBalanceThreshold);

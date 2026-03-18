@@ -158,6 +158,7 @@ model BankAccount {
   recurringRules RecurringRule[]
   transactions   Transaction[]
 
+  @@unique([userId, name])
   @@index([userId])
   @@map("accounts")
 }
@@ -287,7 +288,7 @@ model Transaction {
   paymentMethod          PaymentMethod?
   account                BankAccount     @relation(fields: [accountId], references: [id], onDelete: Cascade)
   category               Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  recurringRule          RecurringRule?  @relation(fields: [recurringRuleId], references: [id])
+  recurringRule          RecurringRule?  @relation(fields: [recurringRuleId], references: [id], onDelete: SetNull)
   user                   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -295,6 +296,8 @@ model Transaction {
   @@index([categoryId])
   @@index([date])
   @@index([userId, date])
+  @@index([userId, accountId])
+  @@index([recurringRuleId])
   @@map("transactions")
 }
 

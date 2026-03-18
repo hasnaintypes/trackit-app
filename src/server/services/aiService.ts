@@ -3,8 +3,8 @@ import { db } from "@/server/db";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { env } from "@/env";
 import { createLogger } from "@/lib/logging";
-import { toNum } from "@/lib/shared/decimal";
-import { extractJsonFromAI } from "@/lib/shared/ai-utils";
+import { toNum } from "@shared/decimal";
+import { extractJsonFromAI } from "@shared/ai-utils";
 
 const logger = createLogger("aiService");
 import {
@@ -16,8 +16,12 @@ import {
   RECEIPT_PROMPT_TEMPLATE,
 } from "@/constants/prompt";
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY_MS = 1000;
+import {
+  MAX_RETRIES,
+  RETRY_DELAY_MS,
+  RATE_LIMIT_DELAY_MS,
+  VALID_FREQUENCIES,
+} from "@/constants/ai";
 
 import type { CategoryForAI } from "@/types/category";
 import type {
@@ -33,6 +37,14 @@ import type {
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isRateLimitError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    "status" in error &&
+    (error as unknown as { status: number }).status === 429
+  );
 }
 
 function getApiKey(): string {
@@ -79,20 +91,23 @@ async function callGeminiWithRetry<T>(
       ) {
         throw lastError;
       }
+      const isRateLimit = isRateLimitError(error);
       if (attempt < MAX_RETRIES) {
-        const delay = RETRY_DELAY_MS * attempt;
+        const delay = isRateLimit
+          ? RATE_LIMIT_DELAY_MS * Math.pow(2, attempt - 1)
+          : RETRY_DELAY_MS * attempt;
         logger.warn(
           `Gemini API call failed (attempt ${attempt}/${MAX_RETRIES}), retrying in ${delay}ms`,
-          {
-            error: lastError.message,
-          },
+          { error: lastError.message, isRateLimit },
         );
         await sleep(delay);
       }
     }
   }
   throw new TRPCError({
-    code: "INTERNAL_SERVER_ERROR",
+    code: isRateLimitError(lastError)
+      ? "TOO_MANY_REQUESTS"
+      : "INTERNAL_SERVER_ERROR",
     message: `AI request failed after ${MAX_RETRIES} attempts: ${lastError?.message ?? "Unknown error"}`,
   });
 }
@@ -102,16 +117,11 @@ export class AIService {
    * Generate AI-powered budget recommendations
    */
   static async generateBudgetRecommendations(userId: string) {
-    const [transactions, budgets] = await Promise.all([
-      db.transaction.findMany({
-        where: { userId },
-        select: {
-          type: true,
-          amount: true,
-          category: { select: { name: true } },
-        },
-        orderBy: { date: "desc" },
-        take: 100,
+    const [spendingByCategory, budgets] = await Promise.all([
+      db.transaction.groupBy({
+        by: ["categoryId"],
+        where: { userId, type: "DEBIT", categoryId: { not: null } },
+        _sum: { amount: true },
       }),
       db.budget.findMany({
         where: { userId },
@@ -123,14 +133,27 @@ export class AIService {
       }),
     ]);
 
+    const categoryIds = spendingByCategory
+      .map((g) => g.categoryId)
+      .filter((id): id is string => id !== null);
+    const categories =
+      categoryIds.length > 0
+        ? await db.category.findMany({
+            where: { id: { in: categoryIds } },
+            select: { id: true, name: true },
+          })
+        : [];
+    const categoryNameMap = new Map(categories.map((c) => [c.id, c.name]));
+
     const categorySpending: Record<string, number> = {};
-    transactions.forEach((t) => {
-      if (t.type === "DEBIT" && t.category) {
-        const amount = toNum(t.amount);
-        categorySpending[t.category.name] =
-          (categorySpending[t.category.name] ?? 0) + amount;
+    for (const group of spendingByCategory) {
+      const name = group.categoryId
+        ? categoryNameMap.get(group.categoryId)
+        : null;
+      if (name && group._sum.amount) {
+        categorySpending[name] = toNum(group._sum.amount);
       }
-    });
+    }
 
     const existingBudgets = budgets
       .map((b) => `${b.category.name}: $${toNum(b.amount)} ${b.period}`)
@@ -169,32 +192,50 @@ export class AIService {
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0);
 
-    const transactions = await db.transaction.findMany({
-      where: {
-        userId,
-        date: { gte: startDate, lte: endDate },
-      },
-      select: {
-        type: true,
-        amount: true,
-        category: { select: { name: true } },
-      },
-    });
+    const dateFilter = {
+      userId,
+      type: "DEBIT" as const,
+      date: { gte: startDate, lte: endDate },
+    };
 
-    const totalSpent = transactions
-      .filter((t) => t.type === "DEBIT")
-      .reduce((sum, t) => sum + toNum(t.amount), 0);
+    const [totalResult, spendingByCategory] = await Promise.all([
+      db.transaction.aggregate({
+        where: dateFilter,
+        _sum: { amount: true },
+      }),
+      db.transaction.groupBy({
+        by: ["categoryId"],
+        where: dateFilter,
+        _sum: { amount: true },
+      }),
+    ]);
 
-    const categoryBreakdown = transactions
-      .filter((t) => t.type === "DEBIT")
-      .reduce(
-        (acc, t) => {
-          const category = t.category?.name ?? "Uncategorized";
-          acc[category] = (acc[category] ?? 0) + toNum(t.amount);
-          return acc;
-        },
-        {} as Record<string, number>,
-      );
+    const totalSpent = totalResult._sum.amount
+      ? toNum(totalResult._sum.amount)
+      : 0;
+
+    const catIds = spendingByCategory
+      .map((g) => g.categoryId)
+      .filter((id): id is string => id !== null);
+    const cats =
+      catIds.length > 0
+        ? await db.category.findMany({
+            where: { id: { in: catIds } },
+            select: { id: true, name: true },
+          })
+        : [];
+    const catNameMap = new Map(cats.map((c) => [c.id, c.name]));
+
+    const categoryBreakdown: Record<string, number> = {};
+    for (const group of spendingByCategory) {
+      const name = group.categoryId
+        ? (catNameMap.get(group.categoryId) ?? "Uncategorized")
+        : "Uncategorized";
+      if (group._sum.amount) {
+        categoryBreakdown[name] =
+          (categoryBreakdown[name] ?? 0) + toNum(group._sum.amount);
+      }
+    }
 
     const prompt = SPENDING_INSIGHTS_TEMPLATE.replace("{{period}}", period)
       .replace("{{totalSpent}}", totalSpent.toFixed(2))
@@ -212,8 +253,9 @@ export class AIService {
    * Detect anomalous transactions
    */
   static async detectAnomalies(userId: string) {
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const transactions = await db.transaction.findMany({
-      where: { userId },
+      where: { userId, date: { gte: thirtyDaysAgo } },
       select: {
         type: true,
         amount: true,
@@ -285,39 +327,40 @@ export class AIService {
    * Get personalized financial advice
    */
   static async getFinancialAdvice(userId: string) {
-    const user = await db.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        transactions: {
-          orderBy: { date: "desc" },
-          take: 50,
-          select: {
-            type: true,
-            amount: true,
-            category: { select: { name: true } },
-          },
-        },
-        budgets: {
+    const [userExists, incomeResult, expenseResult, budgets] =
+      await Promise.all([
+        db.user.findUnique({
+          where: { id: userId },
+          select: { id: true },
+        }),
+        db.transaction.aggregate({
+          where: { userId, type: "CREDIT" },
+          _sum: { amount: true },
+        }),
+        db.transaction.aggregate({
+          where: { userId, type: "DEBIT" },
+          _sum: { amount: true },
+        }),
+        db.budget.findMany({
+          where: { userId },
           select: {
             id: true,
             amount: true,
             category: { select: { name: true } },
           },
-        },
-      },
-    });
+        }),
+      ]);
 
-    if (!user)
+    if (!userExists)
       throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
 
-    const totalIncome = user.transactions
-      .filter((t) => t.type === "CREDIT")
-      .reduce((sum, t) => sum + toNum(t.amount), 0);
+    const totalIncome = incomeResult._sum.amount
+      ? toNum(incomeResult._sum.amount)
+      : 0;
 
-    const totalExpenses = user.transactions
-      .filter((t) => t.type === "DEBIT")
-      .reduce((sum, t) => sum + toNum(t.amount), 0);
+    const totalExpenses = expenseResult._sum.amount
+      ? toNum(expenseResult._sum.amount)
+      : 0;
 
     const savingsRate =
       totalIncome > 0 ? ((totalIncome - totalExpenses) / totalIncome) * 100 : 0;
@@ -328,7 +371,7 @@ export class AIService {
     )
       .replace("{{totalExpenses}}", totalExpenses.toFixed(2))
       .replace("{{savingsRate}}", savingsRate.toFixed(1))
-      .replace("{{budgetCount}}", user.budgets.length.toString());
+      .replace("{{budgetCount}}", budgets.length.toString());
 
     return callGeminiWithRetry(prompt, (text) =>
       extractJsonFromAI<FinancialAdvice>(text, "advice"),
@@ -342,12 +385,7 @@ export class AIService {
     transactions: TransactionForAI[],
     categories: CategoryForAI[],
   ): Promise<CategorizationResponse> {
-    const maxRows = Number(
-      env?.GEMINI_MAX_ROWS ??
-        process.env.GEMINI_MAX_ROWS ??
-        process.env.NEXT_PUBLIC_GEMINI_MAX_ROWS ??
-        50,
-    );
+    const maxRows = env.GEMINI_MAX_ROWS;
 
     if (!transactions || transactions.length === 0) {
       return { results: [] };
@@ -435,7 +473,10 @@ export class AIService {
       const parsed = JSON.parse(jsonText) as unknown;
 
       if (!parsed || typeof parsed !== "object") {
-        throw new Error("Response is not an object");
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Response is not an object",
+        });
       }
 
       let results: CategorizationResult[];
@@ -471,7 +512,10 @@ export class AIService {
           },
         );
       } else {
-        throw new Error("Response does not contain results array");
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Response does not contain results array",
+        });
       }
 
       const validatedResults: CategorizationResult[] = [];
@@ -509,7 +553,10 @@ export class AIService {
       }
 
       if (validatedResults.length === 0 && expectedCount > 0) {
-        throw new Error("No valid categorization results found in AI response");
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "No valid categorization results found in AI response",
+        });
       }
 
       return {
@@ -517,9 +564,10 @@ export class AIService {
         errors: errors.length > 0 ? errors : undefined,
       };
     } catch (error) {
-      throw new Error(
-        `Failed to parse AI response: ${error instanceof Error ? error.message : "Unknown parsing error"}. Raw response: ${jsonText.substring(0, 200)}...`,
-      );
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `Failed to parse AI response: ${error instanceof Error ? error.message : "Unknown parsing error"}`,
+      });
     }
   }
 
@@ -532,7 +580,10 @@ export class AIService {
     try {
       const parsed = JSON.parse(jsonText) as unknown;
       if (!parsed || typeof parsed !== "object")
-        throw new Error("Parsed receipt response is not an object");
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Parsed receipt response is not an object",
+        });
 
       const obj = parsed as Record<string, unknown>;
 
@@ -592,11 +643,10 @@ export class AIService {
       let recurrence: ReceiptScanResult["recurrence"] = null;
       if (obj.recurrence && typeof obj.recurrence === "object") {
         const r = obj.recurrence as Record<string, unknown>;
-        const validFrequencies = ["DAILY", "WEEKLY", "MONTHLY", "YEARLY"];
         recurrence = {
           frequency:
             typeof r.frequency === "string" &&
-            validFrequencies.includes(r.frequency)
+            (VALID_FREQUENCIES as readonly string[]).includes(r.frequency)
               ? (r.frequency as "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY")
               : null,
           interval: typeof r.interval === "number" ? r.interval : null,
@@ -622,7 +672,10 @@ export class AIService {
             ? null
             : undefined;
       let categoryConfidence: number | null | undefined = undefined;
-      if (typeof obj.categoryConfidence === "number") {
+      if (
+        typeof obj.categoryConfidence === "number" &&
+        Number.isFinite(obj.categoryConfidence)
+      ) {
         let conf = Math.round(obj.categoryConfidence);
         if (conf < 0) conf = 0;
         if (conf > 100) conf = 100;
@@ -723,9 +776,10 @@ export class AIService {
 
       return result;
     } catch (error) {
-      throw new Error(
-        `Failed to parse receipt AI response: ${error instanceof Error ? error.message : String(error)}. Raw: ${jsonText.substring(0, 200)}...`,
-      );
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `Failed to parse receipt AI response: ${error instanceof Error ? error.message : String(error)}`,
+      });
     }
   }
 }

@@ -1,5 +1,19 @@
 import type { Gender, Currency, Country, Timezone } from "@prisma/client";
 
+export const CURRENCY_SYMBOLS: Record<Currency, string> = {
+  USD: "$",
+  EUR: "€",
+  GBP: "£",
+  JPY: "¥",
+  AUD: "$",
+  CAD: "$",
+  CHF: "Fr",
+  CNY: "¥",
+  INR: "₹",
+  SGD: "$",
+  PKR: "₨",
+};
+
 export const GenderOptions = {
   MALE: "Male",
   FEMALE: "Female",

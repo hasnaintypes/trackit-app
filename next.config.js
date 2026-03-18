@@ -15,6 +15,10 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const config = {};
 
+config.outputFileTracingIncludes = {
+  "/api/**": ["./src/lib/email/templates/**"],
+};
+
 config.images = {
   remotePatterns: [
     {
@@ -60,6 +64,11 @@ config.headers = async () => [
       {
         key: "Permissions-Policy",
         value: "camera=(), microphone=(), geolocation=()",
+      },
+      {
+        key: "Content-Security-Policy",
+        value:
+          "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none';",
       },
     ],
   },

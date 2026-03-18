@@ -20,7 +20,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@ui/table";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -29,19 +29,19 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+} from "@ui/dropdown-menu";
+import { Button } from "@ui/button";
+import { Input } from "@ui/input";
+import { Checkbox } from "@ui/checkbox";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@ui/select";
+import { Badge } from "@ui/badge";
+import { Skeleton } from "@ui/skeleton";
 import {
   MoreHorizontal,
   Search,
@@ -67,7 +67,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useCategories } from "@/hooks/use-categories";
-import { DeleteDialog } from "@/components/common/delete-dialog";
+import { DeleteDialog } from "@common/delete-dialog";
 import { useFormatter } from "@/hooks/use-formatter";
 
 import type { Transaction } from "@/types/transaction";

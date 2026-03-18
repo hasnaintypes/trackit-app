@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { createTRPCRouter } from "@/server/api/trpc";
 import { aiRateLimitedProcedure } from "@/server/api/trpc";
 import { AIService } from "@/server/services/aiService";
@@ -28,7 +29,21 @@ export const aiRouter = createTRPCRouter({
 
   scanReceipt: aiRateLimitedProcedure
     .input(scanReceiptSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      // Verify category ownership if categories provided
+      if (input.categories?.length) {
+        const categoryIds = input.categories.map((c) => c.id);
+        const owned = await ctx.db.category.findMany({
+          where: { id: { in: categoryIds }, userId: ctx.user.id },
+          select: { id: true },
+        });
+        if (owned.length !== categoryIds.length) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "One or more categories not found",
+          });
+        }
+      }
       return AIService.scanReceiptWithAI({
         extractedText: input.extractedText ?? null,
         imageUrl: input.imageUrl ?? null,
@@ -38,7 +53,19 @@ export const aiRouter = createTRPCRouter({
 
   categorizeTransactions: aiRateLimitedProcedure
     .input(categorizeTransactionsSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      // Verify category ownership
+      const categoryIds = input.categories.map((c) => c.id);
+      const owned = await ctx.db.category.findMany({
+        where: { id: { in: categoryIds }, userId: ctx.user.id },
+        select: { id: true },
+      });
+      if (owned.length !== categoryIds.length) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "One or more categories not found",
+        });
+      }
       return AIService.categorizeTransactionsWithAI(
         input.transactions,
         input.categories,

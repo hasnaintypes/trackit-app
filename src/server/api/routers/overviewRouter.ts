@@ -2,7 +2,7 @@ import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
-import { toNum } from "@/lib/shared/decimal";
+import { toNum } from "@shared/decimal";
 
 export const overviewRouter = createTRPCRouter({
   /**
