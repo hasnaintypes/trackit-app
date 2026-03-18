@@ -57,10 +57,9 @@ export const categoryRouter = createTRPCRouter({
     .input(categoryIdParam)
     .query(async ({ ctx, input }) => {
       const cat = await ctx.db.category.findUnique({
-        where: { id: input.id },
+        where: { id: input.id, userId: ctx.user.id },
         select: {
           id: true,
-          userId: true,
           name: true,
           type: true,
           color: true,
@@ -69,7 +68,7 @@ export const categoryRouter = createTRPCRouter({
           parentCategoryId: true,
         },
       });
-      if (cat?.userId !== ctx.user.id) {
+      if (!cat) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Category not found",

@@ -58,10 +58,9 @@ export const accountRouter = createTRPCRouter({
       const prisma = ctx.db;
 
       const aRaw = await prisma.bankAccount.findUnique({
-        where: { id: input.id },
+        where: { id: input.id, userId },
         select: {
           id: true,
-          userId: true,
           name: true,
           type: true,
           currency: true,
@@ -74,7 +73,7 @@ export const accountRouter = createTRPCRouter({
         },
       });
       const a = aRaw as RawAccount | null;
-      if (a?.userId !== userId) return null;
+      if (!a) return null;
       return {
         id: a.id,
         name: a.name,
