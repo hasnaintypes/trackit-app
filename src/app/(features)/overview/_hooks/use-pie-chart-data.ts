@@ -31,11 +31,14 @@ export function usePieChartData(
       }
     }
 
-    return Object.entries(categoryTotals).map(([name, value], index) => {
-      const category = categories.find((c) => c.name === name);
-      const fill = category?.color ?? `var(--chart-${(index % 5) + 1})`;
-      return { name, value, fill };
-    });
+    return Object.entries(categoryTotals)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 6)
+      .map(([name, value], index) => {
+        const category = categories.find((c) => c.name === name);
+        const fill = category?.color ?? `var(--chart-${(index % 5) + 1})`;
+        return { name, value, fill };
+      });
   }, [transactions, categoryMap, categories]);
 
   const pieChartConfig = useMemo(() => {
