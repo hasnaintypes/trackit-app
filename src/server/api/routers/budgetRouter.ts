@@ -3,10 +3,11 @@ import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { BudgetService } from "@/server/services/budgetService";
 import { createBudgetSchema, updateBudgetSchema } from "@/validation/budget";
+import { toNum } from "@shared/decimal";
 
 export const budgetRouter = createTRPCRouter({
   all: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db.budget.findMany({
+    const budgets = await ctx.db.budget.findMany({
       where: { userId: ctx.user.id },
       select: {
         id: true,
@@ -30,6 +31,12 @@ export const budgetRouter = createTRPCRouter({
       },
       orderBy: { createdAt: "desc" },
     });
+
+    return budgets.map((b) => ({
+      ...b,
+      amount: toNum(b.amount),
+      spentAmount: toNum(b.spentAmount),
+    }));
   }),
 
   create: protectedProcedure

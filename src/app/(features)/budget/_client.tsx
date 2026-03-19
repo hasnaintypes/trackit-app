@@ -1,22 +1,10 @@
 "use client";
 
-import React, { Suspense } from "react";
-import dynamic from "next/dynamic";
+import React from "react";
 import { api } from "@/trpc/react";
-import { toNum } from "@shared/decimal";
 import { Loader2, Wallet } from "lucide-react";
 import { BudgetCard } from "@/components/pages/(protected)/budget/budget-card";
 import { CreateBudgetDialog } from "@/components/pages/(protected)/budget/create-budget-dialog";
-import { Skeleton } from "@ui/skeleton";
-import type { ChartConfig } from "@ui/chart";
-
-const GenericRadarChart = dynamic(
-  () =>
-    import("@/components/charts/radar-chart").then((m) => ({
-      default: m.GenericRadarChart,
-    })),
-  { loading: () => <Skeleton className="h-[300px] w-full rounded-xl" /> },
-);
 
 export default function BudgetPageClient() {
   const { data: budgets, isLoading } = api.budget.all.useQuery();
@@ -31,27 +19,9 @@ export default function BudgetPageClient() {
 
   const budgetList = budgets ?? [];
 
-  // Transform data for Radar Chart
-  const chartData = budgetList.slice(0, 6).map((b) => ({
-    category: b.category.name,
-    budget: toNum(b.amount),
-    spent: toNum(b.spentAmount),
-  }));
-
-  const radarConfig = {
-    budget: {
-      label: "Budget",
-      color: "hsl(var(--primary))",
-    },
-    spent: {
-      label: "Spent",
-      color: "hsl(var(--destructive))",
-    },
-  } satisfies ChartConfig;
-
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col justify-between gap-4 border-b pb-6 sm:flex-row sm:items-center">
+    <div className="animate-in fade-in-50 flex flex-col space-y-12 duration-500">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-foreground text-3xl font-bold tracking-tight">
             Budget & Goals
@@ -78,56 +48,19 @@ export default function BudgetPageClient() {
           </div>
         </div>
       ) : (
-        <div className="grid gap-8 lg:grid-cols-3">
-          {/* Main Content: Budget Cards */}
-          <div className="space-y-6 lg:col-span-2">
-            <h2 className="text-xl font-semibold tracking-tight">
-              Active Budgets
-            </h2>
-            <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
-              {budgetList.map((b) => (
-                <BudgetCard
-                  key={b.id}
-                  id={b.id}
-                  name={b.category.name}
-                  icon={b.category.icon}
-                  amount={toNum(b.amount)}
-                  spent={toNum(b.spentAmount)}
-                  period={b.period}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Sidebar: Analytics */}
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold tracking-tight">Analytics</h2>
-            <Suspense
-              fallback={<Skeleton className="h-[300px] w-full rounded-xl" />}
-            >
-              <GenericRadarChart
-                title="Spending Distribution"
-                description="Budget v/s Actual Spending"
-                data={chartData}
-                indexKey="category"
-                dataKeys={[
-                  {
-                    key: "budget",
-                    name: "Budget Limit",
-                    color: "var(--color-budget)",
-                    fillOpacity: 0.2,
-                  },
-                  {
-                    key: "spent",
-                    name: "Actual Spent",
-                    color: "var(--color-spent)",
-                    fillOpacity: 0.5,
-                  },
-                ]}
-                config={radarConfig}
-              />
-            </Suspense>
-          </div>
+        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+          {budgetList.map((b) => (
+            <BudgetCard
+              key={b.id}
+              id={b.id}
+              name={b.category.name}
+              icon={b.category.icon}
+              color={b.category.color}
+              amount={b.amount}
+              spent={b.spentAmount}
+              period={b.period}
+            />
+          ))}
         </div>
       )}
     </div>
