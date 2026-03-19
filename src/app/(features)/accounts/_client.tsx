@@ -88,7 +88,7 @@ export default function AccountsPageClient() {
   }, [modalState.deletingId, deleteAccount]);
 
   return (
-    <div className="animate-in fade-in-50 flex flex-col space-y-8 duration-500">
+    <div className="animate-in fade-in-50 flex flex-col space-y-12 duration-500">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-foreground text-3xl font-bold tracking-tight">
@@ -108,26 +108,24 @@ export default function AccountsPageClient() {
         </div>
       </div>
 
-      <div className="flex-1">
-        {isLoading ? (
-          <AccountSkeleton />
-        ) : accounts.length === 0 ? (
-          <EmptyState onCreate={handleOpenCreate} />
-        ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {accounts.map((account) => (
-              <AccountCard
-                key={account.id}
-                account={account}
-                onEdit={handleEdit}
-                onDelete={handleDeleteClick}
-                onClick={() => router.push(`/accounts/${account.id}`)}
-                formatAmount={formatAmount}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      {isLoading ? (
+        <AccountSkeleton />
+      ) : accounts.length === 0 ? (
+        <EmptyState onCreate={handleOpenCreate} />
+      ) : (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {accounts.map((account) => (
+            <AccountCard
+              key={account.id}
+              account={account}
+              onEdit={handleEdit}
+              onDelete={handleDeleteClick}
+              onClick={() => router.push(`/accounts/${account.id}`)}
+              formatAmount={formatAmount}
+            />
+          ))}
+        </div>
+      )}
 
       <Suspense fallback={null}>
         <AccountForm

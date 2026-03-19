@@ -205,7 +205,7 @@ export default function EditProfileSection() {
                 value={formData.gender ?? undefined}
                 onValueChange={(value) => handleSelectChange("gender", value)}
               >
-                <SelectTrigger id="gender">
+                <SelectTrigger id="gender" className="w-full">
                   <SelectValue placeholder="Select your gender" />
                 </SelectTrigger>
                 <SelectContent>
@@ -246,7 +246,7 @@ export default function EditProfileSection() {
                 value={formData.country ?? undefined}
                 onValueChange={(value) => handleSelectChange("country", value)}
               >
-                <SelectTrigger id="country">
+                <SelectTrigger id="country" className="w-full">
                   <SelectValue placeholder="Select your country" />
                 </SelectTrigger>
                 <SelectContent>
@@ -266,7 +266,7 @@ export default function EditProfileSection() {
                 value={formData.timezone ?? undefined}
                 onValueChange={(value) => handleSelectChange("timezone", value)}
               >
-                <SelectTrigger id="timezone">
+                <SelectTrigger id="timezone" className="w-full">
                   <SelectValue placeholder="Select your timezone" />
                 </SelectTrigger>
                 <SelectContent>

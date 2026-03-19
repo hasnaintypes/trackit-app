@@ -108,19 +108,21 @@ export default function TransactionsPageClient() {
   );
 
   return (
-    <div className="space-y-8 pt-8">
+    <div className="animate-in fade-in-50 flex flex-col space-y-12 duration-500">
       <TransactionsHeader onAdd={handleAdd} onImport={handleImport} />
 
-      <TransactionsList
-        transactions={transactions}
-        isLoading={isLoading}
-        totalCount={transactionsData?.totalCount ?? 0}
-        pageIndex={pagination.pageIndex}
-        pageSize={pagination.pageSize}
-        onEdit={handleEditTransaction}
-        onDelete={handleDeleteTransactions}
-        onPageChange={handlePageChange}
-      />
+      <div>
+        <TransactionsList
+          transactions={transactions}
+          isLoading={isLoading}
+          totalCount={transactionsData?.totalCount ?? 0}
+          pageIndex={pagination.pageIndex}
+          pageSize={pagination.pageSize}
+          onEdit={handleEditTransaction}
+          onDelete={handleDeleteTransactions}
+          onPageChange={handlePageChange}
+        />
+      </div>
 
       <Suspense fallback={null}>
         <TransactionForm

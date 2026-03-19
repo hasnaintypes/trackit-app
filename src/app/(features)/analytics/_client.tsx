@@ -5,14 +5,6 @@ import dynamic from "next/dynamic";
 import { useTransactions } from "@/hooks/use-transactions";
 import { Skeleton } from "@ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@ui/card";
-
-const AreaChart = dynamic(
-  () =>
-    import("@/components/charts/area-chart").then((m) => ({
-      default: m.AreaChart,
-    })),
-  { loading: () => <Skeleton className="h-[400px] w-full rounded-xl" /> },
-);
 import {
   Select,
   SelectContent,
@@ -24,6 +16,14 @@ import type { ChartConfig } from "@ui/chart";
 import { subMonths, format } from "date-fns";
 import { useFormatter } from "@/hooks/use-formatter";
 import { CalendarDays } from "lucide-react";
+
+const AreaChart = dynamic(
+  () =>
+    import("@/components/charts/area-chart").then((m) => ({
+      default: m.AreaChart,
+    })),
+  { loading: () => <Skeleton className="h-[400px] w-full rounded-xl" /> },
+);
 
 type DateRange = "3" | "6" | "12";
 
@@ -74,41 +74,43 @@ export default function AnalyticsPageClient() {
   }, [transactions, dateRange]);
 
   return (
-    <div className="space-y-8">
+    <div className="animate-in fade-in-50 flex flex-col space-y-12 duration-500">
       {/* Header */}
-      <div>
-        <h1 className="text-foreground text-3xl font-bold tracking-tight">
-          Analytics
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Visualize your income, expenses, and spending patterns
-        </p>
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div>
+          <h1 className="text-foreground text-3xl font-bold tracking-tight">
+            Analytics
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Visualize your income, expenses, and spending patterns
+          </p>
+        </div>
+        <Select
+          value={dateRange}
+          onValueChange={(v) => setDateRange(v as DateRange)}
+        >
+          <SelectTrigger className="h-9 w-auto gap-1.5 rounded-lg px-3 text-xs shadow-sm">
+            <CalendarDays className="size-3.5" />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent align="end">
+            {DATE_RANGE_OPTIONS.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Area Chart */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader>
           <CardTitle>Income vs Expenses</CardTitle>
-          <Select
-            value={dateRange}
-            onValueChange={(v) => setDateRange(v as DateRange)}
-          >
-            <SelectTrigger className="h-8 w-auto gap-1.5 rounded-lg px-3 text-xs">
-              <CalendarDays className="size-3.5" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent align="end">
-              {DATE_RANGE_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-2 pb-4 sm:px-6">
           <Suspense
-            fallback={<Skeleton className="h-[400px] w-full rounded-xl" />}
+            fallback={<Skeleton className="h-[300px] w-full rounded-xl" />}
           >
             <AreaChart
               data={areaChartData}
@@ -116,7 +118,7 @@ export default function AnalyticsPageClient() {
               dataKeyIncome="income"
               dataKeyExpense="expense"
               labelKey="date"
-              className="h-[400px] w-full"
+              className="h-[300px] w-full"
               valueFormatter={(val) => formatAmount(val)}
             />
           </Suspense>
