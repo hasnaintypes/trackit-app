@@ -5,7 +5,6 @@ import {
   DateFormat,
   TimeFormat,
   WeekDay,
-  DefaultView,
   CurrencyPosition,
   ThousandSeparator,
   ColorScheme,
@@ -30,7 +29,6 @@ export const updateNotificationsSchema = z.object({
 });
 
 export const updateDisplaySchema = z.object({
-  defaultView: z.nativeEnum(DefaultView).optional(),
   decimalPlaces: z.number().int().min(0).max(4).optional(),
   currencyPosition: z.nativeEnum(CurrencyPosition).optional(),
   thousandSeparator: z.nativeEnum(ThousandSeparator).optional(),

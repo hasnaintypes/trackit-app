@@ -30,7 +30,6 @@ import {
   Currency,
   Language,
   DateFormat,
-  DefaultView,
   Gender,
   Country,
   Timezone,
@@ -53,7 +52,6 @@ interface OnboardingState {
   weekStartsOn: WeekDay;
   largeTx: number;
   lowBalance: number;
-  defaultView: DefaultView;
   colorScheme: ColorScheme;
   emailWeekly: boolean;
   emailMonthly: boolean;
@@ -375,28 +373,6 @@ export function StepForms({
       {step === 4 && (
         <div className="space-y-8">
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Default View</Label>
-              <Select
-                value={prefs.defaultView}
-                onValueChange={(v) =>
-                  updatePref("defaultView", v as DefaultView)
-                }
-              >
-                <SelectTrigger className="bg-muted/30 h-11">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={DefaultView.OVERVIEW}>Overview</SelectItem>
-                  <SelectItem value={DefaultView.TRANSACTIONS}>
-                    Transactions
-                  </SelectItem>
-                  <SelectItem value={DefaultView.NETWORTH}>
-                    Net Worth
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
             <div className="space-y-2">
               <Label>Theme</Label>
               <Select

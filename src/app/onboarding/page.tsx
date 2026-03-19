@@ -14,7 +14,6 @@ import {
   Currency,
   Language,
   DateFormat,
-  DefaultView,
   Gender,
   Country,
   Timezone,
@@ -46,7 +45,6 @@ export interface OnboardingState {
   weekStartsOn: WeekDay;
   largeTx: number;
   lowBalance: number;
-  defaultView: DefaultView;
   colorScheme: ColorScheme;
   emailWeekly: boolean;
   emailMonthly: boolean;
@@ -74,7 +72,6 @@ export default function OnboardingPage() {
     weekStartsOn: WeekDay.SUNDAY,
     largeTx: 1000,
     lowBalance: 500,
-    defaultView: DefaultView.OVERVIEW,
     colorScheme: ColorScheme.SYSTEM,
     emailWeekly: true,
     emailMonthly: true,
@@ -171,7 +168,6 @@ export default function OnboardingPage() {
           emailLargeTransactions: true,
         }),
         updateDisplay.mutateAsync({
-          defaultView: prefs.defaultView,
           colorScheme: prefs.colorScheme,
           compactNumbers: prefs.compactNumbers,
         }),
