@@ -1,13 +1,9 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import { useTheme } from "next-themes";
 import { useSettings } from "@/hooks/use-settings";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@ui/card";
+import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -16,24 +12,22 @@ import {
   SelectValue,
 } from "@ui/select";
 import { Label } from "@ui/label";
-import {
-  Hash,
-  LayoutDashboard,
-  LineChart,
-  Banknote,
-  ListChecks,
-  Globe,
-  BarChart3,
-  Moon,
-  Sun,
-  Laptop,
-} from "lucide-react";
-import { Separator } from "@ui/separator";
 import { RadioGroup, RadioGroupItem } from "@ui/radio-group";
 import { Switch } from "@ui/switch";
 import { Skeleton } from "@ui/skeleton";
 import {
-  DefaultView,
+  Globe,
+  Calendar,
+  Clock,
+  Languages,
+  Coins,
+  CalendarDays,
+  Hash,
+  DollarSign,
+  SeparatorHorizontal,
+  BarChart3,
+} from "lucide-react";
+import {
   CurrencyPosition,
   ThousandSeparator,
   Currency,
@@ -41,492 +35,509 @@ import {
   DateFormat,
   TimeFormat,
   WeekDay,
-  ColorScheme,
 } from "@prisma/client";
-import type React from "react";
 
-// --- Helper Component for Dashboard View Selection ---
-type ViewSettingsCardProps = {
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-  title: string;
-  description: string;
-  value: DefaultView;
-  currentView: DefaultView;
-  onClick: (value: DefaultView) => void;
-  disabled?: boolean;
-};
-
-const ViewSettingsCard: React.FC<ViewSettingsCardProps> = ({
+// ---------------------------------------------------------------------------
+// Shared row component — label+description left, control right
+// ---------------------------------------------------------------------------
+function SettingRow({
   icon: Icon,
-  title,
+  label,
   description,
-  value,
-  currentView,
-  onClick,
-  disabled,
-}) => (
-  <Card
-    className={`hover:bg-muted/50 cursor-pointer transition-all ${
-      currentView === value
-        ? "border-primary ring-primary/50 ring-2"
-        : "border-border"
-    } ${disabled ? "cursor-not-allowed opacity-50" : ""}`}
-    onClick={() => !disabled && onClick(value)}
-  >
-    <CardHeader className="p-4">
-      <div className="flex items-center space-x-3">
-        <Icon
-          className={`h-6 w-6 ${currentView === value ? "text-primary" : "text-muted-foreground"}`}
-        />
-        <div>
-          <h4 className="font-semibold">{title}</h4>
-          <p className="text-muted-foreground text-sm">{description}</p>
+  children,
+  className,
+}: {
+  icon?: React.ComponentType<{ className?: string }>;
+  label: string;
+  description?: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between",
+        className,
+      )}
+    >
+      <div className="flex items-start gap-3">
+        {Icon && (
+          <div className="bg-muted flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
+            <Icon className="text-muted-foreground h-4 w-4" />
+          </div>
+        )}
+        <div className="space-y-0.5">
+          <Label className="text-sm font-medium">{label}</Label>
+          {description && (
+            <p className="text-muted-foreground text-xs">{description}</p>
+          )}
         </div>
       </div>
-    </CardHeader>
-  </Card>
-);
+      <div className="w-full sm:w-48">{children}</div>
+    </div>
+  );
+}
 
+// ---------------------------------------------------------------------------
+// Section wrapper — title + divider + children
+// ---------------------------------------------------------------------------
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <h3 className="text-muted-foreground mb-1 text-xs font-semibold tracking-wider uppercase">
+        {title}
+      </h3>
+      <div className="divide-border divide-y">{children}</div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Format preview helper
+// ---------------------------------------------------------------------------
+function useFormatPreview(
+  currencyPosition: CurrencyPosition,
+  thousandSeparator: ThousandSeparator,
+  decimalPlaces: number,
+  defaultCurrency: Currency,
+  compactNumbers: boolean,
+) {
+  return useMemo(() => {
+    const sep =
+      thousandSeparator === ThousandSeparator.COMMA
+        ? ","
+        : thousandSeparator === ThousandSeparator.SPACE
+          ? " "
+          : "";
+    const dec = thousandSeparator === ThousandSeparator.SPACE ? "," : ".";
+
+    if (compactNumbers) {
+      const symbol =
+        defaultCurrency === Currency.EUR
+          ? "\u20AC"
+          : defaultCurrency === Currency.GBP
+            ? "\u00A3"
+            : "$";
+      return currencyPosition === CurrencyPosition.BEFORE
+        ? `${symbol}1.2M`
+        : `1.2M ${symbol}`;
+    }
+
+    const decimals = dec + "0".repeat(decimalPlaces);
+    const num = `1${sep}234${decimalPlaces > 0 ? decimals : ""}`;
+    const symbol =
+      defaultCurrency === Currency.EUR
+        ? "\u20AC"
+        : defaultCurrency === Currency.GBP
+          ? "\u00A3"
+          : "$";
+    return currencyPosition === CurrencyPosition.BEFORE
+      ? `${symbol}${num}`
+      : `${num} ${symbol}`;
+  }, [
+    currencyPosition,
+    thousandSeparator,
+    decimalPlaces,
+    defaultCurrency,
+    compactNumbers,
+  ]);
+}
+
+// ---------------------------------------------------------------------------
+// Main component
+// ---------------------------------------------------------------------------
 export default function DisplaySettings() {
   const { settings, isLoading, updateDisplay, updateRegional, isUpdating } =
     useSettings();
+  const { theme: currentTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  if (isLoading || !settings) {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const display = settings?.display;
+  const preferences = settings?.preferences;
+
+  const preview = useFormatPreview(
+    display?.currencyPosition ?? CurrencyPosition.BEFORE,
+    display?.thousandSeparator ?? ThousandSeparator.COMMA,
+    display?.decimalPlaces ?? 2,
+    preferences?.defaultCurrency ?? Currency.USD,
+    display?.compactNumbers ?? false,
+  );
+
+  if (isLoading || !settings || !display || !preferences) {
     return (
-      <div className="flex-1 space-y-6">
-        <Skeleton className="h-10 w-48" />
-        <Skeleton className="h-4 w-72" />
-        <div className="space-y-6 pt-4">
-          <Skeleton className="h-[250px] w-full" />
-          <Skeleton className="h-[300px] w-full" />
-        </div>
+      <div className="space-y-8">
+        <Skeleton className="h-32 w-full rounded-xl" />
+        <Skeleton className="h-64 w-full rounded-xl" />
+        <Skeleton className="h-64 w-full rounded-xl" />
       </div>
     );
   }
 
-  const display = settings.display;
-  const preferences = settings.preferences;
-
-  const viewOptions = [
-    {
-      icon: LayoutDashboard,
-      title: "Overview",
-      description: "Your financial summary and quick insights.",
-      value: DefaultView.OVERVIEW,
-    },
-    {
-      icon: ListChecks,
-      title: "Transactions List",
-      description: "A detailed list of all recent activity.",
-      value: DefaultView.TRANSACTIONS,
-    },
-    {
-      icon: LineChart,
-      title: "Net Worth Chart",
-      description: "Focus on assets, liabilities, and trend.",
-      value: DefaultView.NETWORTH,
-    },
-    {
-      icon: Banknote,
-      title: "Investment Portfolio",
-      description: "Detailed view of all connected investment accounts.",
-      value: DefaultView.PORTFOLIO,
-    },
-  ];
-
   return (
-    <div className="flex-1 space-y-6">
-      {/* --- SECTION 1: Default Dashboard View --- */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-3">
-            <LayoutDashboard className="h-6 w-6 text-indigo-500" />
-            Default Dashboard View
-          </CardTitle>
-          <CardDescription>
-            Select the page you want to see immediately after logging in.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
-            {viewOptions.map((option) => (
-              <ViewSettingsCard
-                key={option.value}
-                icon={option.icon}
-                title={option.title}
-                description={option.description}
-                value={option.value}
-                currentView={display.defaultView}
-                disabled={isUpdating}
-                onClick={(val) => updateDisplay({ defaultView: val })}
-              />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* --- SECTION 1.5: Theme & Personalization --- */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-3">
-            <Sun className="h-6 w-6 text-orange-500" />
-            Theme & Personalization
-          </CardTitle>
-          <CardDescription>
-            Choose your preferred color theme for the workspace.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <div className="space-y-10">
+      {/* ================================================================= */}
+      {/* THEME */}
+      {/* ================================================================= */}
+      <Section title="Theme">
+        <div className="py-5">
           <RadioGroup
-            value={display.colorScheme}
-            disabled={isUpdating}
-            onValueChange={(val) =>
-              updateDisplay({ colorScheme: val as ColorScheme })
-            }
-            className="grid grid-cols-1 gap-4 md:grid-cols-3"
+            value={mounted ? (currentTheme ?? "light") : "light"}
+            onValueChange={(val) => setTheme(val)}
+            className="grid grid-cols-3 gap-4"
           >
-            <Label
-              htmlFor="light"
-              className="border-muted bg-popover hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary flex cursor-pointer flex-col items-center justify-between rounded-md border-2 p-4 transition-all"
-            >
-              <div className="flex w-full items-center justify-between">
-                <Sun className="h-5 w-5 text-orange-500" />
-                <RadioGroupItem value={ColorScheme.LIGHT} id="light" />
-              </div>
-              <span className="mt-2 font-medium">Light Mode</span>
-            </Label>
-
-            <Label
-              htmlFor="dark"
-              className="border-muted bg-popover hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary flex cursor-pointer flex-col items-center justify-between rounded-md border-2 p-4 transition-all"
-            >
-              <div className="flex w-full items-center justify-between">
-                <Moon className="h-5 w-5 text-indigo-400" />
-                <RadioGroupItem value={ColorScheme.DARK} id="dark" />
-              </div>
-              <span className="mt-2 font-medium">Dark Mode</span>
-            </Label>
-
-            <Label
-              htmlFor="system"
-              className="border-muted bg-popover hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary flex cursor-pointer flex-col items-center justify-between rounded-md border-2 p-4 transition-all"
-            >
-              <div className="flex w-full items-center justify-between">
-                <Laptop className="h-5 w-5 text-slate-500" />
-                <RadioGroupItem value={ColorScheme.SYSTEM} id="system" />
-              </div>
-              <span className="mt-2 font-medium">System Preference</span>
-            </Label>
-          </RadioGroup>
-        </CardContent>
-      </Card>
-
-      {/* --- SECTION 2: Regional & localization --- */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-3">
-            <Globe className="h-6 w-6 text-blue-500" />
-            Regional & Localization
-          </CardTitle>
-          <CardDescription>
-            Configure your base currency and localized formats.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-8 md:grid-cols-2">
-            <div className="space-y-4">
-              <Label className="text-base font-semibold">
-                Primary Currency
-              </Label>
-              <Select
-                value={preferences.defaultCurrency}
-                disabled={isUpdating}
-                onValueChange={(val) =>
-                  updateRegional({ defaultCurrency: val as Currency })
-                }
+            {/* Light */}
+            <label className="cursor-pointer">
+              <RadioGroupItem value="light" className="sr-only" />
+              <div
+                className={cn(
+                  "rounded-xl border-2 p-1.5 transition-all",
+                  mounted && currentTheme === "light"
+                    ? "border-primary ring-primary/25 ring-2"
+                    : "border-border hover:border-muted-foreground/30",
+                )}
               >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.values(Currency).map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-4">
-              <Label className="text-base font-semibold">Language</Label>
-              <Select
-                value={preferences.language}
-                disabled={isUpdating}
-                onValueChange={(val) =>
-                  updateRegional({ language: val as Language })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={Language.EN}>English</SelectItem>
-                  <SelectItem value={Language.ES}>Español</SelectItem>
-                  <SelectItem value={Language.FR}>Français</SelectItem>
-                  <SelectItem value={Language.DE}>Deutsch</SelectItem>
-                  <SelectItem value={Language.IT}>Italiano</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-4">
-              <Label className="text-base font-semibold">Date Format</Label>
-              <Select
-                value={preferences.dateFormat}
-                disabled={isUpdating}
-                onValueChange={(val) =>
-                  updateRegional({ dateFormat: val as DateFormat })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={DateFormat.MM_DD_YYYY}>
-                    MM/DD/YYYY
-                  </SelectItem>
-                  <SelectItem value={DateFormat.DD_MM_YYYY}>
-                    DD/MM/YYYY
-                  </SelectItem>
-                  <SelectItem value={DateFormat.YYYY_MM_DD}>
-                    YYYY-MM-DD
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-4">
-              <Label className="text-base font-semibold">
-                First Day of Week
-              </Label>
-              <Select
-                value={preferences.weekStartsOn}
-                disabled={isUpdating}
-                onValueChange={(val) =>
-                  updateRegional({ weekStartsOn: val as WeekDay })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={WeekDay.SUNDAY}>Sunday</SelectItem>
-                  <SelectItem value={WeekDay.MONDAY}>Monday</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-4">
-              <Label className="text-base font-semibold">Time Format</Label>
-              <Select
-                value={preferences.timeFormat}
-                disabled={isUpdating}
-                onValueChange={(val) =>
-                  updateRegional({ timeFormat: val as TimeFormat })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={TimeFormat.H12}>
-                    12-hour (e.g., 2:30 PM)
-                  </SelectItem>
-                  <SelectItem value={TimeFormat.H24}>
-                    24-hour (e.g., 14:30)
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* --- SECTION 3: Financial Number Formatting --- */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-3">
-            <Hash className="h-6 w-6 text-teal-500" />
-            Financial Number Formatting
-          </CardTitle>
-          <CardDescription>
-            Customize how currency and decimals appear globally.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-8 md:grid-cols-2">
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <Label className="text-base font-semibold">
-                  Decimal Precision
-                </Label>
-                <Select
-                  value={String(display.decimalPlaces)}
-                  disabled={isUpdating}
-                  onValueChange={(val) =>
-                    updateDisplay({ decimalPlaces: parseInt(val) })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0">0 Decimals (e.g., 1234)</SelectItem>
-                    <SelectItem value="2">
-                      2 Decimals (e.g., 1234.56)
-                    </SelectItem>
-                    <SelectItem value="4">
-                      4 Decimals (e.g., 1234.5678)
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-3">
-                <Label className="text-base font-semibold">
-                  Currency Symbol Position
-                </Label>
-                <RadioGroup
-                  value={display.currencyPosition}
-                  disabled={isUpdating}
-                  onValueChange={(val) =>
-                    updateDisplay({ currencyPosition: val as CurrencyPosition })
-                  }
-                  className="grid grid-cols-2 gap-4"
-                >
-                  <Label
-                    htmlFor="before"
-                    className="border-muted bg-popover hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary flex cursor-pointer flex-col items-center justify-between rounded-md border-2 p-4 transition-all"
-                  >
-                    <div className="flex w-full items-center justify-between">
-                      <p className="font-medium">$1,234.56</p>
-                      <RadioGroupItem
-                        value={CurrencyPosition.BEFORE}
-                        id="before"
-                      />
-                    </div>
-                    <span className="text-muted-foreground mt-1 text-sm">
-                      Before Value
-                    </span>
-                  </Label>
-
-                  <Label
-                    htmlFor="after"
-                    className="border-muted bg-popover hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary flex cursor-pointer flex-col items-center justify-between rounded-md border-2 p-4 transition-all"
-                  >
-                    <div className="flex w-full items-center justify-between">
-                      <p className="font-medium">1.234,56 €</p>
-                      <RadioGroupItem
-                        value={CurrencyPosition.AFTER}
-                        id="after"
-                      />
-                    </div>
-                    <span className="text-muted-foreground mt-1 text-sm">
-                      After Value
-                    </span>
-                  </Label>
-                </RadioGroup>
-              </div>
-
-              <Separator />
-
-              <div className="flex items-center justify-between space-x-4 rounded-lg border p-4">
-                <div className="flex items-center gap-3">
-                  <BarChart3 className="text-primary h-5 w-5" />
-                  <div className="space-y-0.5">
-                    <Label className="text-base font-semibold">
-                      Compact Numbers
-                    </Label>
-                    <p className="text-muted-foreground text-sm">
-                      Format millions as &quot;1M&quot; for cleaner chart
-                      displays.
-                    </p>
+                <div className="space-y-2 rounded-lg bg-[#ecedef] p-2">
+                  <div className="space-y-2 rounded-md bg-white p-2 shadow-xs">
+                    <div className="h-2 w-[80px] rounded-lg bg-[#ecedef]" />
+                    <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
+                  </div>
+                  <div className="flex items-center space-x-2 rounded-md bg-white p-2 shadow-xs">
+                    <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
+                    <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
+                  </div>
+                  <div className="flex items-center space-x-2 rounded-md bg-white p-2 shadow-xs">
+                    <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
+                    <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
                   </div>
                 </div>
-                <Switch
-                  checked={display.compactNumbers}
-                  onCheckedChange={(checked) =>
-                    updateDisplay({ compactNumbers: checked })
-                  }
-                  disabled={isUpdating}
-                />
               </div>
-            </div>
+              <p className="mt-2 text-center text-sm font-medium">Light</p>
+            </label>
 
-            <div className="space-y-3">
-              <Label className="text-base font-semibold">
-                Thousands Separator
-              </Label>
-              <RadioGroup
-                value={display.thousandSeparator}
-                disabled={isUpdating}
-                onValueChange={(val) =>
-                  updateDisplay({ thousandSeparator: val as ThousandSeparator })
-                }
-                className="grid grid-cols-1 gap-4"
+            {/* Dark */}
+            <label className="cursor-pointer">
+              <RadioGroupItem value="dark" className="sr-only" />
+              <div
+                className={cn(
+                  "rounded-xl border-2 p-1.5 transition-all",
+                  mounted && currentTheme === "dark"
+                    ? "border-primary ring-primary/25 ring-2"
+                    : "border-border hover:border-muted-foreground/30",
+                )}
               >
-                <Label
-                  htmlFor="comma"
-                  className="border-muted bg-popover hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary flex cursor-pointer flex-col items-center justify-between rounded-md border-2 p-4 transition-all"
-                >
-                  <div className="flex w-full items-center justify-between">
-                    <p className="font-medium">1,234.56</p>
-                    <RadioGroupItem
-                      value={ThousandSeparator.COMMA}
-                      id="comma"
-                    />
+                <div className="space-y-2 rounded-lg bg-slate-950 p-2">
+                  <div className="space-y-2 rounded-md bg-slate-800 p-2 shadow-xs">
+                    <div className="h-2 w-[80px] rounded-lg bg-slate-400" />
+                    <div className="h-2 w-[100px] rounded-lg bg-slate-400" />
                   </div>
-                  <span className="text-muted-foreground mt-1 text-sm">
-                    Comma (Default for US)
-                  </span>
-                </Label>
+                  <div className="flex items-center space-x-2 rounded-md bg-slate-800 p-2 shadow-xs">
+                    <div className="h-4 w-4 rounded-full bg-slate-400" />
+                    <div className="h-2 w-[100px] rounded-lg bg-slate-400" />
+                  </div>
+                  <div className="flex items-center space-x-2 rounded-md bg-slate-800 p-2 shadow-xs">
+                    <div className="h-4 w-4 rounded-full bg-slate-400" />
+                    <div className="h-2 w-[100px] rounded-lg bg-slate-400" />
+                  </div>
+                </div>
+              </div>
+              <p className="mt-2 text-center text-sm font-medium">Dark</p>
+            </label>
 
-                <Label
-                  htmlFor="space"
-                  className="border-muted bg-popover hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary flex cursor-pointer flex-col items-center justify-between rounded-md border-2 p-4 transition-all"
-                >
-                  <div className="flex w-full items-center justify-between">
-                    <p className="font-medium">1 234,56</p>
-                    <RadioGroupItem
-                      value={ThousandSeparator.SPACE}
-                      id="space"
-                    />
+            {/* System */}
+            <label className="cursor-pointer">
+              <RadioGroupItem value="system" className="sr-only" />
+              <div
+                className={cn(
+                  "rounded-xl border-2 p-1.5 transition-all",
+                  mounted && currentTheme === "system"
+                    ? "border-primary ring-primary/25 ring-2"
+                    : "border-border hover:border-muted-foreground/30",
+                )}
+              >
+                <div className="flex gap-0 overflow-hidden rounded-lg">
+                  {/* Left half — light */}
+                  <div className="w-1/2 space-y-2 bg-[#ecedef] p-2">
+                    <div className="space-y-2 rounded-l-md bg-white p-2 shadow-xs">
+                      <div className="h-2 w-4/5 rounded-lg bg-[#ecedef]" />
+                      <div className="h-2 w-3/5 rounded-lg bg-[#ecedef]" />
+                    </div>
+                    <div className="flex items-center space-x-2 rounded-l-md bg-white p-2 shadow-xs">
+                      <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
+                      <div className="h-2 flex-1 rounded-lg bg-[#ecedef]" />
+                    </div>
+                    <div className="flex items-center space-x-2 rounded-l-md bg-white p-2 shadow-xs">
+                      <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
+                      <div className="h-2 flex-1 rounded-lg bg-[#ecedef]" />
+                    </div>
                   </div>
-                  <span className="text-muted-foreground mt-1 text-sm">
-                    Space (Commonly used)
-                  </span>
-                </Label>
+                  {/* Right half — dark */}
+                  <div className="w-1/2 space-y-2 bg-slate-950 p-2">
+                    <div className="space-y-2 rounded-r-md bg-slate-800 p-2 shadow-xs">
+                      <div className="h-2 w-4/5 rounded-lg bg-slate-400" />
+                      <div className="h-2 w-3/5 rounded-lg bg-slate-400" />
+                    </div>
+                    <div className="flex items-center space-x-2 rounded-r-md bg-slate-800 p-2 shadow-xs">
+                      <div className="h-4 w-4 rounded-full bg-slate-400" />
+                      <div className="h-2 flex-1 rounded-lg bg-slate-400" />
+                    </div>
+                    <div className="flex items-center space-x-2 rounded-r-md bg-slate-800 p-2 shadow-xs">
+                      <div className="h-4 w-4 rounded-full bg-slate-400" />
+                      <div className="h-2 flex-1 rounded-lg bg-slate-400" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p className="mt-2 text-center text-sm font-medium">System</p>
+            </label>
+          </RadioGroup>
+        </div>
+      </Section>
 
-                <Label
-                  htmlFor="none"
-                  className="border-muted bg-popover hover:bg-accent hover:text-accent-foreground [&:has([data-state=checked])]:border-primary flex cursor-pointer flex-col items-center justify-between rounded-md border-2 p-4 transition-all"
-                >
-                  <div className="flex w-full items-center justify-between">
-                    <p className="font-medium">1234.56</p>
-                    <RadioGroupItem value={ThousandSeparator.NONE} id="none" />
-                  </div>
-                  <span className="text-muted-foreground mt-1 text-sm">
-                    None
-                  </span>
-                </Label>
-              </RadioGroup>
+      {/* ================================================================= */}
+      {/* REGIONAL */}
+      {/* ================================================================= */}
+      <Section title="Regional">
+        <SettingRow
+          icon={Coins}
+          label="Currency"
+          description="Primary currency for accounts"
+        >
+          <Select
+            value={preferences.defaultCurrency}
+            disabled={isUpdating}
+            onValueChange={(val) =>
+              updateRegional({ defaultCurrency: val as Currency })
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.values(Currency).map((c) => (
+                <SelectItem key={c} value={c}>
+                  {c}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </SettingRow>
+
+        <SettingRow
+          icon={Languages}
+          label="Language"
+          description="Display language"
+        >
+          <Select
+            value={preferences.language}
+            disabled={isUpdating}
+            onValueChange={(val) =>
+              updateRegional({ language: val as Language })
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={Language.EN}>English</SelectItem>
+              <SelectItem value={Language.ES}>Espa&#241;ol</SelectItem>
+              <SelectItem value={Language.FR}>Fran&#231;ais</SelectItem>
+              <SelectItem value={Language.DE}>Deutsch</SelectItem>
+              <SelectItem value={Language.IT}>Italiano</SelectItem>
+            </SelectContent>
+          </Select>
+        </SettingRow>
+
+        <SettingRow
+          icon={Calendar}
+          label="Date Format"
+          description="How dates are displayed"
+        >
+          <Select
+            value={preferences.dateFormat}
+            disabled={isUpdating}
+            onValueChange={(val) =>
+              updateRegional({ dateFormat: val as DateFormat })
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={DateFormat.MM_DD_YYYY}>MM/DD/YYYY</SelectItem>
+              <SelectItem value={DateFormat.DD_MM_YYYY}>DD/MM/YYYY</SelectItem>
+              <SelectItem value={DateFormat.YYYY_MM_DD}>YYYY-MM-DD</SelectItem>
+            </SelectContent>
+          </Select>
+        </SettingRow>
+
+        <SettingRow
+          icon={Clock}
+          label="Time Format"
+          description="12-hour or 24-hour clock"
+        >
+          <Select
+            value={preferences.timeFormat}
+            disabled={isUpdating}
+            onValueChange={(val) =>
+              updateRegional({ timeFormat: val as TimeFormat })
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={TimeFormat.H12}>12h (2:30 PM)</SelectItem>
+              <SelectItem value={TimeFormat.H24}>24h (14:30)</SelectItem>
+            </SelectContent>
+          </Select>
+        </SettingRow>
+
+        <SettingRow
+          icon={CalendarDays}
+          label="Week Starts On"
+          description="First day of the week"
+        >
+          <Select
+            value={preferences.weekStartsOn}
+            disabled={isUpdating}
+            onValueChange={(val) =>
+              updateRegional({ weekStartsOn: val as WeekDay })
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={WeekDay.SUNDAY}>Sunday</SelectItem>
+              <SelectItem value={WeekDay.MONDAY}>Monday</SelectItem>
+            </SelectContent>
+          </Select>
+        </SettingRow>
+      </Section>
+
+      {/* ================================================================= */}
+      {/* NUMBER FORMATTING — with live preview */}
+      {/* ================================================================= */}
+      <Section title="Number Formatting">
+        {/* Live preview banner */}
+        <div className="py-5">
+          <div className="bg-muted/50 flex items-center justify-between rounded-xl border px-5 py-4">
+            <div className="space-y-0.5">
+              <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
+                Preview
+              </p>
+              <p className="text-foreground text-2xl font-bold tracking-tight tabular-nums">
+                {preview}
+              </p>
             </div>
+            <Globe className="text-muted-foreground/40 h-8 w-8" />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        <SettingRow
+          icon={DollarSign}
+          label="Symbol Position"
+          description="Before or after the amount"
+        >
+          <Select
+            value={display.currencyPosition}
+            disabled={isUpdating}
+            onValueChange={(val) =>
+              updateDisplay({ currencyPosition: val as CurrencyPosition })
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={CurrencyPosition.BEFORE}>
+                Before ($100)
+              </SelectItem>
+              <SelectItem value={CurrencyPosition.AFTER}>
+                After (100$)
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </SettingRow>
+
+        <SettingRow
+          icon={SeparatorHorizontal}
+          label="Thousands Separator"
+          description="Digit grouping style"
+        >
+          <Select
+            value={display.thousandSeparator}
+            disabled={isUpdating}
+            onValueChange={(val) =>
+              updateDisplay({ thousandSeparator: val as ThousandSeparator })
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ThousandSeparator.COMMA}>
+                Comma (1,234)
+              </SelectItem>
+              <SelectItem value={ThousandSeparator.SPACE}>
+                Space (1 234)
+              </SelectItem>
+              <SelectItem value={ThousandSeparator.NONE}>
+                None (1234)
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </SettingRow>
+
+        <SettingRow
+          icon={Hash}
+          label="Decimal Places"
+          description="Number of decimal digits"
+        >
+          <Select
+            value={String(display.decimalPlaces)}
+            disabled={isUpdating}
+            onValueChange={(val) =>
+              updateDisplay({ decimalPlaces: parseInt(val) })
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="0">0 (1234)</SelectItem>
+              <SelectItem value="2">2 (1234.56)</SelectItem>
+              <SelectItem value="4">4 (1234.5678)</SelectItem>
+            </SelectContent>
+          </Select>
+        </SettingRow>
+
+        <SettingRow
+          icon={BarChart3}
+          label="Compact Numbers"
+          description='Show "1.2M" instead of "1,200,000" in charts'
+        >
+          <div className="flex justify-end">
+            <Switch
+              checked={display.compactNumbers}
+              onCheckedChange={(checked) =>
+                updateDisplay({ compactNumbers: checked })
+              }
+              disabled={isUpdating}
+            />
+          </div>
+        </SettingRow>
+      </Section>
     </div>
   );
 }
