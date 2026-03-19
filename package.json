@@ -81,6 +81,7 @@
     "hast-util-sanitize": "^5.0.2",
     "inngest": "^3.18.0",
     "input-otp": "^1.4.2",
+    "jspdf": "^4.2.1",
     "lucide-react": "^0.545.0",
     "motion": "^12.23.24",
     "next": "15.5.9",

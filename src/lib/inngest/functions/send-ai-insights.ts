@@ -58,6 +58,23 @@ export const sendAiInsights = inngest.createFunction(
 
         if (insights) {
           await step.run(`send-email-${user.id}`, async () => {
+            const period = format(new Date(), "yyyy-MM");
+
+            // Create report record so it appears in the UI
+            const report = await db.report.create({
+              data: {
+                userId: user.id,
+                type: "SPENDING_INSIGHTS",
+                period,
+                status: "PENDING",
+                data: {
+                  period,
+                  aiContent: insights,
+                  hasAnomalies: false,
+                },
+              },
+            });
+
             const emailHtml = await compileTemplate("ai-insight.html", {
               userName: user.name ?? "there",
               aiContent: insights,
@@ -69,6 +86,16 @@ export const sendAiInsights = inngest.createFunction(
               to: user.email,
               subject: "Your AI Spending Analysis",
               html: emailHtml,
+            });
+
+            // Mark as sent after successful email delivery
+            await db.report.update({
+              where: { id: report.id },
+              data: {
+                status: "SENT",
+                sentAt: new Date(),
+                emailSentTo: user.email,
+              },
             });
           });
           results.push({ userId: user.id, success: true });

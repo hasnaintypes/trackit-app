@@ -12,7 +12,7 @@ interface SendEmailOptions {
   html: string;
 }
 
-interface SendTemplateEmailOptions {
+export interface SendTemplateEmailOptions {
   to: string;
   subject: string;
   template:

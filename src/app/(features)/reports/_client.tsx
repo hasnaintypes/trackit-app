@@ -14,6 +14,7 @@ import {
   Filter,
   MoreHorizontal,
 } from "lucide-react";
+import { ReportPreview } from "@/components/pages/(protected)/reports/report-preview";
 import { toast } from "sonner";
 import { useCallback, useMemo, useState } from "react";
 import type { Report } from "@prisma/client";
@@ -140,8 +141,19 @@ export default function ReportsPageClient() {
     [],
   );
 
-  const handleExport = useCallback(() => {
-    toast.info("Export feature coming soon");
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportPdf = useCallback(async (report: Report) => {
+    setExporting(true);
+    try {
+      const { exportReportPdf } = await import("@shared/pdf-export");
+      await exportReportPdf(report);
+    } catch (error) {
+      console.error("PDF export failed:", error);
+      toast.error("Failed to export PDF");
+    } finally {
+      setExporting(false);
+    }
   }, []);
 
   const handleFilterChange = useCallback((typeFilter: string) => {
@@ -174,9 +186,9 @@ export default function ReportsPageClient() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header section with Welcome text similar to other pages */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="animate-in fade-in-50 flex flex-col space-y-12 duration-500">
+      {/* Header */}
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-foreground text-3xl font-bold tracking-tight">
             Reports & Insights
@@ -211,14 +223,6 @@ export default function ReportsPageClient() {
                 className="bg-muted/30 ring-offset-background focus-visible:ring-ring h-10 border-none pl-9 focus-visible:ring-1"
               />
             </div>
-            <Button
-              variant="outline"
-              className="hover:bg-muted/50 h-10 gap-2 border-dashed shadow-xs"
-              onClick={handleExport}
-            >
-              <Download className="h-4 w-4" />
-              <span className="hidden sm:inline">Export</span>
-            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -337,9 +341,7 @@ export default function ReportsPageClient() {
                     </TableCell>
                     <TableCell>
                       <span className="text-muted-foreground text-sm font-medium">
-                        {report.type === "MONTHLY_SUMMARY"
-                          ? "Income"
-                          : "Analysis"}
+                        {getTypeLabel(report.type)}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -348,22 +350,12 @@ export default function ReportsPageClient() {
                       </span>
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-1.5">
-                        <Badge
-                          variant="secondary"
-                          className="bg-muted h-5 rounded-md px-1.5 text-[10px] font-bold tracking-tighter uppercase"
-                        >
-                          PDF
-                        </Badge>
-                        {report.type === "MONTHLY_SUMMARY" && (
-                          <Badge
-                            variant="secondary"
-                            className="bg-muted h-5 rounded-md px-1.5 text-[10px] font-bold tracking-tighter uppercase"
-                          >
-                            Excel
-                          </Badge>
-                        )}
-                      </div>
+                      <Badge
+                        variant="secondary"
+                        className="bg-muted h-5 rounded-md px-1.5 text-[10px] font-bold tracking-tighter uppercase"
+                      >
+                        PDF
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <span className="text-muted-foreground text-sm whitespace-nowrap">
@@ -402,6 +394,14 @@ export default function ReportsPageClient() {
                                 : "Resend Email"}
                             </span>
                           </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => void handleExportPdf(report)}
+                            disabled={exporting}
+                            className="gap-2"
+                          >
+                            <Download className="h-4 w-4" />
+                            <span>{exporting ? "Exporting..." : "Export"}</span>
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -436,21 +436,7 @@ export default function ReportsPageClient() {
             </div>
           </DialogHeader>
           <div className="bg-muted/20 flex-1 overflow-y-auto p-6">
-            {selectedReport && (
-              <div className="bg-card overflow-hidden rounded-xl border shadow-sm">
-                <div className="bg-muted/10 flex items-center justify-between border-b px-4 py-3">
-                  <span className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
-                    Report Data Summary
-                  </span>
-                  <Badge variant="outline" className="font-mono text-[10px]">
-                    JSON Format
-                  </Badge>
-                </div>
-                <pre className="text-foreground/80 overflow-x-auto p-4 font-mono text-[13px] leading-relaxed whitespace-pre-wrap">
-                  {JSON.stringify(selectedReport.data, null, 2)}
-                </pre>
-              </div>
-            )}
+            {selectedReport && <ReportPreview report={selectedReport} />}
           </div>
           <div className="bg-card flex justify-end gap-3 border-t p-4">
             <Button variant="outline" onClick={handleClosePreview}>
