@@ -219,66 +219,57 @@ const ReceiptStep = React.memo(function ReceiptStep({
   } = useReceiptUpload(form, categories);
 
   return (
-    <div className="group border-border from-primary/5 via-primary/3 hover:border-primary/30 relative overflow-hidden rounded-xl border bg-gradient-to-br to-transparent p-4 transition-all">
-      <div className="relative flex items-start gap-4">
-        <div className="bg-primary/10 ring-primary/20 group-hover:bg-primary/15 group-hover:ring-primary/30 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ring-1 transition-all">
-          <Zap className="text-primary h-5 w-5" />
-        </div>
-        <div className="flex-1 space-y-1">
-          <div className="flex items-center gap-2">
-            <h4 className="text-sm font-semibold">AI Receipt Scanner</h4>
-            <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-medium tracking-wide uppercase">
-              Beta
-            </span>
+    <div className="bg-muted/50 rounded-lg border border-dashed p-3">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <Zap className="text-primary h-4 w-4 shrink-0" />
+          <div>
+            <p className="text-foreground text-xs font-medium">Scan Receipt</p>
+            <p className="text-muted-foreground text-[11px]">
+              {selectedFileName ? (
+                <span className="flex items-center gap-1">
+                  <Check className="h-3 w-3 text-green-500" />
+                  {selectedFileName}
+                </span>
+              ) : (
+                "Auto-fill from a photo"
+              )}
+            </p>
           </div>
-          <p className="text-muted-foreground text-xs">
-            {selectedFileName ? (
-              <span className="flex items-center gap-1.5">
-                <Check className="h-3 w-3 text-green-500" />
-                <span className="font-medium">{selectedFileName}</span>
-              </span>
-            ) : (
-              "Upload a receipt to auto-fill transaction details"
-            )}
-          </p>
         </div>
-      </div>
-      <div className="mt-3 flex items-center gap-2">
-        <input
-          id="receipt-file-input"
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleFileChange}
-        />
-        <label htmlFor="receipt-file-input" className="flex-1">
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-9 w-full cursor-pointer bg-transparent font-medium"
-            asChild
-          >
-            <span>{selectedFile ? "Change File" : "Choose Receipt"}</span>
-          </Button>
-        </label>
-        {selectedFile && (
-          <Button
-            variant="default"
-            size="sm"
-            className="h-9 min-w-[80px] font-medium"
-            disabled={isPending}
-            onClick={handleScan}
-          >
-            {isPending ? (
-              <>
-                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                Scanning
-              </>
-            ) : (
-              "Scan Now"
-            )}
-          </Button>
-        )}
+        <div className="flex items-center gap-1.5">
+          <input
+            id="receipt-file-input"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+          <label htmlFor="receipt-file-input">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 cursor-pointer px-2.5 text-[11px]"
+              asChild
+            >
+              <span>{selectedFile ? "Change" : "Choose File"}</span>
+            </Button>
+          </label>
+          {selectedFile && (
+            <Button
+              size="sm"
+              className="h-7 px-2.5 text-[11px]"
+              disabled={isPending}
+              onClick={handleScan}
+            >
+              {isPending ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                "Scan"
+              )}
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );
