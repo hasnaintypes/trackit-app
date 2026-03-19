@@ -11,6 +11,8 @@ import {
 import {
   type ChartConfig,
   ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from "@ui/chart";
@@ -30,6 +32,8 @@ function formatAxisValue(value: number): string {
   if (value >= 1000) return `${Math.round(value / 1000)}k`;
   return String(value);
 }
+
+const TICK_STYLE = { fill: "hsl(var(--muted-foreground))", fontSize: 12 };
 
 function AreaChartInner({
   data,
@@ -60,12 +64,7 @@ function AreaChartInner({
       <ChartContainer config={config} className="h-[300px] w-full">
         <RechartsAreaChart
           data={data}
-          margin={{
-            left: 12,
-            right: 12,
-            top: 8,
-            bottom: 0,
-          }}
+          margin={{ left: 12, right: 12, top: 8, bottom: 0 }}
         >
           <CartesianGrid vertical={false} strokeDasharray="3 3" />
           <XAxis
@@ -73,15 +72,16 @@ function AreaChartInner({
             tickLine={false}
             axisLine={false}
             tickMargin={12}
-            tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+            minTickGap={32}
+            tick={TICK_STYLE}
           />
           <YAxis
             tickLine={false}
             axisLine={false}
             tickMargin={8}
             tickFormatter={formatAxisValue}
-            tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
-            width={45}
+            tick={TICK_STYLE}
+            width={50}
           />
           <ChartTooltip
             cursor={false}
@@ -96,29 +96,30 @@ function AreaChartInner({
               />
             }
           />
+          <ChartLegend content={<ChartLegendContent />} />
           <defs>
             <linearGradient id="fillIncome" x1="0" y1="0" x2="0" y2="1">
               <stop
                 offset="5%"
                 stopColor="var(--color-income)"
-                stopOpacity={0.4}
+                stopOpacity={0.8}
               />
               <stop
                 offset="95%"
                 stopColor="var(--color-income)"
-                stopOpacity={0.05}
+                stopOpacity={0.1}
               />
             </linearGradient>
             <linearGradient id="fillExpense" x1="0" y1="0" x2="0" y2="1">
               <stop
                 offset="5%"
                 stopColor="var(--color-expense)"
-                stopOpacity={0.4}
+                stopOpacity={0.8}
               />
               <stop
                 offset="95%"
                 stopColor="var(--color-expense)"
-                stopOpacity={0.05}
+                stopOpacity={0.1}
               />
             </linearGradient>
           </defs>

@@ -11,6 +11,7 @@ import {
 import {
   type ChartConfig,
   ChartContainer,
+  ChartLegend,
   ChartTooltip,
   ChartTooltipContent,
 } from "@ui/chart";
@@ -28,6 +29,8 @@ function formatAxisValue(value: number): string {
   if (value >= 1000) return `${Math.round(value / 1000)}k`;
   return String(value);
 }
+
+const TICK_STYLE = { fill: "hsl(var(--muted-foreground))", fontSize: 12 };
 
 function BarChartInner({
   data,
@@ -83,28 +86,57 @@ function BarChartInner({
           tickLine={false}
           tickMargin={12}
           axisLine={false}
-          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+          tick={TICK_STYLE}
         />
         <YAxis
           tickLine={false}
           axisLine={false}
           tickMargin={8}
-          tickFormatter={valueFormatter ?? formatAxisValue}
-          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+          tickFormatter={formatAxisValue}
+          tick={TICK_STYLE}
           width={65}
         />
         <ChartTooltip
           cursor={{ fill: "hsl(var(--muted))", opacity: 0.3 }}
           content={
             <ChartTooltipContent
-              hideLabel
-              formatter={
-                valueFormatter
-                  ? (value) => valueFormatter(Number(value))
-                  : undefined
-              }
+              formatter={(value, name) => (
+                <>
+                  <div
+                    className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                    style={{
+                      backgroundColor: `var(--color-${dataKey})`,
+                    }}
+                  />
+                  <div className="flex flex-1 items-center justify-between gap-2 leading-none">
+                    <span className="text-muted-foreground">
+                      {config[String(name)]?.label ?? name}
+                    </span>
+                    <span className="text-foreground font-mono font-medium tabular-nums">
+                      {valueFormatter
+                        ? valueFormatter(Number(value))
+                        : Number(value).toLocaleString()}
+                    </span>
+                  </div>
+                </>
+              )}
             />
           }
+        />
+        <ChartLegend
+          content={() => (
+            <div className="flex items-center justify-center gap-1.5 pt-3 text-xs">
+              <div
+                className="h-2 w-2 shrink-0 rounded-[2px]"
+                style={{
+                  backgroundColor: `var(--color-${dataKey})`,
+                }}
+              />
+              <span className="text-muted-foreground">
+                {config[dataKey]?.label ?? dataKey}
+              </span>
+            </div>
+          )}
         />
         <Bar
           dataKey={dataKey}
