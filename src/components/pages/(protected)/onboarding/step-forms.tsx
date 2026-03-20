@@ -6,9 +6,6 @@ import {
   Camera,
   Calendar,
   ShieldAlert,
-  Moon,
-  Sun,
-  Laptop,
   Mail,
   BarChart3,
   DollarSign,
@@ -34,7 +31,6 @@ import {
   Country,
   Timezone,
   WeekDay,
-  ColorScheme,
 } from "@prisma/client";
 import { motion } from "framer-motion";
 
@@ -52,7 +48,6 @@ interface OnboardingState {
   weekStartsOn: WeekDay;
   largeTx: number;
   lowBalance: number;
-  colorScheme: ColorScheme;
   emailWeekly: boolean;
   emailMonthly: boolean;
   compactNumbers: boolean;
@@ -372,39 +367,6 @@ export function StepForms({
       {/* STEP 4: EXPERIENCE */}
       {step === 4 && (
         <div className="space-y-8">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Theme</Label>
-              <Select
-                value={prefs.colorScheme}
-                onValueChange={(v) =>
-                  updatePref("colorScheme", v as ColorScheme)
-                }
-              >
-                <SelectTrigger className="bg-muted/30 h-11">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ColorScheme.LIGHT}>
-                    <div className="flex items-center gap-2">
-                      <Sun className="h-4 w-4" /> Light
-                    </div>
-                  </SelectItem>
-                  <SelectItem value={ColorScheme.DARK}>
-                    <div className="flex items-center gap-2">
-                      <Moon className="h-4 w-4" /> Dark
-                    </div>
-                  </SelectItem>
-                  <SelectItem value={ColorScheme.SYSTEM}>
-                    <div className="flex items-center gap-2">
-                      <Laptop className="h-4 w-4" /> Auto
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
           <div className="bg-muted/20 divide-y rounded-xl border">
             <div className="flex items-center justify-between p-4">
               <div className="space-y-0.5">

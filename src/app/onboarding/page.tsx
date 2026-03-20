@@ -18,7 +18,6 @@ import {
   Country,
   Timezone,
   WeekDay,
-  ColorScheme,
 } from "@prisma/client";
 import { StepForms } from "@/components/pages/(protected)/onboarding/step-forms";
 import { createLogger } from "@/lib/logging";
@@ -45,7 +44,6 @@ export interface OnboardingState {
   weekStartsOn: WeekDay;
   largeTx: number;
   lowBalance: number;
-  colorScheme: ColorScheme;
   emailWeekly: boolean;
   emailMonthly: boolean;
   compactNumbers: boolean;
@@ -72,7 +70,6 @@ export default function OnboardingPage() {
     weekStartsOn: WeekDay.SUNDAY,
     largeTx: 1000,
     lowBalance: 500,
-    colorScheme: ColorScheme.SYSTEM,
     emailWeekly: true,
     emailMonthly: true,
     compactNumbers: false,
@@ -168,7 +165,6 @@ export default function OnboardingPage() {
           emailLargeTransactions: true,
         }),
         updateDisplay.mutateAsync({
-          colorScheme: prefs.colorScheme,
           compactNumbers: prefs.compactNumbers,
         }),
       ]);
