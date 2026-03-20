@@ -55,6 +55,7 @@ interface IncomeExpenseChartProps {
   data: Record<string, unknown>[];
   config: ChartConfig;
   rangeLabel: string;
+  isLoading?: boolean;
   valueFormatter?: (value: number) => string;
 }
 
@@ -62,6 +63,7 @@ export const IncomeExpenseChart = React.memo(function IncomeExpenseChart({
   data,
   config,
   rangeLabel,
+  isLoading,
   valueFormatter,
 }: IncomeExpenseChartProps) {
   const [chartType, setChartType] = useState<ChartVariant>("area");
@@ -73,6 +75,7 @@ export const IncomeExpenseChart = React.memo(function IncomeExpenseChart({
     dataKeyExpense: "expense",
     labelKey: "date",
     className: "h-[300px] w-full",
+    isLoading,
     valueFormatter,
   };
 

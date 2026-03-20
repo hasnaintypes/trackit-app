@@ -29,8 +29,8 @@ const DATE_RANGE_OPTIONS: { value: DateRange; label: string }[] = [
 ];
 
 const areaConfig = {
-  income: { label: "Income", color: "#3b82f6" },
-  expense: { label: "Expense", color: "#06b6d4" },
+  income: { label: "Income", color: "#22c55e" },
+  expense: { label: "Expense", color: "#ef4444" },
 } satisfies ChartConfig;
 
 export default function AnalyticsPageClient() {
@@ -60,7 +60,7 @@ export default function AnalyticsPageClient() {
     categoryMap,
     flatCategories,
   );
-  const areaChartData = useAreaChartData(transactions, rangeMonths);
+  const chartData = useAreaChartData(transactions, rangeMonths, "monthly");
 
   const rangeLabel =
     DATE_RANGE_OPTIONS.find((opt) => opt.value === dateRange)?.label ??
@@ -101,6 +101,7 @@ export default function AnalyticsPageClient() {
         <CategoryBarCard
           data={barData}
           config={barConfig}
+          isLoading={isLoading}
           valueFormatter={(val) => formatAmount(val)}
         />
         <TopTransactionsCard
@@ -113,9 +114,10 @@ export default function AnalyticsPageClient() {
 
       {/* Row 2: Area chart */}
       <IncomeExpenseChart
-        data={areaChartData}
+        data={chartData}
         config={areaConfig}
         rangeLabel={rangeLabel}
+        isLoading={isLoading}
         valueFormatter={(val) => formatAmount(val)}
       />
     </div>

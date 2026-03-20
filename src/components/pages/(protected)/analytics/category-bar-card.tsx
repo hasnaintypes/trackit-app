@@ -23,12 +23,14 @@ const HorizontalBarChart = dynamic(
 interface CategoryBarCardProps {
   data: Record<string, unknown>[];
   config: ChartConfig;
+  isLoading?: boolean;
   valueFormatter?: (value: number) => string;
 }
 
 export const CategoryBarCard = React.memo(function CategoryBarCard({
   data,
   config,
+  isLoading,
   valueFormatter,
 }: CategoryBarCardProps) {
   return (
@@ -47,6 +49,7 @@ export const CategoryBarCard = React.memo(function CategoryBarCard({
             dataKey="amount"
             labelKey="category"
             className="h-[300px] w-full"
+            isLoading={isLoading}
             valueFormatter={valueFormatter}
           />
         </Suspense>
