@@ -11,7 +11,6 @@ import {
 } from "@ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { ICON_MAP } from "@/constants/icons";
-import { format } from "date-fns";
 import type { BankAccount as Account } from "@/types/account";
 
 export type ApiAccount = Omit<Account, "createdAt" | "updatedAt"> & {
@@ -28,6 +27,7 @@ export interface AccountCardProps {
   onDelete: (e: React.MouseEvent, id: string) => void;
   onClick: () => void;
   formatAmount: (amount: number | string) => string;
+  formatDate: (date: Date | string) => string;
 }
 
 export const AccountCard = React.memo(function AccountCard({
@@ -36,14 +36,13 @@ export const AccountCard = React.memo(function AccountCard({
   onDelete,
   onClick,
   formatAmount,
+  formatDate,
 }: AccountCardProps) {
   const IconComponent = ICON_MAP.get(account.icon ?? "") ?? Wallet;
   const formattedBalance = formatAmount(Number(account.balance));
   const accentColor = account.color ?? "#6366f1";
 
-  const updatedLabel = account.updatedAt
-    ? format(new Date(account.updatedAt), "MMM d, yyyy")
-    : null;
+  const updatedLabel = account.updatedAt ? formatDate(account.updatedAt) : null;
 
   return (
     <div

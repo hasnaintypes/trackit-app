@@ -35,7 +35,7 @@ const mapToInitialValues = (a: Account | ApiAccount) => ({
 export default function AccountsPageClient() {
   const router = useRouter();
   const { accounts, isLoading } = useAccounts();
-  const { formatAmount } = useFormatter();
+  const { formatAmount, formatDate } = useFormatter();
 
   const [modalState, setModalState] = useState<{
     isCreateOpen: boolean;
@@ -122,6 +122,7 @@ export default function AccountsPageClient() {
               onDelete={handleDeleteClick}
               onClick={() => router.push(`/accounts/${account.id}`)}
               formatAmount={formatAmount}
+              formatDate={formatDate}
             />
           ))}
         </div>

@@ -33,7 +33,7 @@ const DATE_RANGE_OPTIONS: { value: DateRange; label: string }[] = [
 const barChartConfig = {
   amount: {
     label: "Expenses",
-    color: "var(--chart-1)",
+    color: "#6366f1",
   },
 } satisfies ChartConfig;
 
@@ -41,6 +41,7 @@ interface SpendingOverviewCardProps {
   barChartData: Array<{ date: string; amount: number }>;
   barRange: DateRange;
   onBarRangeChange: (value: DateRange) => void;
+  isLoading?: boolean;
   formatAmount: (value: number) => string;
 }
 
@@ -48,6 +49,7 @@ function SpendingOverviewCardInner({
   barChartData,
   barRange,
   onBarRangeChange,
+  isLoading,
   formatAmount,
 }: SpendingOverviewCardProps) {
   return (
@@ -81,6 +83,7 @@ function SpendingOverviewCardInner({
             dataKey="amount"
             labelKey="date"
             className="h-[300px] w-full"
+            isLoading={isLoading}
             valueFormatter={(val) => formatAmount(val)}
           />
         </Suspense>

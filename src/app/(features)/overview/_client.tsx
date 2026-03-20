@@ -76,6 +76,7 @@ export default function OverviewPageClient() {
           barChartData={barChartData}
           barRange={barRange}
           onBarRangeChange={setBarRange}
+          isLoading={txLoading}
           formatAmount={formatAmount}
         />
         <SpendingByCategoryCard

@@ -2,19 +2,16 @@
 
 import React from "react";
 import { api } from "@/trpc/react";
-import { Loader2, Wallet } from "lucide-react";
+import { Wallet } from "lucide-react";
 import { BudgetCard } from "@/components/pages/(protected)/budget/budget-card";
 import { CreateBudgetDialog } from "@/components/pages/(protected)/budget/create-budget-dialog";
+import { BudgetSkeleton } from "@skeletons/budget-skeleton";
 
 export default function BudgetPageClient() {
   const { data: budgets, isLoading } = api.budget.all.useQuery();
 
   if (isLoading) {
-    return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="text-primary h-8 w-8 animate-spin" />
-      </div>
-    );
+    return <BudgetSkeleton />;
   }
 
   const budgetList = budgets ?? [];
