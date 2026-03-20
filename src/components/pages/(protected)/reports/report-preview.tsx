@@ -1,3 +1,5 @@
+"use client";
+
 import type { Report } from "@prisma/client";
 import type {
   MonthlySummaryData,
@@ -7,15 +9,15 @@ import type {
 } from "@/types/report";
 import { Progress } from "@ui/progress";
 import { AlertTriangle } from "lucide-react";
+import { useFormatter } from "@/hooks/use-formatter";
 
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(value);
-}
-
-function MonthlySummaryPreview({ data }: { data: MonthlySummaryData }) {
+function MonthlySummaryPreview({
+  data,
+  formatCurrency,
+}: {
+  data: MonthlySummaryData;
+  formatCurrency: (value: number) => string;
+}) {
   const netSavingsPositive = data.netSavings >= 0;
 
   return (
@@ -107,7 +109,13 @@ function MonthlySummaryPreview({ data }: { data: MonthlySummaryData }) {
   );
 }
 
-function WeeklyDigestPreview({ data }: { data: WeeklyDigestData }) {
+function WeeklyDigestPreview({
+  data,
+  formatCurrency,
+}: {
+  data: WeeklyDigestData;
+  formatCurrency: (value: number) => string;
+}) {
   const netSavingsPositive = data.netSavings >= 0;
 
   return (
@@ -166,7 +174,13 @@ function WeeklyDigestPreview({ data }: { data: WeeklyDigestData }) {
   );
 }
 
-function BudgetExceededPreview({ data }: { data: BudgetExceededData }) {
+function BudgetExceededPreview({
+  data,
+  formatCurrency,
+}: {
+  data: BudgetExceededData;
+  formatCurrency: (value: number) => string;
+}) {
   const remaining = data.limit - data.spent;
 
   return (
@@ -243,6 +257,8 @@ function SpendingInsightsPreview({ data }: { data: SpendingInsightsData }) {
 }
 
 export function ReportPreview({ report }: { report: Report }) {
+  const { formatAmount } = useFormatter();
+  const formatCurrency = (value: number) => formatAmount(value);
   const data = report.data as Record<string, unknown> | null;
 
   if (!data) {
@@ -256,13 +272,24 @@ export function ReportPreview({ report }: { report: Report }) {
   switch (report.type) {
     case "MONTHLY_SUMMARY":
       return (
-        <MonthlySummaryPreview data={data as unknown as MonthlySummaryData} />
+        <MonthlySummaryPreview
+          data={data as unknown as MonthlySummaryData}
+          formatCurrency={formatCurrency}
+        />
       );
     case "WEEKLY_DIGEST":
-      return <WeeklyDigestPreview data={data as unknown as WeeklyDigestData} />;
+      return (
+        <WeeklyDigestPreview
+          data={data as unknown as WeeklyDigestData}
+          formatCurrency={formatCurrency}
+        />
+      );
     case "BUDGET_EXCEEDED":
       return (
-        <BudgetExceededPreview data={data as unknown as BudgetExceededData} />
+        <BudgetExceededPreview
+          data={data as unknown as BudgetExceededData}
+          formatCurrency={formatCurrency}
+        />
       );
     case "SPENDING_INSIGHTS":
       return (
