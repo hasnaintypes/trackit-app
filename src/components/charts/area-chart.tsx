@@ -16,6 +16,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@ui/chart";
+import { Skeleton } from "@ui/skeleton";
 import { cn } from "@/lib/utils";
 
 interface AreaChartProps {
@@ -25,6 +26,7 @@ interface AreaChartProps {
   dataKeyExpense: string;
   labelKey: string;
   className?: string;
+  isLoading?: boolean;
   valueFormatter?: (value: number) => string;
 }
 
@@ -42,8 +44,13 @@ function AreaChartInner({
   dataKeyExpense,
   labelKey,
   className,
+  isLoading,
   valueFormatter,
 }: AreaChartProps) {
+  if (isLoading) {
+    return <Skeleton className="h-[300px] w-full rounded-xl" />;
+  }
+
   if (!data?.length) {
     return (
       <div className="flex h-[300px] flex-col items-center justify-center rounded-xl border border-dashed p-8 text-center backdrop-blur-sm">
@@ -88,11 +95,26 @@ function AreaChartInner({
             content={
               <ChartTooltipContent
                 indicator="dot"
-                formatter={
-                  valueFormatter
-                    ? (value) => valueFormatter(Number(value))
-                    : undefined
-                }
+                formatter={(value, name, item) => {
+                  const label = config[String(name)]?.label ?? String(name);
+                  const color = item?.color ?? `var(--color-${String(name)})`;
+                  return (
+                    <>
+                      <div
+                        className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
+                        style={{ backgroundColor: color }}
+                      />
+                      <div className="flex flex-1 items-center justify-between gap-2 leading-none">
+                        <span className="text-muted-foreground">{label}</span>
+                        <span className="text-foreground font-mono font-medium tabular-nums">
+                          {valueFormatter
+                            ? valueFormatter(Number(value))
+                            : Number(value).toLocaleString()}
+                        </span>
+                      </div>
+                    </>
+                  );
+                }}
               />
             }
           />

@@ -16,6 +16,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@ui/chart";
+import { Skeleton } from "@ui/skeleton";
 
 interface HorizontalBarChartProps {
   data: Record<string, unknown>[];
@@ -23,6 +24,7 @@ interface HorizontalBarChartProps {
   dataKey: string;
   labelKey: string;
   className?: string;
+  isLoading?: boolean;
   valueFormatter?: (value: number) => string;
 }
 
@@ -38,8 +40,13 @@ function HorizontalBarChartInner({
   dataKey,
   labelKey,
   className,
+  isLoading,
   valueFormatter,
 }: HorizontalBarChartProps) {
+  if (isLoading) {
+    return <Skeleton className="h-[300px] w-full rounded-xl" />;
+  }
+
   const hasData = data.some(
     (item) => typeof item[dataKey] === "number" && Number(item[dataKey]) > 0,
   );

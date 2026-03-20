@@ -15,6 +15,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@ui/chart";
+import { Skeleton } from "@ui/skeleton";
 
 interface BarChartProps {
   data: Record<string, unknown>[];
@@ -22,6 +23,7 @@ interface BarChartProps {
   dataKey: string;
   labelKey: string;
   className?: string;
+  isLoading?: boolean;
   valueFormatter?: (value: number) => string;
 }
 
@@ -38,8 +40,13 @@ function BarChartInner({
   dataKey,
   labelKey,
   className,
+  isLoading,
   valueFormatter,
 }: BarChartProps) {
+  if (isLoading) {
+    return <Skeleton className="h-[300px] w-full rounded-xl" />;
+  }
+
   const hasData = data.some(
     (item) => typeof item[dataKey] === "number" && Number(item[dataKey]) > 0,
   );
