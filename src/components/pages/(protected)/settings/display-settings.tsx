@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useTheme } from "next-themes";
 import { useSettings } from "@/hooks/use-settings";
 import { cn } from "@/lib/utils";
 import {
@@ -12,8 +11,8 @@ import {
   SelectValue,
 } from "@ui/select";
 import { Label } from "@ui/label";
-import { RadioGroup, RadioGroupItem } from "@ui/radio-group";
 import { Switch } from "@ui/switch";
+import { Button } from "@ui/button";
 import { Skeleton } from "@ui/skeleton";
 import {
   Globe,
@@ -26,6 +25,8 @@ import {
   DollarSign,
   SeparatorHorizontal,
   BarChart3,
+  Save,
+  Loader2,
 } from "lucide-react";
 import {
   CurrencyPosition,
@@ -38,7 +39,24 @@ import {
 } from "@prisma/client";
 
 // ---------------------------------------------------------------------------
-// Shared row component — label+description left, control right
+// Currency display map
+// ---------------------------------------------------------------------------
+const CURRENCY_LABELS: Record<Currency, { symbol: string; name: string }> = {
+  [Currency.USD]: { symbol: "$", name: "US Dollar" },
+  [Currency.EUR]: { symbol: "\u20AC", name: "Euro" },
+  [Currency.GBP]: { symbol: "\u00A3", name: "British Pound" },
+  [Currency.JPY]: { symbol: "\u00A5", name: "Japanese Yen" },
+  [Currency.AUD]: { symbol: "A$", name: "Australian Dollar" },
+  [Currency.CAD]: { symbol: "C$", name: "Canadian Dollar" },
+  [Currency.CHF]: { symbol: "Fr", name: "Swiss Franc" },
+  [Currency.CNY]: { symbol: "\u00A5", name: "Chinese Yuan" },
+  [Currency.INR]: { symbol: "\u20B9", name: "Indian Rupee" },
+  [Currency.SGD]: { symbol: "S$", name: "Singapore Dollar" },
+  [Currency.PKR]: { symbol: "Rs", name: "Pakistani Rupee" },
+};
+
+// ---------------------------------------------------------------------------
+// Shared row component
 // ---------------------------------------------------------------------------
 function SettingRow({
   icon: Icon,
@@ -62,7 +80,7 @@ function SettingRow({
     >
       <div className="flex items-start gap-3">
         {Icon && (
-          <div className="bg-muted flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
+          <div className="bg-muted flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border">
             <Icon className="text-muted-foreground h-4 w-4" />
           </div>
         )}
@@ -79,7 +97,7 @@ function SettingRow({
 }
 
 // ---------------------------------------------------------------------------
-// Section wrapper — title + divider + children
+// Section wrapper
 // ---------------------------------------------------------------------------
 function Section({
   title,
@@ -90,10 +108,12 @@ function Section({
 }) {
   return (
     <div>
-      <h3 className="text-muted-foreground mb-1 text-xs font-semibold tracking-wider uppercase">
+      <h3 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
         {title}
       </h3>
-      <div className="divide-border divide-y">{children}</div>
+      <div className="bg-card divide-border divide-y rounded-xl border px-5 shadow-sm dark:border-white/10">
+        {children}
+      </div>
     </div>
   );
 }
@@ -116,14 +136,9 @@ function useFormatPreview(
           ? " "
           : "";
     const dec = thousandSeparator === ThousandSeparator.SPACE ? "," : ".";
+    const symbol = CURRENCY_LABELS[defaultCurrency]?.symbol ?? "$";
 
     if (compactNumbers) {
-      const symbol =
-        defaultCurrency === Currency.EUR
-          ? "\u20AC"
-          : defaultCurrency === Currency.GBP
-            ? "\u00A3"
-            : "$";
       return currencyPosition === CurrencyPosition.BEFORE
         ? `${symbol}1.2M`
         : `1.2M ${symbol}`;
@@ -131,12 +146,6 @@ function useFormatPreview(
 
     const decimals = dec + "0".repeat(decimalPlaces);
     const num = `1${sep}234${decimalPlaces > 0 ? decimals : ""}`;
-    const symbol =
-      defaultCurrency === Currency.EUR
-        ? "\u20AC"
-        : defaultCurrency === Currency.GBP
-          ? "\u00A3"
-          : "$";
     return currencyPosition === CurrencyPosition.BEFORE
       ? `${symbol}${num}`
       : `${num} ${symbol}`;
@@ -150,33 +159,99 @@ function useFormatPreview(
 }
 
 // ---------------------------------------------------------------------------
+// Local state types
+// ---------------------------------------------------------------------------
+interface LocalRegional {
+  defaultCurrency: Currency;
+  language: Language;
+  dateFormat: DateFormat;
+  timeFormat: TimeFormat;
+  weekStartsOn: WeekDay;
+}
+
+interface LocalDisplay {
+  currencyPosition: CurrencyPosition;
+  thousandSeparator: ThousandSeparator;
+  decimalPlaces: number;
+  compactNumbers: boolean;
+}
+
+// ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
 export default function DisplaySettings() {
   const { settings, isLoading, updateDisplay, updateRegional, isUpdating } =
     useSettings();
-  const { theme: currentTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const display = settings?.display;
   const preferences = settings?.preferences;
 
+  // Local buffered state — only saved on button click
+  const [localRegional, setLocalRegional] = useState<LocalRegional | null>(
+    null,
+  );
+  const [localDisplay, setLocalDisplay] = useState<LocalDisplay | null>(null);
+
+  // Seed local state once server data arrives
+  useEffect(() => {
+    if (preferences && !localRegional) {
+      setLocalRegional({
+        defaultCurrency: preferences.defaultCurrency,
+        language: preferences.language,
+        dateFormat: preferences.dateFormat,
+        timeFormat: preferences.timeFormat,
+        weekStartsOn: preferences.weekStartsOn,
+      });
+    }
+  }, [preferences, localRegional]);
+
+  useEffect(() => {
+    if (display && !localDisplay) {
+      setLocalDisplay({
+        currencyPosition: display.currencyPosition,
+        thousandSeparator: display.thousandSeparator,
+        decimalPlaces: display.decimalPlaces,
+        compactNumbers: display.compactNumbers,
+      });
+    }
+  }, [display, localDisplay]);
+
   const preview = useFormatPreview(
-    display?.currencyPosition ?? CurrencyPosition.BEFORE,
-    display?.thousandSeparator ?? ThousandSeparator.COMMA,
-    display?.decimalPlaces ?? 2,
-    preferences?.defaultCurrency ?? Currency.USD,
-    display?.compactNumbers ?? false,
+    localDisplay?.currencyPosition ?? CurrencyPosition.BEFORE,
+    localDisplay?.thousandSeparator ?? ThousandSeparator.COMMA,
+    localDisplay?.decimalPlaces ?? 2,
+    localRegional?.defaultCurrency ?? Currency.USD,
+    localDisplay?.compactNumbers ?? false,
   );
 
-  if (isLoading || !settings || !display || !preferences) {
+  // Dirty check
+  const isDirty = useMemo(() => {
+    if (!localRegional || !localDisplay || !preferences || !display)
+      return false;
+    return (
+      localRegional.defaultCurrency !== preferences.defaultCurrency ||
+      localRegional.language !== preferences.language ||
+      localRegional.dateFormat !== preferences.dateFormat ||
+      localRegional.timeFormat !== preferences.timeFormat ||
+      localRegional.weekStartsOn !== preferences.weekStartsOn ||
+      localDisplay.currencyPosition !== display.currencyPosition ||
+      localDisplay.thousandSeparator !== display.thousandSeparator ||
+      localDisplay.decimalPlaces !== display.decimalPlaces ||
+      localDisplay.compactNumbers !== display.compactNumbers
+    );
+  }, [localRegional, localDisplay, preferences, display]);
+
+  const handleSave = async () => {
+    if (!localRegional || !localDisplay) return;
+    await Promise.all([
+      updateRegional(localRegional),
+      updateDisplay(localDisplay),
+    ]);
+  };
+
+  if (isLoading || !settings || !localRegional || !localDisplay) {
     return (
       <div className="space-y-8">
-        <Skeleton className="h-32 w-full rounded-xl" />
         <Skeleton className="h-64 w-full rounded-xl" />
         <Skeleton className="h-64 w-full rounded-xl" />
       </div>
@@ -185,124 +260,6 @@ export default function DisplaySettings() {
 
   return (
     <div className="space-y-10">
-      {/* ================================================================= */}
-      {/* THEME */}
-      {/* ================================================================= */}
-      <Section title="Theme">
-        <div className="py-5">
-          <RadioGroup
-            value={mounted ? (currentTheme ?? "light") : "light"}
-            onValueChange={(val) => setTheme(val)}
-            className="grid grid-cols-3 gap-4"
-          >
-            {/* Light */}
-            <label className="cursor-pointer">
-              <RadioGroupItem value="light" className="sr-only" />
-              <div
-                className={cn(
-                  "rounded-xl border-2 p-1.5 transition-all",
-                  mounted && currentTheme === "light"
-                    ? "border-primary ring-primary/25 ring-2"
-                    : "border-border hover:border-muted-foreground/30",
-                )}
-              >
-                <div className="space-y-2 rounded-lg bg-[#ecedef] p-2">
-                  <div className="space-y-2 rounded-md bg-white p-2 shadow-xs">
-                    <div className="h-2 w-[80px] rounded-lg bg-[#ecedef]" />
-                    <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
-                  </div>
-                  <div className="flex items-center space-x-2 rounded-md bg-white p-2 shadow-xs">
-                    <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
-                    <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
-                  </div>
-                  <div className="flex items-center space-x-2 rounded-md bg-white p-2 shadow-xs">
-                    <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
-                    <div className="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
-                  </div>
-                </div>
-              </div>
-              <p className="mt-2 text-center text-sm font-medium">Light</p>
-            </label>
-
-            {/* Dark */}
-            <label className="cursor-pointer">
-              <RadioGroupItem value="dark" className="sr-only" />
-              <div
-                className={cn(
-                  "rounded-xl border-2 p-1.5 transition-all",
-                  mounted && currentTheme === "dark"
-                    ? "border-primary ring-primary/25 ring-2"
-                    : "border-border hover:border-muted-foreground/30",
-                )}
-              >
-                <div className="space-y-2 rounded-lg bg-slate-950 p-2">
-                  <div className="space-y-2 rounded-md bg-slate-800 p-2 shadow-xs">
-                    <div className="h-2 w-[80px] rounded-lg bg-slate-400" />
-                    <div className="h-2 w-[100px] rounded-lg bg-slate-400" />
-                  </div>
-                  <div className="flex items-center space-x-2 rounded-md bg-slate-800 p-2 shadow-xs">
-                    <div className="h-4 w-4 rounded-full bg-slate-400" />
-                    <div className="h-2 w-[100px] rounded-lg bg-slate-400" />
-                  </div>
-                  <div className="flex items-center space-x-2 rounded-md bg-slate-800 p-2 shadow-xs">
-                    <div className="h-4 w-4 rounded-full bg-slate-400" />
-                    <div className="h-2 w-[100px] rounded-lg bg-slate-400" />
-                  </div>
-                </div>
-              </div>
-              <p className="mt-2 text-center text-sm font-medium">Dark</p>
-            </label>
-
-            {/* System */}
-            <label className="cursor-pointer">
-              <RadioGroupItem value="system" className="sr-only" />
-              <div
-                className={cn(
-                  "rounded-xl border-2 p-1.5 transition-all",
-                  mounted && currentTheme === "system"
-                    ? "border-primary ring-primary/25 ring-2"
-                    : "border-border hover:border-muted-foreground/30",
-                )}
-              >
-                <div className="flex gap-0 overflow-hidden rounded-lg">
-                  {/* Left half — light */}
-                  <div className="w-1/2 space-y-2 bg-[#ecedef] p-2">
-                    <div className="space-y-2 rounded-l-md bg-white p-2 shadow-xs">
-                      <div className="h-2 w-4/5 rounded-lg bg-[#ecedef]" />
-                      <div className="h-2 w-3/5 rounded-lg bg-[#ecedef]" />
-                    </div>
-                    <div className="flex items-center space-x-2 rounded-l-md bg-white p-2 shadow-xs">
-                      <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
-                      <div className="h-2 flex-1 rounded-lg bg-[#ecedef]" />
-                    </div>
-                    <div className="flex items-center space-x-2 rounded-l-md bg-white p-2 shadow-xs">
-                      <div className="h-4 w-4 rounded-full bg-[#ecedef]" />
-                      <div className="h-2 flex-1 rounded-lg bg-[#ecedef]" />
-                    </div>
-                  </div>
-                  {/* Right half — dark */}
-                  <div className="w-1/2 space-y-2 bg-slate-950 p-2">
-                    <div className="space-y-2 rounded-r-md bg-slate-800 p-2 shadow-xs">
-                      <div className="h-2 w-4/5 rounded-lg bg-slate-400" />
-                      <div className="h-2 w-3/5 rounded-lg bg-slate-400" />
-                    </div>
-                    <div className="flex items-center space-x-2 rounded-r-md bg-slate-800 p-2 shadow-xs">
-                      <div className="h-4 w-4 rounded-full bg-slate-400" />
-                      <div className="h-2 flex-1 rounded-lg bg-slate-400" />
-                    </div>
-                    <div className="flex items-center space-x-2 rounded-r-md bg-slate-800 p-2 shadow-xs">
-                      <div className="h-4 w-4 rounded-full bg-slate-400" />
-                      <div className="h-2 flex-1 rounded-lg bg-slate-400" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <p className="mt-2 text-center text-sm font-medium">System</p>
-            </label>
-          </RadioGroup>
-        </div>
-      </Section>
-
       {/* ================================================================= */}
       {/* REGIONAL */}
       {/* ================================================================= */}
@@ -313,21 +270,30 @@ export default function DisplaySettings() {
           description="Primary currency for accounts"
         >
           <Select
-            value={preferences.defaultCurrency}
-            disabled={isUpdating}
+            value={localRegional.defaultCurrency}
             onValueChange={(val) =>
-              updateRegional({ defaultCurrency: val as Currency })
+              setLocalRegional((p) =>
+                p ? { ...p, defaultCurrency: val as Currency } : p,
+              )
             }
           >
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {Object.values(Currency).map((c) => (
-                <SelectItem key={c} value={c}>
-                  {c}
-                </SelectItem>
-              ))}
+              {Object.values(Currency).map((c) => {
+                const info = CURRENCY_LABELS[c];
+                return (
+                  <SelectItem key={c} value={c}>
+                    <span className="flex items-center gap-2">
+                      <span className="text-muted-foreground w-6 text-center font-mono text-xs">
+                        {info?.symbol}
+                      </span>
+                      {c} — {info?.name}
+                    </span>
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         </SettingRow>
@@ -338,10 +304,11 @@ export default function DisplaySettings() {
           description="Display language"
         >
           <Select
-            value={preferences.language}
-            disabled={isUpdating}
+            value={localRegional.language}
             onValueChange={(val) =>
-              updateRegional({ language: val as Language })
+              setLocalRegional((p) =>
+                p ? { ...p, language: val as Language } : p,
+              )
             }
           >
             <SelectTrigger className="w-full">
@@ -363,10 +330,11 @@ export default function DisplaySettings() {
           description="How dates are displayed"
         >
           <Select
-            value={preferences.dateFormat}
-            disabled={isUpdating}
+            value={localRegional.dateFormat}
             onValueChange={(val) =>
-              updateRegional({ dateFormat: val as DateFormat })
+              setLocalRegional((p) =>
+                p ? { ...p, dateFormat: val as DateFormat } : p,
+              )
             }
           >
             <SelectTrigger className="w-full">
@@ -386,10 +354,11 @@ export default function DisplaySettings() {
           description="12-hour or 24-hour clock"
         >
           <Select
-            value={preferences.timeFormat}
-            disabled={isUpdating}
+            value={localRegional.timeFormat}
             onValueChange={(val) =>
-              updateRegional({ timeFormat: val as TimeFormat })
+              setLocalRegional((p) =>
+                p ? { ...p, timeFormat: val as TimeFormat } : p,
+              )
             }
           >
             <SelectTrigger className="w-full">
@@ -408,10 +377,11 @@ export default function DisplaySettings() {
           description="First day of the week"
         >
           <Select
-            value={preferences.weekStartsOn}
-            disabled={isUpdating}
+            value={localRegional.weekStartsOn}
             onValueChange={(val) =>
-              updateRegional({ weekStartsOn: val as WeekDay })
+              setLocalRegional((p) =>
+                p ? { ...p, weekStartsOn: val as WeekDay } : p,
+              )
             }
           >
             <SelectTrigger className="w-full">
@@ -450,10 +420,11 @@ export default function DisplaySettings() {
           description="Before or after the amount"
         >
           <Select
-            value={display.currencyPosition}
-            disabled={isUpdating}
+            value={localDisplay.currencyPosition}
             onValueChange={(val) =>
-              updateDisplay({ currencyPosition: val as CurrencyPosition })
+              setLocalDisplay((p) =>
+                p ? { ...p, currencyPosition: val as CurrencyPosition } : p,
+              )
             }
           >
             <SelectTrigger className="w-full">
@@ -476,10 +447,11 @@ export default function DisplaySettings() {
           description="Digit grouping style"
         >
           <Select
-            value={display.thousandSeparator}
-            disabled={isUpdating}
+            value={localDisplay.thousandSeparator}
             onValueChange={(val) =>
-              updateDisplay({ thousandSeparator: val as ThousandSeparator })
+              setLocalDisplay((p) =>
+                p ? { ...p, thousandSeparator: val as ThousandSeparator } : p,
+              )
             }
           >
             <SelectTrigger className="w-full">
@@ -505,10 +477,11 @@ export default function DisplaySettings() {
           description="Number of decimal digits"
         >
           <Select
-            value={String(display.decimalPlaces)}
-            disabled={isUpdating}
+            value={String(localDisplay.decimalPlaces)}
             onValueChange={(val) =>
-              updateDisplay({ decimalPlaces: parseInt(val) })
+              setLocalDisplay((p) =>
+                p ? { ...p, decimalPlaces: parseInt(val) } : p,
+              )
             }
           >
             <SelectTrigger className="w-full">
@@ -529,15 +502,34 @@ export default function DisplaySettings() {
         >
           <div className="flex justify-end">
             <Switch
-              checked={display.compactNumbers}
+              checked={localDisplay.compactNumbers}
               onCheckedChange={(checked) =>
-                updateDisplay({ compactNumbers: checked })
+                setLocalDisplay((p) =>
+                  p ? { ...p, compactNumbers: checked } : p,
+                )
               }
-              disabled={isUpdating}
             />
           </div>
         </SettingRow>
       </Section>
+
+      {/* ================================================================= */}
+      {/* SAVE BUTTON */}
+      {/* ================================================================= */}
+      <div className="flex justify-end">
+        <Button
+          onClick={handleSave}
+          disabled={!isDirty || isUpdating}
+          className="min-w-32"
+        >
+          {isUpdating ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Save className="mr-2 h-4 w-4" />
+          )}
+          {isUpdating ? "Saving..." : "Save Changes"}
+        </Button>
+      </div>
     </div>
   );
 }

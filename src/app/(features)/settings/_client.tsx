@@ -4,7 +4,7 @@ import React, { Suspense, useCallback, useState } from "react";
 import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@ui/skeleton";
-import { Palette, Layers } from "lucide-react";
+import { Settings2, Layers, Download } from "lucide-react";
 
 const sectionFallback = <Skeleton className="h-96 w-full rounded-xl" />;
 
@@ -16,16 +16,21 @@ const DisplaySettings = dynamic(
   () => import("@/components/pages/(protected)/settings/display-settings"),
   { loading: () => sectionFallback },
 );
+const ExportSettings = dynamic(
+  () => import("@/components/pages/(protected)/settings/export-settings"),
+  { loading: () => sectionFallback },
+);
 
 const sections = [
-  { id: "appearance", label: "Appearance & Display", icon: Palette },
+  { id: "preferences", label: "Preferences", icon: Settings2 },
   { id: "categories", label: "Categories", icon: Layers },
+  { id: "export", label: "Export Data", icon: Download },
 ] as const;
 
 type SectionId = (typeof sections)[number]["id"];
 
 export default function SettingsPageClient() {
-  const [activeSection, setActiveSection] = useState<SectionId>("appearance");
+  const [activeSection, setActiveSection] = useState<SectionId>("preferences");
 
   const handleSectionChange = useCallback((id: SectionId) => {
     setActiveSection(id);
@@ -61,8 +66,9 @@ export default function SettingsPageClient() {
       {/* Content Area */}
       <div className="min-w-0 flex-1">
         <Suspense fallback={sectionFallback}>
-          {activeSection === "appearance" && <DisplaySettings />}
+          {activeSection === "preferences" && <DisplaySettings />}
           {activeSection === "categories" && <CategoriesSettings />}
+          {activeSection === "export" && <ExportSettings />}
         </Suspense>
       </div>
     </div>
