@@ -28,7 +28,7 @@ import {
   Menu,
   Home,
   ArrowLeftRight,
-  Wallet,
+  Users,
   PieChart,
   FileText,
   Settings,
@@ -40,7 +40,7 @@ const navigationLinks = [
   { href: "/overview", label: "Dashboard", icon: Home },
   { href: "/transactions", label: "Transactions", icon: ArrowLeftRight },
   { href: "/budget", label: "Budget", icon: PieChart },
-  { href: "/accounts", label: "Accounts", icon: Wallet },
+  { href: "/splits", label: "Splits", icon: Users },
 ];
 
 const quickActions = [
