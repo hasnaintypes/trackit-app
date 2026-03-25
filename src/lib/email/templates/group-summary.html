@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body
+    style="
+      font-family:
+        -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto,
+        sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f5;
+    "
+  >
+    <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px">
+      <div
+        style="
+          background: white;
+          border-radius: 12px;
+          padding: 32px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        "
+      >
+        <h1 style="font-size: 24px; color: #18181b; margin: 0 0 8px">
+          Group Spending Summary
+        </h1>
+        <p style="color: #71717a; margin: 0 0 24px">
+          Hi {{userName}}, here's your group spending for {{period}}.
+        </p>
+
+        {{#each groups}}
+        <div
+          style="
+            border: 1px solid #e4e4e7;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+          "
+        >
+          <p style="margin: 0; font-weight: 600; color: #18181b">
+            {{this.name}}
+          </p>
+          <p style="margin: 4px 0 0; color: #71717a; font-size: 14px">
+            {{this.expenseCount}} expenses &middot; ${{this.totalSpent}} total
+          </p>
+        </div>
+        {{/each}}
+
+        <a
+          href="{{appUrl}}/splits"
+          style="
+            display: inline-block;
+            background: #6366f1;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 16px;
+          "
+          >View Details</a
+        >
+      </div>
+      <p
+        style="
+          text-align: center;
+          color: #a1a1aa;
+          font-size: 12px;
+          margin-top: 24px;
+        "
+      >
+        Sent by Trackit
+      </p>
+    </div>
+  </body>
+</html>
