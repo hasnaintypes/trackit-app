@@ -26,6 +26,7 @@ interface HorizontalBarChartProps {
   className?: string;
   isLoading?: boolean;
   valueFormatter?: (value: number) => string;
+  hideLegend?: boolean;
 }
 
 function truncateLabel(value: string, maxLen = 14): string {
@@ -42,6 +43,7 @@ function HorizontalBarChartInner({
   className,
   isLoading,
   valueFormatter,
+  hideLegend,
 }: HorizontalBarChartProps) {
   if (isLoading) {
     return <Skeleton className="h-[300px] w-full rounded-xl" />;
@@ -125,29 +127,31 @@ function HorizontalBarChartInner({
             />
           }
         />
-        <ChartLegend
-          content={() => (
-            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 pt-3 text-xs">
-              {data.map((item, index) => {
-                const rawName = item[labelKey];
-                const name = typeof rawName === "string" ? rawName : "";
-                const fill =
-                  typeof item.fill === "string" && item.fill
-                    ? item.fill
-                    : `var(--chart-${(index % 5) + 1})`;
-                return (
-                  <div key={index} className="flex items-center gap-1.5">
-                    <div
-                      className="h-2 w-2 shrink-0 rounded-[2px]"
-                      style={{ backgroundColor: fill }}
-                    />
-                    <span className="text-muted-foreground">{name}</span>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        />
+        {!hideLegend && (
+          <ChartLegend
+            content={() => (
+              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 pt-3 text-xs">
+                {data.map((item, index) => {
+                  const rawName = item[labelKey];
+                  const name = typeof rawName === "string" ? rawName : "";
+                  const fill =
+                    typeof item.fill === "string" && item.fill
+                      ? item.fill
+                      : `var(--chart-${(index % 5) + 1})`;
+                  return (
+                    <div key={index} className="flex items-center gap-1.5">
+                      <div
+                        className="h-2 w-2 shrink-0 rounded-[2px]"
+                        style={{ backgroundColor: fill }}
+                      />
+                      <span className="text-muted-foreground">{name}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          />
+        )}
         <Bar dataKey={dataKey} radius={[0, 5, 5, 0]} maxBarSize={28}>
           {data.map((item, index) => {
             const fill =
