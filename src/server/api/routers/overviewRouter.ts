@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { toNum } from "@shared/decimal";
+import { SplitService } from "@/server/services/splitService";
 
 export const overviewRouter = createTRPCRouter({
   /**
@@ -279,6 +280,37 @@ export const overviewRouter = createTRPCRouter({
       yearly: toNum(yearlyAgg._sum.amount),
       total: totalSpending,
       categories: breakdown,
+    };
+  }),
+
+  splitSummary: protectedProcedure.query(async ({ ctx }) => {
+    const groups = await ctx.db.group.findMany({
+      where: { userId: ctx.user.id, isArchived: false },
+      select: { id: true },
+    });
+
+    let youOwe = 0;
+    let youAreOwed = 0;
+
+    for (const group of groups) {
+      const balances = await SplitService.calculateGroupBalances(
+        group.id,
+        ctx.user.id,
+        ctx.db,
+      );
+      const selfBalance = balances.get("self") ?? 0;
+
+      if (selfBalance < 0) {
+        youOwe += Math.abs(selfBalance);
+      } else if (selfBalance > 0) {
+        youAreOwed += selfBalance;
+      }
+    }
+
+    return {
+      youOwe: Math.round(youOwe * 100) / 100,
+      youAreOwed: Math.round(youAreOwed * 100) / 100,
+      unsettledGroups: groups.length,
     };
   }),
 });
