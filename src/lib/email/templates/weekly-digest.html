@@ -1,36 +1,17 @@
 <!doctype html>
-<html
-  lang="en"
-  xmlns="http://www.w3.org/1999/xhtml"
-  xmlns:v="urn:schemas-microsoft-com:vml"
-  xmlns:o="urn:schemas-microsoft-com:office:office"
->
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="x-apple-disable-message-reformatting" />
-    <meta name="color-scheme" content="light dark" />
-    <meta name="supported-color-schemes" content="light dark" />
+    <meta name="color-scheme" content="light" />
     <title>Weekly Digest</title>
-    <!--[if mso]>
-      <noscript
-        ><xml
-          ><o:OfficeDocumentSettings
-            ><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings
-          ></xml
-        ></noscript
-      >
-      <style>
-        table {
-          border-collapse: collapse;
-        }
-        td,
-        th {
-          font-family: Arial, sans-serif;
-        }
-      </style>
-    <![endif]-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
       body,
       table,
@@ -49,32 +30,7 @@
         padding: 0;
         width: 100% !important;
       }
-      @media (prefers-color-scheme: dark) {
-        .body-bg {
-          background-color: #0f172a !important;
-        }
-        .container-bg {
-          background-color: #1e293b !important;
-        }
-        .card-bg {
-          background-color: #334155 !important;
-          border-color: #475569 !important;
-        }
-        .text-primary {
-          color: #f1f5f9 !important;
-        }
-        .text-secondary {
-          color: #cbd5e1 !important;
-        }
-        .text-muted {
-          color: #94a3b8 !important;
-        }
-        .footer-bg {
-          background-color: #1e293b !important;
-          border-color: #334155 !important;
-        }
-      }
-      @media only screen and (max-width: 620px) {
+      @media only screen and (max-width: 580px) {
         .container {
           width: 100% !important;
           max-width: 100% !important;
@@ -83,18 +39,10 @@
           padding-left: 24px !important;
           padding-right: 24px !important;
         }
-        .header-pad {
-          padding-left: 24px !important;
-          padding-right: 24px !important;
-        }
-        .footer-pad {
-          padding-left: 24px !important;
-          padding-right: 24px !important;
-        }
         .stat-col {
           display: block !important;
           width: 100% !important;
-          padding: 0 0 12px 0 !important;
+          padding: 0 0 8px 0 !important;
         }
       }
     </style>
@@ -103,123 +51,96 @@
     style="
       margin: 0;
       padding: 0;
-      background-color: #f1f5f9;
+      background-color: #fafafa;
       font-family:
-        -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto,
-        &quot;Helvetica Neue&quot;, Arial, sans-serif;
+        &quot;Inter&quot;,
+        -apple-system,
+        BlinkMacSystemFont,
+        &quot;Segoe UI&quot;,
+        Roboto,
+        sans-serif;
     "
   >
-    <!-- Preheader -->
-    <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all">
+    <div
+      style="
+        display: none;
+        max-height: 0;
+        overflow: hidden;
+        mso-hide: all;
+        font-size: 0;
+        color: #fafafa;
+        line-height: 0;
+      "
+    >
       Your week in review: ${{weeklyTotal}} spent
-      &#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;
     </div>
-
     <table
       role="presentation"
       width="100%"
       cellpadding="0"
       cellspacing="0"
       border="0"
-      style="background-color: #f1f5f9"
-      class="body-bg"
+      style="background-color: #fafafa"
     >
       <tr>
-        <td align="center" style="padding: 40px 16px">
-          <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td><![endif]-->
+        <td align="center" style="padding: 48px 16px">
           <table
             role="presentation"
-            class="container-bg container"
-            width="600"
+            class="container"
+            width="520"
             cellpadding="0"
             cellspacing="0"
             border="0"
             style="
-              max-width: 600px;
+              max-width: 520px;
               width: 100%;
               background-color: #ffffff;
-              border-radius: 12px;
-              overflow: hidden;
-              box-shadow:
-                0 1px 3px rgba(0, 0, 0, 0.08),
-                0 1px 2px rgba(0, 0, 0, 0.06);
+              border-radius: 16px;
+              border: 1px solid #e4e4e7;
             "
           >
-            <!-- Header -->
             <tr>
-              <td
-                class="header-pad"
-                style="
-                  background-color: #18181b;
-                  padding: 28px 40px;
-                  text-align: center;
-                "
-              >
+              <td style="padding: 32px 40px 0; text-align: center">
                 <p
                   style="
                     margin: 0;
-                    color: #ffffff;
-                    font-size: 22px;
+                    font-size: 20px;
                     font-weight: 700;
-                    letter-spacing: -0.3px;
+                    color: #09090b;
+                    letter-spacing: -0.5px;
                   "
                 >
                   Trackit
                 </p>
-                <p
-                  style="
-                    margin: 6px 0 0;
-                    color: #a1a1aa;
-                    font-size: 13px;
-                    font-weight: 400;
-                    letter-spacing: 0.3px;
-                  "
-                >
-                  Weekly Digest &mdash; {{weekRange}}
+                <p style="margin: 6px 0 0; font-size: 13px; color: #a1a1aa">
+                  Weekly Digest &middot; {{weekRange}}
                 </p>
               </td>
             </tr>
             <tr>
-              <td
-                style="
-                  background-color: #10b981;
-                  height: 3px;
-                  font-size: 0;
-                  line-height: 0;
-                "
-              >
-                &nbsp;
-              </td>
-            </tr>
-
-            <!-- Content -->
-            <tr>
-              <td class="content-pad" style="padding: 36px 40px">
+              <td class="content-pad" style="padding: 32px 40px">
                 <p
                   style="
-                    margin: 0 0 20px;
-                    font-size: 16px;
+                    margin: 0 0 16px;
+                    font-size: 15px;
                     line-height: 1.6;
-                    color: #111827;
+                    color: #09090b;
                   "
-                  class="text-primary"
                 >
                   Hi {{userName}},
                 </p>
-
                 <p
                   style="
-                    margin: 0 0 28px;
-                    font-size: 15px;
+                    margin: 0 0 24px;
+                    font-size: 14px;
                     line-height: 1.7;
-                    color: #4b5563;
+                    color: #52525b;
                   "
-                  class="text-secondary"
                 >
                   Here's a quick look at your spending this week.
                 </p>
 
-                <!-- Hero stat card -->
+                <!-- Hero stat -->
                 <table
                   role="presentation"
                   width="100%"
@@ -227,64 +148,57 @@
                   cellspacing="0"
                   border="0"
                   style="
-                    background-color: #f8fafc;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 8px;
-                    margin-bottom: 24px;
+                    background-color: #fafafa;
+                    border-radius: 10px;
+                    margin: 0 0 16px;
                   "
-                  class="card-bg"
                 >
                   <tr>
-                    <td style="padding: 24px; text-align: center">
+                    <td style="padding: 20px; text-align: center">
                       <p
                         style="
                           margin: 0 0 4px;
-                          font-size: 11px;
-                          font-weight: 700;
-                          color: #6b7280;
+                          font-size: 12px;
+                          font-weight: 600;
+                          color: #a1a1aa;
                           text-transform: uppercase;
-                          letter-spacing: 0.8px;
+                          letter-spacing: 0.5px;
                         "
-                        class="text-muted"
                       >
-                        Total Spent This Week
+                        Total Spent
                       </p>
                       <p
                         style="
-                          margin: 0 0 8px;
-                          font-size: 36px;
+                          margin: 0 0 6px;
+                          font-size: 32px;
                           font-weight: 700;
-                          color: #111827;
+                          color: #09090b;
                           letter-spacing: -0.5px;
                         "
-                        class="text-primary"
                       >
                         ${{weeklyTotal}}
                       </p>
-                      <p
-                        style="margin: 0; font-size: 14px; color: #6b7280"
-                        class="text-muted"
-                      >
+                      <p style="margin: 0; font-size: 13px; color: #71717a">
                         {{changeText}} from last week
                       </p>
                     </td>
                   </tr>
                 </table>
 
-                <!-- Activity stats -->
+                <!-- Stats row -->
                 <table
                   role="presentation"
                   width="100%"
                   cellpadding="0"
                   cellspacing="0"
                   border="0"
-                  style="margin-bottom: 32px"
+                  style="margin: 0 0 24px"
                 >
                   <tr>
                     <td
                       class="stat-col"
                       width="50%"
-                      style="padding-right: 8px"
+                      style="padding-right: 6px"
                       valign="top"
                     >
                       <table
@@ -293,36 +207,29 @@
                         cellpadding="0"
                         cellspacing="0"
                         border="0"
-                        style="
-                          background-color: #f8fafc;
-                          border: 1px solid #e5e7eb;
-                          border-radius: 8px;
-                        "
-                        class="card-bg"
+                        style="background-color: #fafafa; border-radius: 10px"
                       >
                         <tr>
-                          <td style="padding: 20px">
+                          <td style="padding: 16px">
                             <p
                               style="
-                                margin: 0 0 6px;
-                                font-size: 11px;
-                                font-weight: 700;
-                                color: #6b7280;
+                                margin: 0 0 4px;
+                                font-size: 12px;
+                                font-weight: 600;
+                                color: #a1a1aa;
                                 text-transform: uppercase;
-                                letter-spacing: 0.8px;
+                                letter-spacing: 0.5px;
                               "
-                              class="text-muted"
                             >
                               Transactions
                             </p>
                             <p
                               style="
                                 margin: 0;
-                                font-size: 24px;
+                                font-size: 20px;
                                 font-weight: 700;
-                                color: #111827;
+                                color: #09090b;
                               "
-                              class="text-primary"
                             >
                               {{transactionCount}}
                             </p>
@@ -333,7 +240,7 @@
                     <td
                       class="stat-col"
                       width="50%"
-                      style="padding-left: 8px"
+                      style="padding-left: 6px"
                       valign="top"
                     >
                       <table
@@ -342,36 +249,29 @@
                         cellpadding="0"
                         cellspacing="0"
                         border="0"
-                        style="
-                          background-color: #f8fafc;
-                          border: 1px solid #e5e7eb;
-                          border-radius: 8px;
-                        "
-                        class="card-bg"
+                        style="background-color: #fafafa; border-radius: 10px"
                       >
                         <tr>
-                          <td style="padding: 20px">
+                          <td style="padding: 16px">
                             <p
                               style="
-                                margin: 0 0 6px;
-                                font-size: 11px;
-                                font-weight: 700;
-                                color: #6b7280;
+                                margin: 0 0 4px;
+                                font-size: 12px;
+                                font-weight: 600;
+                                color: #a1a1aa;
                                 text-transform: uppercase;
-                                letter-spacing: 0.8px;
+                                letter-spacing: 0.5px;
                               "
-                              class="text-muted"
                             >
                               Top Category
                             </p>
                             <p
                               style="
                                 margin: 0;
-                                font-size: 18px;
+                                font-size: 16px;
                                 font-weight: 700;
-                                color: #111827;
+                                color: #09090b;
                               "
-                              class="text-primary"
                             >
                               {{topCategory}}
                             </p>
@@ -382,81 +282,77 @@
                   </tr>
                 </table>
 
-                <!-- CTA -->
                 <table
                   role="presentation"
-                  align="center"
+                  width="100%"
                   cellpadding="0"
                   cellspacing="0"
                   border="0"
-                  style="margin: 0 auto"
                 >
                   <tr>
-                    <td
-                      align="center"
-                      bgcolor="#10b981"
-                      style="background-color: #10b981; border-radius: 8px"
-                    >
+                    <td align="center">
                       <a
                         href="{{appUrl}}/transactions"
                         target="_blank"
                         style="
                           display: inline-block;
-                          padding: 14px 36px;
-                          font-size: 15px;
+                          padding: 12px 32px;
+                          font-size: 14px;
                           font-weight: 600;
+                          font-family:
+                            &quot;Inter&quot;,
+                            -apple-system,
+                            BlinkMacSystemFont,
+                            &quot;Segoe UI&quot;,
+                            Roboto,
+                            sans-serif;
                           color: #ffffff;
+                          background-color: #18181b;
                           text-decoration: none;
                           border-radius: 8px;
                         "
-                        >View Transactions</a
+                        >View transactions</a
                       >
                     </td>
                   </tr>
                 </table>
               </td>
             </tr>
-
-            <!-- Footer -->
             <tr>
               <td
-                class="footer-pad footer-bg"
                 style="
-                  background-color: #f8fafc;
-                  padding: 24px 40px;
+                  padding: 20px 40px;
                   text-align: center;
-                  border-top: 1px solid #e5e7eb;
+                  border-top: 1px solid #f4f4f5;
                 "
               >
                 <p
                   style="
-                    margin: 0 0 8px;
+                    margin: 0 0 6px;
                     font-size: 12px;
                     line-height: 1.5;
-                    color: #9ca3af;
+                    color: #a1a1aa;
                   "
-                  class="text-muted"
-                >
-                  You receive this weekly digest as part of your Trackit
-                  account.
-                </p>
-                <p
-                  style="margin: 0 0 12px; font-size: 12px; color: #9ca3af"
-                  class="text-muted"
                 >
                   <a
                     href="{{appUrl}}/settings"
-                    style="color: #6b7280; text-decoration: underline"
-                    >Manage notification settings</a
+                    style="color: #a1a1aa; text-decoration: underline"
+                    >Manage notifications</a
                   >
                 </p>
-                <p style="margin: 0; font-size: 11px; color: #d1d5db">
-                  &copy; {{year}} Trackit &middot; All rights reserved
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 12px;
+                    line-height: 1.5;
+                    color: #a1a1aa;
+                  "
+                >
+                  &copy; {{year}} Trackit
                 </p>
               </td>
             </tr>
           </table>
-          <!--[if mso]></td></tr></table><![endif]-->
         </td>
       </tr>
     </table>

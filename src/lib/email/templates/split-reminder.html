@@ -1,106 +1,298 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="color-scheme" content="light" />
+    <title>Split Reminder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body,
+      table,
+      td,
+      a {
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+      table,
+      td {
+        mso-table-lspace: 0pt;
+        mso-table-rspace: 0pt;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100% !important;
+      }
+      @media only screen and (max-width: 580px) {
+        .container {
+          width: 100% !important;
+          max-width: 100% !important;
+        }
+        .content-pad {
+          padding-left: 24px !important;
+          padding-right: 24px !important;
+        }
+        .stat-col {
+          display: block !important;
+          width: 100% !important;
+          padding: 0 0 8px 0 !important;
+        }
+      }
+    </style>
   </head>
   <body
     style="
-      font-family:
-        -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto,
-        sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #f4f4f5;
+      background-color: #fafafa;
+      font-family:
+        &quot;Inter&quot;,
+        -apple-system,
+        BlinkMacSystemFont,
+        &quot;Segoe UI&quot;,
+        Roboto,
+        sans-serif;
     "
   >
-    <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px">
-      <div
-        style="
-          background: white;
-          border-radius: 12px;
-          padding: 32px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        "
-      >
-        <h1 style="font-size: 24px; color: #18181b; margin: 0 0 8px">
-          Split Reminder
-        </h1>
-        <p style="color: #71717a; margin: 0 0 24px">
-          Hi {{userName}}, here's your weekly split summary.
-        </p>
-
-        {{#if hasDebt}}
-        <div
-          style="
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-          "
-        >
-          <p style="margin: 0; color: #dc2626; font-size: 14px">You owe</p>
-          <p
-            style="
-              margin: 4px 0 0;
-              color: #dc2626;
-              font-size: 28px;
-              font-weight: 700;
-            "
-          >
-            ${{youOwe}}
-          </p>
-        </div>
-        {{/if}} {{#if hasCredit}}
-        <div
-          style="
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-          "
-        >
-          <p style="margin: 0; color: #16a34a; font-size: 14px">You are owed</p>
-          <p
-            style="
-              margin: 4px 0 0;
-              color: #16a34a;
-              font-size: 28px;
-              font-weight: 700;
-            "
-          >
-            ${{youAreOwed}}
-          </p>
-        </div>
-        {{/if}}
-
-        <a
-          href="{{appUrl}}/splits"
-          style="
-            display: inline-block;
-            background: #6366f1;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 500;
-            margin-top: 16px;
-          "
-          >View Splits</a
-        >
-      </div>
-      <p
-        style="
-          text-align: center;
-          color: #a1a1aa;
-          font-size: 12px;
-          margin-top: 24px;
-        "
-      >
-        Sent by Trackit
-      </p>
+    <div
+      style="
+        display: none;
+        max-height: 0;
+        overflow: hidden;
+        mso-hide: all;
+        font-size: 0;
+        color: #fafafa;
+        line-height: 0;
+      "
+    >
+      Your weekly split summary
     </div>
+    <table
+      role="presentation"
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      style="background-color: #fafafa"
+    >
+      <tr>
+        <td align="center" style="padding: 48px 16px">
+          <table
+            role="presentation"
+            class="container"
+            width="520"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            style="
+              max-width: 520px;
+              width: 100%;
+              background-color: #ffffff;
+              border-radius: 16px;
+              border: 1px solid #e4e4e7;
+            "
+          >
+            <tr>
+              <td style="padding: 32px 40px 0; text-align: center">
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: #09090b;
+                    letter-spacing: -0.5px;
+                  "
+                >
+                  Trackit
+                </p>
+                <p style="margin: 6px 0 0; font-size: 13px; color: #a1a1aa">
+                  Split Reminder
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td class="content-pad" style="padding: 32px 40px">
+                <p
+                  style="
+                    margin: 0 0 16px;
+                    font-size: 15px;
+                    line-height: 1.6;
+                    color: #09090b;
+                  "
+                >
+                  Hi {{userName}},
+                </p>
+                <p
+                  style="
+                    margin: 0 0 24px;
+                    font-size: 14px;
+                    line-height: 1.7;
+                    color: #52525b;
+                  "
+                >
+                  Here's your weekly split summary.
+                </p>
+
+                <!-- Balance cards -->
+                <table
+                  role="presentation"
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
+                  style="margin: 0 0 24px"
+                >
+                  <tr>
+                    {{#if hasDebt}}
+                    <td
+                      class="stat-col"
+                      width="50%"
+                      style="padding-right: 6px"
+                      valign="top"
+                    >
+                      <table
+                        role="presentation"
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        border="0"
+                        style="background-color: #fef2f2; border-radius: 10px"
+                      >
+                        <tr>
+                          <td style="padding: 16px">
+                            <p
+                              style="
+                                margin: 0 0 4px;
+                                font-size: 13px;
+                                color: #dc2626;
+                              "
+                            >
+                              You owe
+                            </p>
+                            <p
+                              style="
+                                margin: 0;
+                                font-size: 24px;
+                                font-weight: 700;
+                                color: #dc2626;
+                              "
+                            >
+                              ${{youOwe}}
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                    {{/if}} {{#if hasCredit}}
+                    <td
+                      class="stat-col"
+                      width="50%"
+                      style="padding-left: 6px"
+                      valign="top"
+                    >
+                      <table
+                        role="presentation"
+                        width="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        border="0"
+                        style="background-color: #f0fdf4; border-radius: 10px"
+                      >
+                        <tr>
+                          <td style="padding: 16px">
+                            <p
+                              style="
+                                margin: 0 0 4px;
+                                font-size: 13px;
+                                color: #16a34a;
+                              "
+                            >
+                              You are owed
+                            </p>
+                            <p
+                              style="
+                                margin: 0;
+                                font-size: 24px;
+                                font-weight: 700;
+                                color: #16a34a;
+                              "
+                            >
+                              ${{youAreOwed}}
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                    {{/if}}
+                  </tr>
+                </table>
+
+                <table
+                  role="presentation"
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
+                >
+                  <tr>
+                    <td align="center">
+                      <a
+                        href="{{appUrl}}/splits"
+                        target="_blank"
+                        style="
+                          display: inline-block;
+                          padding: 12px 32px;
+                          font-size: 14px;
+                          font-weight: 600;
+                          font-family:
+                            &quot;Inter&quot;,
+                            -apple-system,
+                            BlinkMacSystemFont,
+                            &quot;Segoe UI&quot;,
+                            Roboto,
+                            sans-serif;
+                          color: #ffffff;
+                          background-color: #18181b;
+                          text-decoration: none;
+                          border-radius: 8px;
+                        "
+                        >View splits</a
+                      >
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td
+                style="
+                  padding: 20px 40px;
+                  text-align: center;
+                  border-top: 1px solid #f4f4f5;
+                "
+              >
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 12px;
+                    line-height: 1.5;
+                    color: #a1a1aa;
+                  "
+                >
+                  &copy; {{year}} Trackit
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
   </body>
 </html>

@@ -1,36 +1,17 @@
 <!doctype html>
-<html
-  lang="en"
-  xmlns="http://www.w3.org/1999/xhtml"
-  xmlns:v="urn:schemas-microsoft-com:vml"
-  xmlns:o="urn:schemas-microsoft-com:office:office"
->
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="x-apple-disable-message-reformatting" />
-    <meta name="color-scheme" content="light dark" />
-    <meta name="supported-color-schemes" content="light dark" />
+    <meta name="color-scheme" content="light" />
     <title>Budget Alert</title>
-    <!--[if mso]>
-      <noscript
-        ><xml
-          ><o:OfficeDocumentSettings
-            ><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings
-          ></xml
-        ></noscript
-      >
-      <style>
-        table {
-          border-collapse: collapse;
-        }
-        td,
-        th {
-          font-family: Arial, sans-serif;
-        }
-      </style>
-    <![endif]-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
       body,
       table,
@@ -49,48 +30,12 @@
         padding: 0;
         width: 100% !important;
       }
-      @media (prefers-color-scheme: dark) {
-        .body-bg {
-          background-color: #0f172a !important;
-        }
-        .container-bg {
-          background-color: #1e293b !important;
-        }
-        .card-bg {
-          background-color: #334155 !important;
-          border-color: #475569 !important;
-        }
-        .text-primary {
-          color: #f1f5f9 !important;
-        }
-        .text-secondary {
-          color: #cbd5e1 !important;
-        }
-        .text-muted {
-          color: #94a3b8 !important;
-        }
-        .footer-bg {
-          background-color: #1e293b !important;
-          border-color: #334155 !important;
-        }
-        .bar-track {
-          background-color: #475569 !important;
-        }
-      }
-      @media only screen and (max-width: 620px) {
+      @media only screen and (max-width: 580px) {
         .container {
           width: 100% !important;
           max-width: 100% !important;
         }
         .content-pad {
-          padding-left: 24px !important;
-          padding-right: 24px !important;
-        }
-        .header-pad {
-          padding-left: 24px !important;
-          padding-right: 24px !important;
-        }
-        .footer-pad {
           padding-left: 24px !important;
           padding-right: 24px !important;
         }
@@ -101,123 +46,93 @@
     style="
       margin: 0;
       padding: 0;
-      background-color: #f1f5f9;
+      background-color: #fafafa;
       font-family:
-        -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto,
-        &quot;Helvetica Neue&quot;, Arial, sans-serif;
+        &quot;Inter&quot;,
+        -apple-system,
+        BlinkMacSystemFont,
+        &quot;Segoe UI&quot;,
+        Roboto,
+        sans-serif;
     "
   >
-    <!-- Preheader -->
-    <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all">
+    <div
+      style="
+        display: none;
+        max-height: 0;
+        overflow: hidden;
+        mso-hide: all;
+        font-size: 0;
+        color: #fafafa;
+        line-height: 0;
+      "
+    >
       You've reached {{percentage}}% of your {{categoryName}} budget
-      &#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;&#847;
     </div>
-
     <table
       role="presentation"
       width="100%"
       cellpadding="0"
       cellspacing="0"
       border="0"
-      style="background-color: #f1f5f9"
-      class="body-bg"
+      style="background-color: #fafafa"
     >
       <tr>
-        <td align="center" style="padding: 40px 16px">
-          <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td><![endif]-->
+        <td align="center" style="padding: 48px 16px">
           <table
             role="presentation"
-            class="container-bg container"
-            width="600"
+            class="container"
+            width="520"
             cellpadding="0"
             cellspacing="0"
             border="0"
             style="
-              max-width: 600px;
+              max-width: 520px;
               width: 100%;
               background-color: #ffffff;
-              border-radius: 12px;
-              overflow: hidden;
-              box-shadow:
-                0 1px 3px rgba(0, 0, 0, 0.08),
-                0 1px 2px rgba(0, 0, 0, 0.06);
+              border-radius: 16px;
+              border: 1px solid #e4e4e7;
             "
           >
-            <!-- Header -->
             <tr>
-              <td
-                class="header-pad"
-                style="
-                  background-color: #18181b;
-                  padding: 28px 40px;
-                  text-align: center;
-                "
-              >
+              <td style="padding: 32px 40px 0; text-align: center">
                 <p
                   style="
                     margin: 0;
-                    color: #ffffff;
-                    font-size: 22px;
+                    font-size: 20px;
                     font-weight: 700;
-                    letter-spacing: -0.3px;
+                    color: #09090b;
+                    letter-spacing: -0.5px;
                   "
                 >
                   Trackit
                 </p>
-                <p
-                  style="
-                    margin: 6px 0 0;
-                    color: #a1a1aa;
-                    font-size: 13px;
-                    font-weight: 400;
-                    letter-spacing: 0.3px;
-                  "
-                >
-                  Budget Alert
-                </p>
               </td>
             </tr>
             <tr>
-              <td
-                style="
-                  background-color: #f59e0b;
-                  height: 3px;
-                  font-size: 0;
-                  line-height: 0;
-                "
-              >
-                &nbsp;
-              </td>
-            </tr>
-
-            <!-- Content -->
-            <tr>
-              <td class="content-pad" style="padding: 36px 40px">
+              <td class="content-pad" style="padding: 32px 40px">
                 <p
                   style="
-                    margin: 0 0 20px;
-                    font-size: 16px;
+                    margin: 0 0 16px;
+                    font-size: 15px;
                     line-height: 1.6;
-                    color: #111827;
+                    color: #09090b;
                   "
-                  class="text-primary"
                 >
                   Hi {{userName}},
                 </p>
-
                 <p
                   style="
-                    margin: 0 0 28px;
-                    font-size: 15px;
+                    margin: 0 0 24px;
+                    font-size: 14px;
                     line-height: 1.7;
-                    color: #4b5563;
+                    color: #52525b;
                   "
-                  class="text-secondary"
                 >
                   Your
-                  <strong style="color: #111827">{{categoryName}}</strong>
+                  <strong style="color: #09090b">{{categoryName}}</strong>
                   budget has reached
-                  <strong style="color: #111827">{{percentage}}%</strong> of its
+                  <strong style="color: #09090b">{{percentage}}%</strong> of its
                   limit.
                 </p>
 
@@ -228,15 +143,14 @@
                   cellpadding="0"
                   cellspacing="0"
                   border="0"
-                  style="margin-bottom: 8px"
+                  style="margin: 0 0 6px"
                 >
                   <tr>
                     <td
-                      class="bar-track"
                       style="
-                        background-color: #e5e7eb;
-                        border-radius: 6px;
-                        height: 10px;
+                        background-color: #f4f4f5;
+                        border-radius: 4px;
+                        height: 8px;
                         font-size: 0;
                         line-height: 0;
                       "
@@ -253,8 +167,8 @@
                           <td
                             style="
                               background-color: #f59e0b;
-                              border-radius: 6px;
-                              height: 10px;
+                              border-radius: 4px;
+                              height: 8px;
                               font-size: 0;
                               line-height: 0;
                             "
@@ -268,17 +182,16 @@
                 </table>
                 <p
                   style="
-                    margin: 0 0 28px;
+                    margin: 0 0 24px;
                     font-size: 12px;
-                    color: #9ca3af;
+                    color: #a1a1aa;
                     text-align: right;
                   "
-                  class="text-muted"
                 >
                   {{percentage}}% used
                 </p>
 
-                <!-- Budget card -->
+                <!-- Budget details -->
                 <table
                   role="presentation"
                   width="100%"
@@ -286,15 +199,13 @@
                   cellspacing="0"
                   border="0"
                   style="
-                    background-color: #f8fafc;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 8px;
-                    margin-bottom: 28px;
+                    background-color: #fafafa;
+                    border-radius: 10px;
+                    margin: 0 0 24px;
                   "
-                  class="card-bg"
                 >
                   <tr>
-                    <td style="padding: 20px 24px">
+                    <td style="padding: 16px 20px">
                       <table
                         role="presentation"
                         width="100%"
@@ -305,23 +216,21 @@
                         <tr>
                           <td
                             style="
-                              padding-bottom: 14px;
+                              padding-bottom: 12px;
                               font-size: 13px;
-                              color: #6b7280;
+                              color: #71717a;
                             "
-                            class="text-muted"
                           >
                             Spent
                           </td>
                           <td
                             style="
-                              padding-bottom: 14px;
-                              font-size: 22px;
+                              padding-bottom: 12px;
+                              font-size: 18px;
                               font-weight: 700;
                               text-align: right;
-                              color: #111827;
+                              color: #09090b;
                             "
-                            class="text-primary"
                           >
                             ${{spent}}
                           </td>
@@ -329,25 +238,23 @@
                         <tr>
                           <td
                             style="
-                              padding: 14px 0;
+                              padding: 12px 0;
                               font-size: 13px;
-                              color: #6b7280;
-                              border-top: 1px solid #e5e7eb;
+                              color: #71717a;
+                              border-top: 1px solid #e4e4e7;
                             "
-                            class="text-muted"
                           >
-                            Budget Limit
+                            Limit
                           </td>
                           <td
                             style="
-                              padding: 14px 0;
-                              font-size: 15px;
+                              padding: 12px 0;
+                              font-size: 14px;
                               font-weight: 600;
                               text-align: right;
-                              color: #4b5563;
-                              border-top: 1px solid #e5e7eb;
+                              color: #52525b;
+                              border-top: 1px solid #e4e4e7;
                             "
-                            class="text-secondary"
                           >
                             ${{limit}}
                           </td>
@@ -355,23 +262,22 @@
                         <tr>
                           <td
                             style="
-                              padding-top: 14px;
+                              padding-top: 12px;
                               font-size: 13px;
-                              color: #6b7280;
-                              border-top: 1px solid #e5e7eb;
+                              color: #71717a;
+                              border-top: 1px solid #e4e4e7;
                             "
-                            class="text-muted"
                           >
                             Remaining
                           </td>
                           <td
                             style="
-                              padding-top: 14px;
-                              font-size: 15px;
+                              padding-top: 12px;
+                              font-size: 14px;
                               font-weight: 600;
                               text-align: right;
-                              color: #10b981;
-                              border-top: 1px solid #e5e7eb;
+                              color: #16a34a;
+                              border-top: 1px solid #e4e4e7;
                             "
                           >
                             ${{remaining}}
@@ -382,126 +288,77 @@
                   </tr>
                 </table>
 
-                <!-- AI Recommendations -->
                 <table
                   role="presentation"
                   width="100%"
                   cellpadding="0"
                   cellspacing="0"
                   border="0"
-                  style="
-                    background-color: #f8fafc;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 8px;
-                    margin-bottom: 32px;
-                  "
-                  class="card-bg"
                 >
                   <tr>
-                    <td style="padding: 20px 24px">
-                      <p
-                        style="
-                          margin: 0 0 10px;
-                          font-size: 11px;
-                          font-weight: 700;
-                          color: #6b7280;
-                          text-transform: uppercase;
-                          letter-spacing: 0.8px;
-                        "
-                        class="text-muted"
-                      >
-                        AI Recommendations
-                      </p>
-                      <p
-                        style="
-                          margin: 0;
-                          font-size: 14px;
-                          line-height: 1.7;
-                          color: #4b5563;
-                          white-space: pre-line;
-                        "
-                        class="text-secondary"
-                      >
-                        {{aiRecommendations}}
-                      </p>
-                    </td>
-                  </tr>
-                </table>
-
-                <!-- CTA -->
-                <table
-                  role="presentation"
-                  align="center"
-                  cellpadding="0"
-                  cellspacing="0"
-                  border="0"
-                  style="margin: 0 auto"
-                >
-                  <tr>
-                    <td
-                      align="center"
-                      bgcolor="#10b981"
-                      style="background-color: #10b981; border-radius: 8px"
-                    >
+                    <td align="center">
                       <a
                         href="{{appUrl}}/budget"
                         target="_blank"
                         style="
                           display: inline-block;
-                          padding: 14px 36px;
-                          font-size: 15px;
+                          padding: 12px 32px;
+                          font-size: 14px;
                           font-weight: 600;
+                          font-family:
+                            &quot;Inter&quot;,
+                            -apple-system,
+                            BlinkMacSystemFont,
+                            &quot;Segoe UI&quot;,
+                            Roboto,
+                            sans-serif;
                           color: #ffffff;
+                          background-color: #18181b;
                           text-decoration: none;
                           border-radius: 8px;
                         "
-                        >Review Budget</a
+                        >Review budget</a
                       >
                     </td>
                   </tr>
                 </table>
               </td>
             </tr>
-
-            <!-- Footer -->
             <tr>
               <td
-                class="footer-pad footer-bg"
                 style="
-                  background-color: #f8fafc;
-                  padding: 24px 40px;
+                  padding: 20px 40px;
                   text-align: center;
-                  border-top: 1px solid #e5e7eb;
+                  border-top: 1px solid #f4f4f5;
                 "
               >
                 <p
                   style="
-                    margin: 0 0 8px;
+                    margin: 0 0 6px;
                     font-size: 12px;
                     line-height: 1.5;
-                    color: #9ca3af;
+                    color: #a1a1aa;
                   "
-                  class="text-muted"
-                >
-                  You received this because budget alerts are enabled.
-                </p>
-                <p
-                  style="margin: 0 0 12px; font-size: 12px; color: #9ca3af"
-                  class="text-muted"
                 >
                   <a
                     href="{{appUrl}}/settings"
-                    style="color: #6b7280; text-decoration: underline"
-                    >Manage notification settings</a
+                    style="color: #a1a1aa; text-decoration: underline"
+                    >Manage notifications</a
                   >
                 </p>
-                <p style="margin: 0; font-size: 11px; color: #d1d5db">
-                  &copy; {{year}} Trackit &middot; All rights reserved
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 12px;
+                    line-height: 1.5;
+                    color: #a1a1aa;
+                  "
+                >
+                  &copy; {{year}} Trackit
                 </p>
               </td>
             </tr>
           </table>
-          <!--[if mso]></td></tr></table><![endif]-->
         </td>
       </tr>
     </table>
