@@ -33,7 +33,7 @@ const DATE_RANGE_OPTIONS: { value: DateRange; label: string }[] = [
 const barChartConfig = {
   amount: {
     label: "Expenses",
-    color: "#6366f1",
+    color: "#ef4444",
   },
 } satisfies ChartConfig;
 

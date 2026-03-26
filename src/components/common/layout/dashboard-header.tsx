@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 const secondaryLinks = [
   { href: "/overview", label: "Overview" },
   { href: "/accounts", label: "Wallet" },
-  { href: "/transactions", label: "Invoice" },
   { href: "/analytics", label: "Analytics" },
   { href: "/profile", label: "Profile" },
   { href: "/settings", label: "Settings" },

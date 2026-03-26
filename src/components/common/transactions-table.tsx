@@ -86,6 +86,7 @@ interface TransactionsTableProps {
   pageSize?: number;
   totalCount?: number;
   onPageChange?: (pageIndex: number, pageSize?: number) => void;
+  hidePagination?: boolean;
 }
 
 const TRANSACTION_TYPE_CONFIG = {
@@ -105,6 +106,18 @@ const TRANSACTION_TYPE_CONFIG = {
     className: "bg-blue-500/10 text-blue-600 border-blue-500/20",
   },
 } as const;
+
+const COLUMN_LABELS: Record<string, string> = {
+  createdAt: "Created At",
+  description: "Description",
+  categoryId: "Category",
+  type: "Type",
+  amount: "Amount",
+  date: "Date",
+  paymentMethod: "Payment Method",
+  isRecurring: "Frequency",
+  actions: "Actions",
+};
 
 const PAYMENT_METHOD_MAP: Record<string, string> = {
   CARD: "Card",
@@ -219,6 +232,7 @@ export function TransactionsTable({
   pageSize,
   totalCount,
   onPageChange,
+  hidePagination,
 }: TransactionsTableProps) {
   const { formatAmount, formatDate } = useFormatter();
   const { categoryMap } = useCategories();
@@ -651,6 +665,7 @@ export function TransactionsTable({
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
                 .map((column) => {
+                  const label = COLUMN_LABELS[column.id] ?? column.id;
                   return (
                     <DropdownMenuCheckboxItem
                       key={column.id}
@@ -660,7 +675,7 @@ export function TransactionsTable({
                         column.toggleVisibility(!!value)
                       }
                     >
-                      {column.id}
+                      {label}
                     </DropdownMenuCheckboxItem>
                   );
                 })}
@@ -728,73 +743,77 @@ export function TransactionsTable({
       </div>
 
       {/* Pagination */}
-      <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-        <div className="text-muted-foreground text-sm">
-          {selectedRows.length > 0 && (
-            <span className="mr-4">
-              {selectedRows.length} of {table.getFilteredRowModel().rows.length}{" "}
-              row(s) selected
+      {!hidePagination && (
+        <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+          <div className="text-muted-foreground text-sm">
+            {selectedRows.length > 0 && (
+              <span className="mr-4">
+                {selectedRows.length} of{" "}
+                {table.getFilteredRowModel().rows.length} row(s) selected
+              </span>
+            )}
+            <span>
+              Page {table.getState().pagination.pageIndex + 1} of{" "}
+              {table.getPageCount()}
             </span>
-          )}
-          <span>
-            Page {table.getState().pagination.pageIndex + 1} of{" "}
-            {table.getPageCount()}
-          </span>
-        </div>
+          </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronsLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-          >
-            <ChevronsRight className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.setPageIndex(0)}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <ChevronsLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+              disabled={!table.getCanNextPage()}
+            >
+              <ChevronsRight className="h-4 w-4" />
+            </Button>
 
-          <Select
-            value={`${table.getState().pagination.pageSize}`}
-            onValueChange={(value) => {
-              table.setPageSize(Number(value));
-            }}
-          >
-            <SelectTrigger className="h-9 w-[100px]">
-              <SelectValue placeholder={table.getState().pagination.pageSize} />
-            </SelectTrigger>
-            <SelectContent side="top">
-              {[10, 20, 30, 40, 50].map((pageSize) => (
-                <SelectItem key={pageSize} value={`${pageSize}`}>
-                  {pageSize} rows
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            <Select
+              value={`${table.getState().pagination.pageSize}`}
+              onValueChange={(value) => {
+                table.setPageSize(Number(value));
+              }}
+            >
+              <SelectTrigger className="h-9 w-[100px]">
+                <SelectValue
+                  placeholder={table.getState().pagination.pageSize}
+                />
+              </SelectTrigger>
+              <SelectContent side="top">
+                {[10, 20, 30, 40, 50].map((pageSize) => (
+                  <SelectItem key={pageSize} value={`${pageSize}`}>
+                    {pageSize} rows
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Delete confirmation dialog */}
       <DeleteDialog

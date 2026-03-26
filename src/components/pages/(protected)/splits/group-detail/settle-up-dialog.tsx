@@ -16,13 +16,13 @@ import { Input } from "@ui/input";
 import { Button } from "@ui/button";
 import { Textarea } from "@ui/textarea";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-  SheetFooter,
-} from "@ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@ui/dialog";
 import { Calendar } from "@ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@ui/popover";
 import { ArrowRight, CalendarIcon, Loader2 } from "lucide-react";
@@ -30,7 +30,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@ui/avatar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { generateNamedAvatar } from "@/lib/shared/avatar";
 import type { CreateSettlementInput } from "@/validation/settlement";
 
@@ -71,7 +70,6 @@ export function SettleUpDialog({
   onSubmit,
   isSubmitting,
 }: SettleUpDialogProps) {
-  const isMobile = useIsMobile();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: { amount, date: new Date(), notes: "" },
@@ -103,21 +101,16 @@ export function SettleUpDialog({
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side={isMobile ? "bottom" : "right"}
-        className={cn(
-          isMobile
-            ? "max-h-[92vh] overflow-y-auto rounded-t-2xl"
-            : "w-full overflow-y-auto sm:max-w-md",
-        )}
-      >
-        <SheetHeader>
-          <SheetTitle>Settle Up</SheetTitle>
-          <SheetDescription>Record a payment between members</SheetDescription>
-        </SheetHeader>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Settle Up</DialogTitle>
+          <DialogDescription>
+            Record a payment between members
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="space-y-5 px-4">
+        <div className="space-y-5">
           {/* From → To visual */}
           {from && to && (
             <div className="flex items-center justify-center gap-4 rounded-xl border p-4">
@@ -239,7 +232,7 @@ export function SettleUpDialog({
                 )}
               />
 
-              <SheetFooter className="px-0 pt-2">
+              <DialogFooter className="pt-2">
                 <Button
                   variant="outline"
                   type="button"
@@ -258,11 +251,11 @@ export function SettleUpDialog({
                     "Record Settlement"
                   )}
                 </Button>
-              </SheetFooter>
+              </DialogFooter>
             </form>
           </Form>
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 }
