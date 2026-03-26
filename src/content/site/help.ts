@@ -1,69 +1,84 @@
 import type { HelpContent } from "@/types/site";
 
 const help: HelpContent = {
-  searchPlaceholder: "Search guides, topics, or troubleshooting tips",
+  hero: {
+    title: "Help & Support",
+    description:
+      "Everything you need to get the most out of Trackit. Browse guides, explore FAQs, or reach out to our team for assistance.",
+  },
   cards: [
     {
-      title: "Getting Started & Account Setup",
+      title: "Getting Started",
       description:
-        "Learn how to set up Trackit, link accounts using Plaid/OAuth, and activate Multi-Currency tracking.",
+        "Create your account, complete onboarding, add your first bank account, and start tracking transactions in minutes.",
       linkText: "Read guide",
       href: "/docs/getting-started",
     },
     {
-      title: "AI Insights, Budgeting & Reports",
+      title: "AI Insights & Budgeting",
       description:
-        "Master Goal-Based Budgeting, understand your AI Spending Summaries, and use Gemini OCR for receipt scanning.",
+        "Set up budgets with smart alerts, scan receipts with AI, get spending insights, and schedule automated weekly and monthly reports.",
       linkText: "See details",
-      href: "/docs/transactions", // Keeping the original link
+      href: "/docs/transactions",
     },
     {
-      title: "Group Collaboration & Settlements",
+      title: "Splits & Group Expenses",
       description:
-        "Set up groups, track shared expenses, split bills by percentage, and use Stripe Polar for instant settlements.",
+        "Create groups, add shared expenses, split bills equally or by custom amounts, and settle debts with simplified payments.",
       linkText: "Learn more",
-      href: "/docs/security", // Keeping the original link
+      href: "/docs/security",
     },
   ],
+  faqDescription:
+    "Find answers to common questions about accounts, transactions, budgets, AI features, and more.",
   faqItems: [
     {
       id: "account-setup",
       question: "How do I create a Trackit account?",
       answer:
-        "Visit the sign-up page and follow the guided setup. You have flexible options, including using OAuth (Google, GitHub) or our secure passwordless login for quick and authenticated access. Trackit also utilizes Better Auth to integrate with email-based OTPs for better security during setup or recovery.",
+        "Visit the sign-up page and register with your email and password, or sign in instantly with Google. After verifying your email, you'll be guided through a quick onboarding flow to set your currency, language, and notification preferences.",
     },
     {
       id: "transactions",
-      question: "How do I use the AI and OCR features for financial tracking?",
+      question: "How do I track and import transactions?",
       answer:
-        "Trackit's AI (Gemini/OpenAI) is integrated into several features. It provides predictive modeling for upcoming bills or savings gaps and anomaly detection for unusual spending. You can also use Gemini OCR directly in the transaction view to simply snap a photo of a receipt; the system instantly reads the merchant, amount, and date, then uses AI to categorize the transaction for you, virtually eliminating manual data entry.",
+        "You can add transactions manually, or bulk import them via CSV file with automatic column mapping. Trackit's AI will categorize imported transactions for you. You can also scan receipts using the built-in OCR powered by Google Gemini, which extracts the merchant, amount, and date automatically.",
+    },
+    {
+      id: "budgets",
+      question: "How does budgeting work in Trackit?",
+      answer:
+        "Create budgets for any spending category with daily, weekly, monthly, or yearly periods. Trackit tracks your spending in real time and sends you email alerts when you reach 70%, 90%, or 100% of your budget. Parent category budgets automatically include subcategory spending.",
+    },
+    {
+      id: "ai-features",
+      question: "What AI features does Trackit offer?",
+      answer:
+        "Trackit uses Google Gemini to provide smart transaction categorization, spending insights and trend analysis, anomaly detection for unusual spending, receipt OCR scanning, budget recommendations, and personalized financial advice. AI insights are also delivered to your inbox every few days if enabled.",
+    },
+    {
+      id: "splits",
+      question: "How do I split expenses with friends or roommates?",
+      answer:
+        "Create a group, add your contacts as members, then log shared expenses. Trackit supports four split methods: equal, exact amounts, percentage, and shares-based. The app calculates who owes whom and simplifies debts to minimize the number of payments needed to settle up.",
+    },
+    {
+      id: "reports",
+      question: "Can I get automated financial reports?",
+      answer:
+        "Yes. Trackit automatically generates and emails you a weekly spending digest every Monday and a detailed monthly summary on the first of each month. You can also manually generate reports from the Reports page and resend any previous report to your inbox.",
     },
     {
       id: "security",
-      question:
-        "How does Trackit protect my financial information and personal data?",
+      question: "How does Trackit protect my data?",
       answer:
-        "Security is paramount. Trackit uses bank-grade encryption for data storage, secure cookies for session management, and robust Two-Factor Authentication (2FA) for all user accounts. We employ Role-Based Access Control (RBAC) to enforce permissions, track all sensitive actions via Audit logs, and utilize Arcjet for rate limiting and preventing unauthorized access attempts.",
+        "Trackit uses secure session management via Better Auth, email verification for all accounts, and rate limiting to prevent brute-force attacks. All data is scoped to your user account with strict server-side authorization on every API call.",
     },
     {
-      id: "multi-currency",
-      question:
-        "Does Trackit support multiple currencies, and how does it handle conversions?",
+      id: "settings",
+      question: "Can I customize how amounts and dates are displayed?",
       answer:
-        "Yes, Trackit fully supports multi-currency tracking. You can manage multiple accounts and wallets in different currencies. The system automatically fetches and applies real-time exchange rate conversions when viewing your total net worth or running reports, ensuring your financial picture is always accurate regardless of where your money is held.",
-    },
-    {
-      id: "group-settlements",
-      question:
-        "What is Stripe Polar, and how does it help with group settlements?",
-      answer:
-        "Stripe Polar is the payment technology integrated directly into Trackit to facilitate instant peer-to-peer (P2P) transfers and wallet-to-wallet transactions. After tracking shared expenses, Trackit provides settlement suggestions. You can then use Stripe Polar to execute these transfers immediately within the app to settle debts with group members, making the process fast and effortless.",
-    },
-    {
-      id: "alerts-and-notifications",
-      question: "How do I set up custom alerts and get financial reports?",
-      answer:
-        "Trackit offers a robust notification system. You can set Customizable Notification Rulesfor example, 'notify me if dining spending exceeds $200'for immediate budget breach alerts or unusual activity. Furthermore, you can schedule monthly reports (containing full visual analytics and summaries) to be automatically delivered to your email.",
+        "Absolutely. In Settings, you can configure your preferred currency, language, date format, time format, currency symbol position, thousand separator style, decimal places, and compact number display. These preferences apply across your entire dashboard.",
     },
   ],
 };

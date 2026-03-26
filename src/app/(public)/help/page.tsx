@@ -1,29 +1,21 @@
-import { FAQ, ListItem, Search } from "@component/help";
+import { FAQ, ListItem } from "@component/help";
 import help from "@content/site/help";
 
 export default function Page() {
   return (
     <div>
       <div className="bg-muted relative">
-        <div className="relative container mx-auto px-4 py-16 md:py-24">
-          <div className="mb-12 text-center">
+        <div className="relative container mx-auto px-4 pt-24 pb-16 md:pt-32 md:pb-24">
+          <div className="mb-16 text-center">
             <h1 className="mb-6 text-4xl leading-tight font-bold md:text-5xl">
-              {help.hero?.title}
+              <span className="from-foreground to-foreground/80 bg-gradient-to-r bg-clip-text text-transparent">
+                Help &
+              </span>{" "}
+              <span className="text-primary italic">Support</span>
             </h1>
             <p className="text-muted-foreground mx-auto max-w-3xl text-lg leading-relaxed text-balance">
               {help.hero?.description}
             </p>
-          </div>
-
-          {/* Added descriptive text above search */}
-          <div className="mb-4 text-center">
-            <p className="text-muted-foreground text-lg">
-              Find quick answers or browse popular topics below.
-            </p>
-          </div>
-
-          <div className="mb-16">
-            <Search />
           </div>
 
           <div className="mx-auto -mb-36 grid max-w-6xl gap-6 md:grid-cols-3">

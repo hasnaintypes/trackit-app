@@ -12,7 +12,10 @@ const PricingSectionInner = () => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-6 py-12">
       <h1 className="text-center text-5xl font-semibold tracking-tighter">
-        Pricing
+        <span className="from-foreground to-foreground/80 bg-gradient-to-r bg-clip-text text-transparent">
+          Simple
+        </span>{" "}
+        <span className="text-primary italic">Pricing</span>
       </h1>
       <div className="mx-auto mt-12 grid max-w-(--breakpoint-lg) grid-cols-1 items-center gap-10 sm:mt-16 lg:grid-cols-3 lg:gap-0">
         {plans.map((plan) => (
@@ -31,7 +34,14 @@ const PricingSectionInner = () => {
               </Badge>
             )}
             <h3 className="text-lg font-medium">{plan.name}</h3>
-            <p className="mt-2 text-4xl font-bold">${plan.price}</p>
+            <p className="mt-2 text-4xl font-bold">
+              {plan.price === 0 ? "Free" : `$${plan.price}`}
+              {plan.price > 0 && (
+                <span className="text-muted-foreground text-base font-normal">
+                  /mo
+                </span>
+              )}
+            </p>
             <p className="text-muted-foreground mt-4 font-medium">
               {plan.description}
             </p>

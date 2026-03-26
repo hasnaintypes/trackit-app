@@ -51,8 +51,8 @@ A personal finance SaaS for bank account management, transaction tracking, hiera
 ### 1. Clone and Install
 
 ```bash
-git clone <repo-url>
-cd trackit-saas
+git clone https://github.com/hasnaintypes/trackit-app.git
+cd trackit-app
 pnpm install
 ```
 

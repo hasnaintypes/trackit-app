@@ -14,7 +14,7 @@ export default function ChangelogPage() {
       >
         <div className="relative z-10 mx-auto max-w-4xl space-y-4">
           <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
-            What&apos;s new?
+            What&apos;s <span className="italic opacity-90">new?</span>
           </h1>
           <p className="text-lg text-balance opacity-80 sm:text-xl">
             A rundown of the latest Trackit feature releases, product
