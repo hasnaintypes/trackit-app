@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { ZodTypeAny } from "zod";
+import type { ZodTypeAny as _ZodTypeAny } from "zod";
 import { cn } from "@/lib/utils";
 import {
   Form,
@@ -97,7 +97,8 @@ export function CategoryForm({
   type FormValues = CreateCategoryInput | UpdateCategoryInput;
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(resolverSchema as ZodTypeAny),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(resolverSchema as any),
     defaultValues: {
       name: "",
       parentCategoryId: undefined,

@@ -50,7 +50,7 @@ export function LoginForm({
     e.preventDefault();
     const validation = loginSchema.safeParse({ email, password });
     if (!validation.success) {
-      toast.error(validation.error.errors[0]?.message ?? "Invalid input");
+      toast.error(validation.error.issues[0]?.message ?? "Invalid input");
       return;
     }
 

@@ -145,7 +145,9 @@ export const overviewRouter = createTRPCRouter({
    */
   balanceOverview: protectedProcedure
     .input(
-      z.object({ months: z.number().min(1).max(24).default(6) }).default({}),
+      z
+        .object({ months: z.number().min(1).max(24).default(6) })
+        .default(() => ({ months: 6 })),
     )
     .query(async ({ ctx, input }) => {
       const userId = ctx.user.id;

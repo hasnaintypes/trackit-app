@@ -167,7 +167,8 @@ export function CreateBudgetDialog() {
   const { data: categories } = api.category.list.useQuery();
 
   const form = useForm<CreateBudgetValues>({
-    resolver: zodResolver(createBudgetSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+    resolver: zodResolver(createBudgetSchema) as any,
     defaultValues: {
       categoryId: "",
       amount: 0,

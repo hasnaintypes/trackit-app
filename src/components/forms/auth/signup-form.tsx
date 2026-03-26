@@ -68,7 +68,7 @@ export function SignupForm({
       confirmPassword,
     });
     if (!validation.success) {
-      toast.error(validation.error.errors[0]?.message ?? "Invalid input");
+      toast.error(validation.error.issues[0]?.message ?? "Invalid input");
       return;
     }
 
