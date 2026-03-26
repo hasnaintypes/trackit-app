@@ -228,11 +228,22 @@ export function useAuth() {
     [],
   );
 
+  const signInWithGoogle = useCallback(
+    async (callbackURL?: string): Promise<void> => {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: callbackURL ?? "/overview",
+      });
+    },
+    [],
+  );
+
   return {
     loading,
     error,
     signUp,
     signIn,
+    signInWithGoogle,
     signOut,
     sendVerificationEmail,
     requestPasswordReset,
