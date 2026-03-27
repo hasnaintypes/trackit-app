@@ -98,7 +98,7 @@ class PdfBuilder {
     this.pdf.setDrawColor(COLORS.brand);
     this.pdf.setLineWidth(0.6);
     this.pdf.line(this.margin, this.y, this.margin + this.contentWidth, this.y);
-    this.y += 6;
+    this.y += 12;
   }
 
   /** Footer on every page: brand + page number */
@@ -281,6 +281,10 @@ class PdfBuilder {
     this.y += 8;
   }
 
+  getCurrentY() {
+    return this.y;
+  }
+
   wrappedText(text: string) {
     this.pdf.setFontSize(10);
     this.pdf.setTextColor(COLORS.black);
@@ -378,6 +382,130 @@ function getTypeLabel(type: string) {
     .replace(/_/g, " ")
     .toLowerCase()
     .replace(/\b\w/g, (l) => l.toUpperCase());
+}
+
+// ---------------------------------------------------------------------------
+// Transaction table export
+// ---------------------------------------------------------------------------
+interface TransactionRow {
+  date: string;
+  description: string;
+  amount: string;
+  type: string;
+  paymentMethod: string;
+  notes: string;
+}
+
+export async function exportTransactionsPdf(
+  transactions: TransactionRow[],
+  period: string,
+) {
+  const { jsPDF } = await import("jspdf");
+  const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const b = new PdfBuilder(pdf);
+
+  await b.loadLogo();
+  b.brandHeader(
+    new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }),
+  );
+
+  b.title("Transaction Export");
+  b.subtitle(`Period: ${period}`);
+  b.divider();
+
+  // Summary stats
+  let totalIncome = 0;
+  let totalExpenses = 0;
+  for (const t of transactions) {
+    const amt = parseFloat(t.amount.replace(/[^0-9.-]/g, "")) || 0;
+    if (t.type === "CREDIT") totalIncome += amt;
+    else totalExpenses += Math.abs(amt);
+  }
+
+  b.statRow([
+    { label: "Transactions", value: String(transactions.length) },
+    { label: "Income", value: fmt(totalIncome), color: COLORS.green },
+    { label: "Expenses", value: fmt(totalExpenses), color: COLORS.red },
+  ]);
+  b.gap(4);
+
+  // Table header
+  const cols = [
+    { label: "Date", width: 28 },
+    { label: "Description", width: 52 },
+    { label: "Amount", width: 30 },
+    { label: "Type", width: 22 },
+    { label: "Payment", width: 25 },
+    { label: "Notes", width: 23 },
+  ];
+  const margin = 15;
+  const rowHeight = 6;
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  let y = b.getCurrentY();
+
+  function drawTableHeader() {
+    pdf.setFillColor(COLORS.lightGray);
+    pdf.rect(margin, y, pageWidth - margin * 2, rowHeight, "F");
+    pdf.setFontSize(7);
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(COLORS.gray);
+    let x = margin + 2;
+    for (const col of cols) {
+      pdf.text(col.label.toUpperCase(), x, y + 4);
+      x += col.width;
+    }
+    y += rowHeight + 1;
+  }
+
+  drawTableHeader();
+
+  for (const t of transactions) {
+    if (y + rowHeight > pageHeight - 15) {
+      pdf.addPage();
+      y = margin;
+      drawTableHeader();
+    }
+
+    pdf.setFontSize(7);
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(COLORS.black);
+    let x = margin + 2;
+
+    const truncate = (s: string, max: number) =>
+      s.length > max ? s.slice(0, max - 1) + "\u2026" : s;
+
+    pdf.text(truncate(t.date, 16), x, y + 4);
+    x += cols[0]!.width;
+    pdf.text(truncate(t.description, 32), x, y + 4);
+    x += cols[1]!.width;
+
+    const amtColor = t.type === "CREDIT" ? COLORS.green : COLORS.red;
+    pdf.setTextColor(amtColor);
+    pdf.text(truncate(t.amount, 16), x, y + 4);
+    x += cols[2]!.width;
+
+    pdf.setTextColor(COLORS.black);
+    pdf.text(t.type, x, y + 4);
+    x += cols[3]!.width;
+    pdf.text(truncate(t.paymentMethod || "-", 14), x, y + 4);
+    x += cols[4]!.width;
+    pdf.text(truncate(t.notes || "-", 14), x, y + 4);
+
+    // Row divider
+    y += rowHeight;
+    pdf.setDrawColor(COLORS.border);
+    pdf.setLineWidth(0.15);
+    pdf.line(margin, y, pageWidth - margin, y);
+    y += 0.5;
+  }
+
+  b.addFooters();
+  pdf.save(`trackit-transactions-${period}.pdf`);
 }
 
 export async function exportReportPdf(report: {

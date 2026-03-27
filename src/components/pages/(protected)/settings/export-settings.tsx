@@ -17,6 +17,7 @@ import {
   FileSpreadsheet,
   Calendar,
   FileText,
+  FileJson2,
   Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -85,6 +86,8 @@ type DateRange =
   | "last_6_months"
   | "this_year";
 
+type ExportFormat = "csv" | "json" | "pdf";
+
 function getDateRange(range: DateRange): {
   startDate?: string;
   endDate?: string;
@@ -140,89 +143,175 @@ const DATE_RANGE_LABELS: Record<DateRange, string> = {
   this_year: "This Year",
 };
 
+const FORMAT_LABELS: Record<ExportFormat, string> = {
+  csv: "CSV (.csv)",
+  json: "JSON (.json)",
+  pdf: "PDF (.pdf)",
+};
+
+const FORMAT_ICONS: Record<
+  ExportFormat,
+  React.ComponentType<{ className?: string }>
+> = {
+  csv: FileSpreadsheet,
+  json: FileJson2,
+  pdf: FileText,
+};
+
+// ---------------------------------------------------------------------------
+// Download helper
+// ---------------------------------------------------------------------------
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+// ---------------------------------------------------------------------------
+// Transaction type used across exporters
+// ---------------------------------------------------------------------------
+interface ExportTransaction {
+  date: string;
+  description: string | null;
+  amount: string;
+  type: string;
+  notes: string | null;
+  paymentMethod: string | null;
+}
+
 // ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
 export default function ExportSettings() {
   const [dateRange, setDateRange] = useState<DateRange>("this_month");
+  const [format, setFormat] = useState<ExportFormat>("csv");
   const [isExporting, setIsExporting] = useState(false);
   const [lastExportCount, setLastExportCount] = useState<number | null>(null);
   const { formatAmount, formatDate } = useFormatter();
   const utils = api.useUtils();
 
-  const handleExportCSV = async () => {
-    setIsExporting(true);
+  const fetchAllTransactions = async (): Promise<ExportTransaction[]> => {
     const range = getDateRange(dateRange);
+    const allTransactions: ExportTransaction[] = [];
+    let cursor: string | undefined = undefined;
+    let hasMore = true;
+
+    while (hasMore) {
+      const res = await utils.transaction.list.fetch({
+        limit: 100,
+        cursor,
+        ...range,
+      });
+
+      allTransactions.push(...res.transactions);
+      cursor = res.nextCursor;
+      hasMore = !!cursor;
+    }
+
+    return allTransactions;
+  };
+
+  const handleExport = async () => {
+    setIsExporting(true);
     try {
-      const allTransactions: Array<{
-        date: string;
-        description: string | null;
-        amount: string;
-        type: string;
-        notes: string | null;
-        paymentMethod: string | null;
-      }> = [];
+      const transactions = await fetchAllTransactions();
 
-      let cursor: string | undefined = undefined;
-      let hasMore = true;
-
-      while (hasMore) {
-        const res = await utils.transaction.list.fetch({
-          limit: 100,
-          cursor,
-          ...range,
-        });
-
-        allTransactions.push(...res.transactions);
-        cursor = res.nextCursor;
-        hasMore = !!cursor;
-      }
-
-      if (allTransactions.length === 0) {
+      if (transactions.length === 0) {
         toast.error("No transactions found for the selected period");
-        setIsExporting(false);
         return;
       }
 
-      // Build CSV
-      const headers = [
-        "Date",
-        "Description",
-        "Amount",
-        "Type",
-        "Payment Method",
-        "Notes",
-      ];
-      const rows = allTransactions.map((t) => [
-        formatDate(t.date),
-        `"${(t.description ?? "").replace(/"/g, '""')}"`,
-        formatAmount(Number(t.amount)),
-        t.type,
-        t.paymentMethod ?? "",
-        `"${(t.notes ?? "").replace(/"/g, '""')}"`,
-      ]);
+      switch (format) {
+        case "csv":
+          exportCSV(transactions);
+          break;
+        case "json":
+          exportJSON(transactions);
+          break;
+        case "pdf":
+          await exportPDF(transactions);
+          break;
+      }
 
-      const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join(
-        "\n",
+      setLastExportCount(transactions.length);
+      toast.success(
+        `Exported ${transactions.length} transactions as ${format.toUpperCase()}`,
       );
-
-      // Download
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `trackit-transactions-${dateRange}.csv`;
-      link.click();
-      URL.revokeObjectURL(url);
-
-      setLastExportCount(allTransactions.length);
-      toast.success(`Exported ${allTransactions.length} transactions`);
     } catch {
       toast.error("Failed to export transactions");
     } finally {
       setIsExporting(false);
     }
   };
+
+  const exportCSV = (transactions: ExportTransaction[]) => {
+    const headers = [
+      "Date",
+      "Description",
+      "Amount",
+      "Type",
+      "Payment Method",
+      "Notes",
+    ];
+    const rows = transactions.map((t) => [
+      formatDate(t.date),
+      `"${(t.description ?? "").replace(/"/g, '""')}"`,
+      formatAmount(Number(t.amount)),
+      t.type,
+      t.paymentMethod ?? "",
+      `"${(t.notes ?? "").replace(/"/g, '""')}"`,
+    ]);
+
+    const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+
+    downloadBlob(
+      new Blob([csv], { type: "text/csv;charset=utf-8;" }),
+      `trackit-transactions-${dateRange}.csv`,
+    );
+  };
+
+  const exportJSON = (transactions: ExportTransaction[]) => {
+    const data = {
+      exportedAt: new Date().toISOString(),
+      period: DATE_RANGE_LABELS[dateRange],
+      count: transactions.length,
+      transactions: transactions.map((t) => ({
+        date: formatDate(t.date),
+        description: t.description ?? "",
+        amount: Number(t.amount),
+        type: t.type,
+        paymentMethod: t.paymentMethod ?? null,
+        notes: t.notes ?? "",
+      })),
+    };
+
+    downloadBlob(
+      new Blob([JSON.stringify(data, null, 2)], {
+        type: "application/json;charset=utf-8;",
+      }),
+      `trackit-transactions-${dateRange}.json`,
+    );
+  };
+
+  const exportPDF = async (transactions: ExportTransaction[]) => {
+    const { exportTransactionsPdf } = await import("@/lib/shared/pdf-export");
+
+    const rows = transactions.map((t) => ({
+      date: formatDate(t.date),
+      description: t.description ?? "",
+      amount: formatAmount(Number(t.amount)),
+      type: t.type,
+      paymentMethod: t.paymentMethod ?? "",
+      notes: t.notes ?? "",
+    }));
+
+    await exportTransactionsPdf(rows, DATE_RANGE_LABELS[dateRange]);
+  };
+
+  const FormatIcon = FORMAT_ICONS[format];
 
   return (
     <div className="space-y-10">
@@ -257,12 +346,19 @@ export default function ExportSettings() {
           label="Format"
           description="Export file format"
         >
-          <Select value="csv" disabled>
+          <Select
+            value={format}
+            onValueChange={(val) => setFormat(val as ExportFormat)}
+          >
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="csv">CSV (.csv)</SelectItem>
+              {Object.entries(FORMAT_LABELS).map(([key, label]) => (
+                <SelectItem key={key} value={key}>
+                  {label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </SettingRow>
@@ -280,14 +376,14 @@ export default function ExportSettings() {
                   : DATE_RANGE_LABELS[dateRange]}
               </p>
             </div>
-            <FileSpreadsheet className="text-muted-foreground/40 h-8 w-8" />
+            <FormatIcon className="text-muted-foreground/40 h-8 w-8" />
           </div>
         </div>
       </Section>
 
       <div className="flex justify-end">
         <Button
-          onClick={handleExportCSV}
+          onClick={handleExport}
           disabled={isExporting}
           className="min-w-32"
         >
@@ -296,7 +392,7 @@ export default function ExportSettings() {
           ) : (
             <Download className="mr-2 h-4 w-4" />
           )}
-          {isExporting ? "Exporting..." : "Export CSV"}
+          {isExporting ? "Exporting..." : `Export ${format.toUpperCase()}`}
         </Button>
       </div>
     </div>
