@@ -1,6 +1,10 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  uploadRateLimitedProcedure,
+} from "@/server/api/trpc";
 import { createLogger } from "@/lib/logging";
 
 const logger = createLogger("transactionRouter");
@@ -538,7 +542,7 @@ export const transactionRouter = createTRPCRouter({
       };
     }),
 
-  uploadReceipt: protectedProcedure
+  uploadReceipt: uploadRateLimitedProcedure
     .input(
       z.object({
         transactionId: z.string().optional(),

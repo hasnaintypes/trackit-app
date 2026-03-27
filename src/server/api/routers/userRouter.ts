@@ -3,6 +3,7 @@ import {
   createTRPCRouter,
   publicProcedure,
   protectedProcedure,
+  uploadRateLimitedProcedure,
 } from "@/server/api/trpc";
 import { uploadForProfile } from "@shared/imagekit";
 import { TRPCError } from "@trpc/server";
@@ -171,7 +172,7 @@ export const userRouter = createTRPCRouter({
    * @param {{file:string,fileName?:string}} input - `file` may be a remote URL or base64 data URI
    * @returns {Promise<{id:string,name:string|null,image:string,role:string,gender:string|null,createdAt:string,updatedAt:string}>}
    */
-  uploadProfileImage: protectedProcedure
+  uploadProfileImage: uploadRateLimitedProcedure
     .input(uploadProfileImageSchema)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.user.id;
@@ -243,6 +244,7 @@ export const userRouter = createTRPCRouter({
         banReason: true,
         banExpires: true,
         hasCompletedOnboarding: true,
+        twoFactorEnabled: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -264,6 +266,7 @@ export const userRouter = createTRPCRouter({
       banReason: user.banReason ?? null,
       banExpires: user.banExpires ? user.banExpires.toISOString() : null,
       hasCompletedOnboarding: user.hasCompletedOnboarding,
+      twoFactorEnabled: user.twoFactorEnabled ?? false,
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
     };

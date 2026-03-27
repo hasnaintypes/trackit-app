@@ -3,16 +3,31 @@ import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { revokeSessionSchema } from "@/validation/session";
 
 /**
+ * Parse the current session token from the request cookie header.
+ */
+function getCurrentSessionToken(headers: Headers): string | null {
+  const cookie = headers.get("cookie");
+  if (!cookie) return null;
+
+  // Better Auth uses "better-auth.session_token" cookie
+  const match = /(?:^|;\s*)better-auth\.session_token=([^;]+)/.exec(cookie);
+  return match?.[1] ?? null;
+}
+
+/**
  * Session router: list current user's sessions and revoke them.
  */
 export const sessionRouter = createTRPCRouter({
   list: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.user.id;
+    const currentToken = getCurrentSessionToken(ctx.headers);
+
     const sessions = await ctx.db.session.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
+        token: true,
         ipAddress: true,
         userAgent: true,
         createdAt: true,
@@ -28,6 +43,7 @@ export const sessionRouter = createTRPCRouter({
       device: s.userAgent ?? "Unknown",
       lastActivity: s.updatedAt.toISOString(),
       expiresAt: s.expiresAt ? s.expiresAt.toISOString() : null,
+      isCurrent: currentToken ? s.token === currentToken : false,
     }));
   }),
 
@@ -53,7 +69,24 @@ export const sessionRouter = createTRPCRouter({
 
   revokeAll: protectedProcedure.mutation(async ({ ctx }) => {
     const userId = ctx.user.id;
-    await ctx.db.session.deleteMany({ where: { userId } });
+    const currentToken = getCurrentSessionToken(ctx.headers);
+
+    // Find the current session to exclude it from deletion
+    let currentSessionId: string | undefined;
+    if (currentToken) {
+      const current = await ctx.db.session.findFirst({
+        where: { userId, token: currentToken },
+        select: { id: true },
+      });
+      currentSessionId = current?.id;
+    }
+
+    await ctx.db.session.deleteMany({
+      where: {
+        userId,
+        ...(currentSessionId ? { NOT: { id: currentSessionId } } : {}),
+      },
+    });
     return { success: true };
   }),
 });

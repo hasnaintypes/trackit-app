@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { Prisma } from "@prisma/client";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { toNum } from "@shared/decimal";
@@ -173,34 +172,22 @@ export const overviewRouter = createTRPCRouter({
         });
       }
 
-      // Aggregate in SQL instead of loading all rows into JS
-      const rows = await db.$queryRaw<
-        Array<{
-          key: string;
-          month: string;
-          year: number;
-          income: number;
-          expense: number;
-        }>
-      >(Prisma.sql`
-        SELECT
-          TO_CHAR(date, 'YYYY-MM') AS key,
-          TO_CHAR(date, 'Mon') AS month,
-          EXTRACT(YEAR FROM date)::int AS year,
-          COALESCE(SUM(CASE WHEN type = 'CREDIT' THEN ABS(amount) ELSE 0 END), 0)::float AS income,
-          COALESCE(SUM(CASE WHEN type = 'DEBIT' THEN ABS(amount) ELSE 0 END), 0)::float AS expense
-        FROM "Transaction"
-        WHERE "userId" = ${userId} AND date >= ${startDate}
-        GROUP BY 1, 2, 3
-        ORDER BY 1 ASC
-      `);
+      // Fetch transactions with minimal select and aggregate in JS
+      const transactions = await db.transaction.findMany({
+        where: { userId, date: { gte: startDate } },
+        select: { date: true, type: true, amount: true },
+      });
 
-      // Merge SQL results into the pre-filled month map
-      for (const row of rows) {
-        const bucket = monthlyMap.get(row.key);
+      for (const tx of transactions) {
+        const key = format(tx.date, "yyyy-MM");
+        const bucket = monthlyMap.get(key);
         if (bucket) {
-          bucket.income = Number(row.income);
-          bucket.expense = Number(row.expense);
+          const amt = Math.abs(toNum(tx.amount));
+          if (tx.type === "CREDIT") {
+            bucket.income += amt;
+          } else if (tx.type === "DEBIT") {
+            bucket.expense += amt;
+          }
         }
       }
 
