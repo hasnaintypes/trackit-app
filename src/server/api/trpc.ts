@@ -5,6 +5,7 @@ import { ZodError } from "zod";
 import { db } from "@/server/db";
 import { auth } from "@/lib/auth";
 import { createLogger } from "@/lib/logging";
+import { AuditService } from "@/server/services/auditService";
 import type { User, Session } from "@/types";
 
 /**
@@ -258,15 +259,73 @@ const enforceAuthMiddleware = t.middleware(({ ctx, next }) => {
 });
 
 /**
+ * Middleware that logs mutations to the audit log.
+ *
+ * Only fires for mutations that complete successfully. Extracts the resource
+ * ID from the input or result and logs the action fire-and-forget so it
+ * never slows down the response.
+ */
+const auditMiddleware = t.middleware(
+  async ({ ctx, next, path, type, getRawInput }) => {
+    const result = await next();
+
+    if (type === "mutation" && ctx.user && result.ok) {
+      const resourceType = AuditService.extractResourceType(path);
+
+      const rawInput = await getRawInput();
+      let resourceId: string | undefined;
+      const input = rawInput as Record<string, unknown> | undefined;
+      if (input && typeof input === "object") {
+        if (typeof input.id === "string") {
+          resourceId = input.id;
+        }
+      }
+
+      const data = result.data as Record<string, unknown> | undefined;
+      if (
+        !resourceId &&
+        data &&
+        typeof data === "object" &&
+        typeof data.id === "string"
+      ) {
+        resourceId = data.id;
+      }
+
+      const ip =
+        ctx.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+        ctx.headers.get("x-real-ip") ??
+        undefined;
+      const userAgent = ctx.headers.get("user-agent") ?? undefined;
+
+      const metadata =
+        input && typeof input === "object" ? { ...input } : undefined;
+
+      void AuditService.log({
+        userId: ctx.user.id,
+        action: path,
+        resourceType,
+        resourceId,
+        metadata,
+        ipAddress: ip,
+        userAgent,
+      });
+    }
+
+    return result;
+  },
+);
+
+/**
  * Protected procedure base.
  *
  * Use this for queries/mutations that require an authenticated user. This
- * applies both the timing middleware and the `enforceAuthMiddleware` to
- * ensure the caller is signed in before the procedure executes.
+ * applies the timing middleware, `enforceAuthMiddleware`, and the audit
+ * middleware to ensure the caller is signed in and mutations are logged.
  */
 export const protectedProcedure = t.procedure
   .use(timingMiddleware)
-  .use(enforceAuthMiddleware);
+  .use(enforceAuthMiddleware)
+  .use(auditMiddleware);
 
 /**
  * AI rate-limited procedure.
@@ -282,6 +341,27 @@ export const aiRateLimitedProcedure = protectedProcedure.use(
       throw new TRPCError({
         code: "TOO_MANY_REQUESTS",
         message: "Rate limit exceeded. Try again in a minute.",
+      });
+    }
+    return next();
+  },
+);
+
+const UPLOAD_MAX = 10;
+
+/**
+ * Upload rate-limited procedure.
+ *
+ * Extends `protectedProcedure` with per-user rate limiting for file uploads
+ * (10 uploads per 60-second window).
+ */
+export const uploadRateLimitedProcedure = protectedProcedure.use(
+  async ({ ctx, next }) => {
+    const { allowed } = await checkRateLimit(ctx.user.id, "upload", UPLOAD_MAX);
+    if (!allowed) {
+      throw new TRPCError({
+        code: "TOO_MANY_REQUESTS",
+        message: "Upload rate limit exceeded. Try again in a minute.",
       });
     }
     return next();
