@@ -41,6 +41,12 @@ export const env = createEnv({
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
     BETTER_AUTH_API_KEY: z.string().optional(),
+    ADMIN_EMAIL: z.string().email().optional(),
+    FIELD_ENCRYPTION_KEY: z
+      .string()
+      .length(64)
+      .regex(/^[0-9a-fA-F]+$/)
+      .optional(),
   },
 
   /**
@@ -98,6 +104,8 @@ export const env = createEnv({
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     BETTER_AUTH_API_KEY: process.env.BETTER_AUTH_API_KEY,
+    ADMIN_EMAIL: process.env.ADMIN_EMAIL,
+    FIELD_ENCRYPTION_KEY: process.env.FIELD_ENCRYPTION_KEY,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
