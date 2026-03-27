@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { db as prisma } from "@/server/db";
 import { sendTemplateEmail } from "@/lib/email";
-import { admin } from "better-auth/plugins";
+import { admin, twoFactor } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { dash, sentinel } from "@better-auth/infra";
 import { createLogger } from "@/lib/logging";
@@ -16,6 +16,14 @@ export const auth = betterAuth({
     nextCookies(),
     dash({ apiKey: env.BETTER_AUTH_API_KEY }),
     sentinel({ apiKey: env.BETTER_AUTH_API_KEY }),
+    twoFactor({
+      issuer: "Trackit",
+      skipVerificationOnEnable: false,
+      backupCodeOptions: {
+        amount: 10,
+        length: 10,
+      },
+    }),
   ],
   database: prismaAdapter(prisma, { provider: "postgresql" }),
   socialProviders: {

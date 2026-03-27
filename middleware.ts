@@ -10,6 +10,7 @@ const AUTH_PATHS = [
   "/reset-password",
   "/forgot-password",
   "/verify-success",
+  "/two-factor",
 ];
 
 // Public pages under src/app/(public)

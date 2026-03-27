@@ -168,7 +168,7 @@ export function LoginForm({
             variant="outline"
             type="button"
             disabled={loading}
-            onClick={() => signInWithGoogle("/onboarding")}
+            onClick={() => signInWithGoogle("/overview")}
             className="hover:bg-primary hover:text-primary-foreground dark:hover:bg-primary cursor-pointer"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

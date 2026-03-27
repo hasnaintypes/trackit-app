@@ -81,7 +81,6 @@ export function SignupForm({
         name,
         email,
         password,
-        role: "user",
         image: defaultAvatar,
         callbackURL: "/onboarding",
       });
