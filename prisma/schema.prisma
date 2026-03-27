@@ -22,8 +22,10 @@ model User {
   gender            Gender?
   country           Country?
   timezone          Timezone?
+  twoFactorEnabled  Boolean?                 @default(false)
   role              String                   @default("user")
   accounts          Account[]
+  twoFactor         TwoFactor[]
   bankAccounts      BankAccount[]
   budgets           Budget[]
   categories        Category[]
@@ -40,6 +42,7 @@ model User {
   sessions          Session[]
   transactions      Transaction[]
   userPreferences   UserPreferences?
+  auditLogs         AuditLog[]
 
   @@map("user")
 }
@@ -145,6 +148,16 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model TwoFactor {
+  id          String @id
+  secret      String
+  backupCodes String
+  userId      String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("twoFactor")
 }
 
 model BankAccount {
@@ -647,6 +660,25 @@ enum PaymentMethod {
   AUTO_DEBIT
   UPI
   OTHER
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action       String
+  resourceType String
+  resourceId   String?
+  metadata     Json?
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([resourceType, resourceId])
+  @@index([createdAt])
+  @@index([action])
+  @@map("audit_logs")
 }
 
 model WaitlistEntry {
