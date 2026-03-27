@@ -19,56 +19,59 @@ export interface BulkImportDialogProps {
 
 type Step = "upload" | "mapping" | "confirm" | "progress";
 
+const initialState: BulkImportState = {
+  file: null,
+  sourceType: "csv",
+  csvData: [],
+  columnMapping: {},
+  parsedTransactions: [],
+  selectedAccountId: null,
+  importProgress: 0,
+  totalToImport: 0,
+  successCount: 0,
+  errorCount: 0,
+  errors: [],
+};
+
 export function BulkImportDialog({
   open,
   onOpenChange,
 }: BulkImportDialogProps) {
   const [currentStep, setCurrentStep] = useState<Step>("upload");
   const [importState, setImportState] = useState<BulkImportState>({
-    file: null,
-    csvData: [],
-    columnMapping: {},
-    parsedTransactions: [],
-    selectedAccountId: null,
-    importProgress: 0,
-    totalToImport: 0,
-    successCount: 0,
-    errorCount: 0,
-    errors: [],
+    ...initialState,
   });
 
   const handleClose = () => {
     if (currentStep === "progress") {
-      // Don't allow closing during import
       return;
     }
     onOpenChange(false);
-    // Reset state
     setCurrentStep("upload");
-    setImportState({
-      file: null,
-      csvData: [],
-      columnMapping: {},
-      parsedTransactions: [],
-      selectedAccountId: null,
-      importProgress: 0,
-      totalToImport: 0,
-      successCount: 0,
-      errorCount: 0,
-      errors: [],
-    });
+    setImportState({ ...initialState });
   };
 
   const steps = {
     upload: (
       <FileUploadStep
-        onNext={(file, csvData: Record<string, string>[]) => {
-          setImportState((prev) => ({
-            ...prev,
-            file,
-            csvData,
-          }));
-          setCurrentStep("mapping");
+        onNext={(file, result) => {
+          if (result.type === "csv") {
+            setImportState((prev) => ({
+              ...prev,
+              file,
+              sourceType: "csv",
+              csvData: result.csvData,
+            }));
+            setCurrentStep("mapping");
+          } else {
+            setImportState((prev) => ({
+              ...prev,
+              file,
+              sourceType: "ofx",
+              parsedTransactions: result.transactions,
+            }));
+            setCurrentStep("confirm");
+          }
         }}
       />
     ),
@@ -90,7 +93,11 @@ export function BulkImportDialog({
       <ConfirmImportStep
         transactions={importState.parsedTransactions}
         errors={importState.errors}
-        onBack={() => setCurrentStep("mapping")}
+        onBack={() =>
+          setCurrentStep(
+            importState.sourceType === "ofx" ? "upload" : "mapping",
+          )
+        }
         onConfirm={(accountId) => {
           setImportState((prev) => ({
             ...prev,
@@ -106,19 +113,7 @@ export function BulkImportDialog({
         onComplete={() => {
           setCurrentStep("upload");
           onOpenChange(false);
-          // Reset state
-          setImportState({
-            file: null,
-            csvData: [],
-            columnMapping: {},
-            parsedTransactions: [],
-            selectedAccountId: null,
-            importProgress: 0,
-            totalToImport: 0,
-            successCount: 0,
-            errorCount: 0,
-            errors: [],
-          });
+          setImportState({ ...initialState });
         }}
         transactions={importState.parsedTransactions}
         selectedAccountId={importState.selectedAccountId}
@@ -126,15 +121,15 @@ export function BulkImportDialog({
     ),
   };
 
-  const titles = {
-    upload: "Upload CSV File",
+  const titles: Record<Step, string> = {
+    upload: "Import Transactions",
     mapping: "Map CSV Columns",
     confirm: "Confirm Import",
     progress: "Importing Transactions",
   };
 
-  const descriptions = {
-    upload: "Select a CSV file containing your transaction data",
+  const descriptions: Record<Step, string> = {
+    upload: "Upload a CSV, OFX, or QFX file containing your transaction data",
     mapping: "Match the columns from your file to transaction fields",
     confirm: "Review your settings before importing",
     progress: "Your transactions are being imported",

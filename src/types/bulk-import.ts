@@ -6,6 +6,7 @@ export interface ImportTransaction extends Partial<Transaction> {
 
 export interface BulkImportState {
   file: File | null;
+  sourceType: "csv" | "ofx";
   csvData: Record<string, string>[];
   columnMapping: Record<string, string>;
   parsedTransactions: ImportTransaction[];
