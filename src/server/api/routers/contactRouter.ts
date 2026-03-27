@@ -7,6 +7,8 @@ import {
   listContactsSchema,
 } from "@/validation/contact";
 import { uploadForProfile } from "@shared/imagekit";
+import { encryptField, decryptField } from "@shared/encryption";
+import { env } from "@/env";
 
 const linkedUserSelect = {
   select: { id: true, name: true, image: true },
@@ -41,7 +43,6 @@ export const contactRouter = createTRPCRouter({
                 OR: [
                   { name: { contains: search, mode: "insensitive" } },
                   { email: { contains: search, mode: "insensitive" } },
-                  { phone: { contains: search } },
                 ],
               }
             : {}),
@@ -71,6 +72,7 @@ export const contactRouter = createTRPCRouter({
       return {
         contacts: contacts.map((c) => ({
           ...c,
+          phone: decryptField(c.phone, env.FIELD_ENCRYPTION_KEY),
           createdAt: c.createdAt.toISOString(),
           updatedAt: c.updatedAt.toISOString(),
         })),
@@ -106,6 +108,7 @@ export const contactRouter = createTRPCRouter({
 
       return {
         ...contact,
+        phone: decryptField(contact.phone, env.FIELD_ENCRYPTION_KEY),
         createdAt: contact.createdAt.toISOString(),
         updatedAt: contact.updatedAt.toISOString(),
       };
@@ -152,12 +155,14 @@ export const contactRouter = createTRPCRouter({
         }
       }
 
+      const encryptedPhone = encryptField(phone, env.FIELD_ENCRYPTION_KEY);
+
       const contact = await ctx.db.contact.create({
         data: {
           userId: ctx.user.id,
           name: input.name,
           email,
-          phone,
+          phone: encryptedPhone,
           avatarUrl: avatarUrl ?? linkedAvatar,
           linkedUserId,
         },
@@ -176,6 +181,7 @@ export const contactRouter = createTRPCRouter({
 
       return {
         ...contact,
+        phone: decryptField(contact.phone, env.FIELD_ENCRYPTION_KEY),
         createdAt: contact.createdAt.toISOString(),
         updatedAt: contact.updatedAt.toISOString(),
       };
@@ -246,12 +252,17 @@ export const contactRouter = createTRPCRouter({
         }
       }
 
+      const encryptedPhone =
+        phone !== undefined
+          ? encryptField(phone, env.FIELD_ENCRYPTION_KEY)
+          : undefined;
+
       const contact = await ctx.db.contact.update({
         where: { id: input.id },
         data: {
           ...(input.name !== undefined && { name: input.name }),
           ...(input.email !== undefined && { email }),
-          ...(input.phone !== undefined && { phone }),
+          ...(input.phone !== undefined && { phone: encryptedPhone }),
           ...(avatarUrl !== undefined && {
             avatarUrl: avatarUrl ?? linkedAvatar ?? null,
           }),
@@ -272,6 +283,7 @@ export const contactRouter = createTRPCRouter({
 
       return {
         ...contact,
+        phone: decryptField(contact.phone, env.FIELD_ENCRYPTION_KEY),
         createdAt: contact.createdAt.toISOString(),
         updatedAt: contact.updatedAt.toISOString(),
       };
