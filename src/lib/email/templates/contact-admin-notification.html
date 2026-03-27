@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="color-scheme" content="light" />
+    <title>New Contact Form Submission</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body,
+      table,
+      td,
+      a {
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+      table,
+      td {
+        mso-table-lspace: 0pt;
+        mso-table-rspace: 0pt;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100% !important;
+      }
+      @media only screen and (max-width: 580px) {
+        .container {
+          width: 100% !important;
+          max-width: 100% !important;
+        }
+        .content-pad {
+          padding-left: 24px !important;
+          padding-right: 24px !important;
+        }
+      }
+    </style>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #fafafa;
+      font-family:
+        &quot;Inter&quot;,
+        -apple-system,
+        BlinkMacSystemFont,
+        &quot;Segoe UI&quot;,
+        Roboto,
+        sans-serif;
+    "
+  >
+    <div
+      style="
+        display: none;
+        max-height: 0;
+        overflow: hidden;
+        mso-hide: all;
+        font-size: 0;
+        color: #fafafa;
+        line-height: 0;
+      "
+    >
+      New contact form submission from {{name}}
+    </div>
+    <table
+      role="presentation"
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      style="background-color: #fafafa"
+    >
+      <tr>
+        <td align="center" style="padding: 48px 16px">
+          <table
+            role="presentation"
+            class="container"
+            width="520"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            style="
+              max-width: 520px;
+              width: 100%;
+              background-color: #ffffff;
+              border-radius: 16px;
+              border: 1px solid #e4e4e7;
+            "
+          >
+            <!-- Logo -->
+            <tr>
+              <td style="padding: 32px 40px 0; text-align: center">
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: #09090b;
+                    letter-spacing: -0.5px;
+                  "
+                >
+                  Trackit
+                </p>
+              </td>
+            </tr>
+
+            <!-- Content -->
+            <tr>
+              <td class="content-pad" style="padding: 32px 40px">
+                <p
+                  style="
+                    margin: 0 0 16px;
+                    font-size: 15px;
+                    line-height: 1.6;
+                    color: #09090b;
+                  "
+                >
+                  New Contact Form Submission
+                </p>
+                <p
+                  style="
+                    margin: 0 0 24px;
+                    font-size: 14px;
+                    line-height: 1.7;
+                    color: #52525b;
+                  "
+                >
+                  You received a new message through the Trackit contact form.
+                </p>
+
+                <!-- Details box -->
+                <table
+                  role="presentation"
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
+                  style="
+                    background-color: #fafafa;
+                    border-radius: 8px;
+                    margin: 0 0 24px;
+                  "
+                >
+                  <tr>
+                    <td style="padding: 16px">
+                      <p
+                        style="
+                          margin: 0 0 8px;
+                          font-size: 13px;
+                          font-weight: 600;
+                          color: #09090b;
+                        "
+                      >
+                        From
+                      </p>
+                      <p
+                        style="
+                          margin: 0 0 16px;
+                          font-size: 14px;
+                          line-height: 1.6;
+                          color: #52525b;
+                        "
+                      >
+                        {{name}} &lt;{{email}}&gt;
+                      </p>
+                      <p
+                        style="
+                          margin: 0 0 8px;
+                          font-size: 13px;
+                          font-weight: 600;
+                          color: #09090b;
+                        "
+                      >
+                        Message
+                      </p>
+                      <p
+                        style="
+                          margin: 0;
+                          font-size: 14px;
+                          line-height: 1.7;
+                          color: #52525b;
+                          white-space: pre-wrap;
+                        "
+                      >
+                        {{message}}
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 13px;
+                    line-height: 1.6;
+                    color: #71717a;
+                  "
+                >
+                  You can reply directly to
+                  <a href="mailto:{{email}}" style="color: #6366f1"
+                    >{{email}}</a
+                  >
+                  to respond.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                style="
+                  padding: 20px 40px;
+                  text-align: center;
+                  border-top: 1px solid #f4f4f5;
+                "
+              >
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 12px;
+                    line-height: 1.5;
+                    color: #a1a1aa;
+                  "
+                >
+                  &copy; {{year}} Trackit
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

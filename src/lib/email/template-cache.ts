@@ -9,6 +9,9 @@ const ALLOWED_TEMPLATES = [
   "ai-insight.html",
   "verification.html",
   "password-reset.html",
+  "contact-admin-notification.html",
+  "contact-confirmation.html",
+  "waitlist-welcome.html",
 ] as const;
 
 const cache = new Map<string, string>();

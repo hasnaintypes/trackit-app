@@ -22,7 +22,10 @@ export interface SendTemplateEmailOptions {
     | "transaction-alert"
     | "ai-insight"
     | "verification"
-    | "password-reset";
+    | "password-reset"
+    | "contact-admin-notification"
+    | "contact-confirmation"
+    | "waitlist-welcome";
   data: Record<string, unknown>;
 }
 
