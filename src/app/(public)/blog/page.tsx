@@ -72,7 +72,7 @@ export default function BlogPage() {
       imageAlt: p.imageAlt,
       title: p.title,
       excerpt: postExcerpts[p.title] ?? "",
-      href: p.href as string | undefined,
+      href: p.href,
       date: postDates[i] ?? "",
       category: postCategories[i] ?? "Product",
     })),

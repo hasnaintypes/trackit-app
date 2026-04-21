@@ -1,13 +1,58 @@
 import { z } from "zod";
 
-export const recurrenceSchema = z.object({
-  frequency: z.enum(["DAILY", "WEEKLY", "MONTHLY", "YEARLY"]),
-  interval: z.number().int().min(1).default(1),
-  startDate: z.string(),
-  endDate: z.string().optional(),
-  timezone: z.string().optional(),
-  dayOfMonth: z.number().int().min(1).max(31).optional(),
-  dayOfWeek: z.number().int().min(0).max(6).optional(),
+export const recurrenceSchema = z
+  .object({
+    frequency: z.enum(["DAILY", "WEEKLY", "SEMI_MONTHLY", "MONTHLY", "YEARLY"]),
+    interval: z.number().int().min(1).default(1),
+    startDate: z.string(),
+    endDate: z.string().optional(),
+    timezone: z.string().optional(),
+    dayOfMonth: z.number().int().min(1).max(31).optional(),
+    semiMonthlyDay: z.number().int().min(1).max(31).optional(),
+    dayOfWeek: z.number().int().min(0).max(6).optional(),
+    weekOfMonth: z.number().int().min(1).max(5).optional(),
+    lastDayOfMonth: z.boolean().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.frequency === "SEMI_MONTHLY") {
+        return (
+          typeof data.dayOfMonth === "number" &&
+          typeof data.semiMonthlyDay === "number"
+        );
+      }
+      return true;
+    },
+    {
+      message:
+        "SEMI_MONTHLY frequency requires both dayOfMonth and semiMonthlyDay",
+      path: ["semiMonthlyDay"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (typeof data.weekOfMonth === "number") {
+        return (
+          data.frequency === "MONTHLY" && typeof data.dayOfWeek === "number"
+        );
+      }
+      return true;
+    },
+    {
+      message: "weekOfMonth requires MONTHLY frequency and dayOfWeek",
+      path: ["weekOfMonth"],
+    },
+  );
+
+export const skipOccurrenceSchema = z.object({
+  ruleId: z.string().min(1),
+  date: z.string().min(1), // ISO date to skip
+});
+
+export const rescheduleOccurrenceSchema = z.object({
+  ruleId: z.string().min(1),
+  originalDate: z.string().min(1), // ISO date of the original occurrence
+  newDate: z.string().min(1), // ISO date to reschedule to
 });
 
 export const createTransactionSchema = z.object({
@@ -78,4 +123,7 @@ export const transactionListInput = z.object({
 export type CreateTransactionInput = z.infer<typeof createTransactionSchema>;
 export type UpdateTransactionInput = z.infer<typeof updateTransactionSchema>;
 export type RecurrenceInput = z.infer<typeof recurrenceSchema>;
-// No default export to preserve proper type information for named exports.
+export type SkipOccurrenceInput = z.infer<typeof skipOccurrenceSchema>;
+export type RescheduleOccurrenceInput = z.infer<
+  typeof rescheduleOccurrenceSchema
+>;

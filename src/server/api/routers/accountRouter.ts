@@ -164,7 +164,7 @@ export const accountRouter = createTRPCRouter({
         where: { id: input.id },
         select: { id: true, userId: true },
       });
-      const existing = existingRaw as { id: string; userId: string } | null;
+      const existing = existingRaw;
       if (existing?.userId !== userId)
         throw new TRPCError({
           code: "NOT_FOUND",

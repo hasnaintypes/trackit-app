@@ -104,15 +104,14 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
       callIfHelper(authExport.api?.get) ??
       null;
 
-    const maybeLookupResult: AuthLookupResult | Promise<AuthLookupResult> =
-      maybeLookupResultRaw as AuthLookupResult | Promise<AuthLookupResult>;
+    const maybeLookupResult = maybeLookupResultRaw;
 
     const lookupResult =
       maybeLookupResult &&
       typeof (maybeLookupResult as Promise<AuthLookupResult>).then ===
         "function"
         ? await maybeLookupResult
-        : (maybeLookupResult as AuthLookupResult);
+        : maybeLookupResult;
 
     // If no session was resolved, log whether a cookie header was present on the request.
     if (!lookupResult) {

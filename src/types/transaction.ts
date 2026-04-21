@@ -10,6 +10,7 @@ export interface Transaction {
   description?: string | null;
   notes?: string | null;
   date: string; // ISO date string
+  scheduledDate?: string | null;
   isRecurring: boolean;
   recurringRuleId?: string | null;
   receipt_url?: string | null;
@@ -25,7 +26,13 @@ export interface Transaction {
     | "OTHER"
     | null;
   recurringRule?: {
-    frequency: "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
+    frequency: "DAILY" | "WEEKLY" | "SEMI_MONTHLY" | "MONTHLY" | "YEARLY";
+    interval: number;
+    dayOfMonth?: number | null;
+    semiMonthlyDay?: number | null;
+    dayOfWeek?: number | null;
+    weekOfMonth?: number | null;
+    lastDayOfMonth: boolean;
     nextRunAt: string;
   } | null;
   createdAt: string;
@@ -44,10 +51,14 @@ export interface RecurringRule {
   startDate: string;
   endDate?: string | null;
   timezone?: string | null;
-  frequency: "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
+  frequency: "DAILY" | "WEEKLY" | "SEMI_MONTHLY" | "MONTHLY" | "YEARLY";
   interval: number;
   dayOfMonth?: number | null;
+  semiMonthlyDay?: number | null;
   dayOfWeek?: number | null;
+  weekOfMonth?: number | null;
+  lastDayOfMonth: boolean;
+  overrides?: Record<string, unknown> | null;
   nextRunAt: string;
   lastRunAt?: string | null;
   status: "ACTIVE" | "PAUSED" | "CANCELLED" | "ENDED";
@@ -60,11 +71,14 @@ export interface RecurringRule {
  * Strict recurrence input type for internal calculation logic
  */
 export type RecurrenceInputStrict = {
-  frequency: "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
+  frequency: "DAILY" | "WEEKLY" | "SEMI_MONTHLY" | "MONTHLY" | "YEARLY";
   interval?: number;
   startDate?: string;
   endDate?: string;
   timezone?: string;
   dayOfMonth?: number;
+  semiMonthlyDay?: number;
   dayOfWeek?: number;
+  weekOfMonth?: number;
+  lastDayOfMonth?: boolean;
 };

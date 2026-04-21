@@ -99,7 +99,7 @@ export const contactRouter = createTRPCRouter({
         },
       });
 
-      if (!contact || contact.userId !== ctx.user.id) {
+      if (contact?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Contact not found",
@@ -195,7 +195,7 @@ export const contactRouter = createTRPCRouter({
         select: { userId: true, email: true, avatarUrl: true },
       });
 
-      if (!existing || existing.userId !== ctx.user.id) {
+      if (existing?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Contact not found",
@@ -297,7 +297,7 @@ export const contactRouter = createTRPCRouter({
         select: { userId: true },
       });
 
-      if (!existing || existing.userId !== ctx.user.id) {
+      if (existing?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Contact not found",

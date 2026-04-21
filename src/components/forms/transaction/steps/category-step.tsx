@@ -263,7 +263,7 @@ const CategoryStep = React.memo(function CategoryStep({
             <FormControl>
               <Select
                 onValueChange={field.onChange}
-                value={(field.value as string | undefined) ?? undefined}
+                value={field.value ?? undefined}
               >
                 <SelectTrigger className="bg-card h-11 w-full border px-4 font-medium shadow-sm transition-shadow hover:shadow">
                   <SelectValue placeholder="Select method" />

@@ -144,10 +144,7 @@ export const ContentSection = ({
 
     if (inline) {
       return (
-        <code
-          className="bg-muted/4 rounded px-1 py-0.5"
-          {...(rest as Record<string, unknown>)}
-        >
+        <code className="bg-muted/4 rounded px-1 py-0.5" {...rest}>
           {children}
         </code>
       );
@@ -174,10 +171,7 @@ export const ContentSection = ({
               <pre
                 className={`language-${lang ?? ""} w-full overflow-auto rounded-lg p-2`}
               >
-                <code
-                  className={`${className ?? ""}`}
-                  {...(rest as Record<string, unknown>)}
-                >
+                <code className={`${className ?? ""}`} {...rest}>
                   {children}
                 </code>
               </pre>
@@ -282,10 +276,7 @@ export const ContentSection = ({
               if (isInternal) {
                 return (
                   <Link href={hrefStr!}>
-                    <a
-                      className="text-primary underline"
-                      {...(rest as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
-                    >
+                    <a className="text-primary underline" {...rest}>
                       {children}
                     </a>
                   </Link>
@@ -297,7 +288,7 @@ export const ContentSection = ({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-primary underline"
-                  {...(rest as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
+                  {...rest}
                 >
                   {children}
                 </a>
@@ -315,7 +306,7 @@ export const ContentSection = ({
                       src={src}
                       alt={alt ?? ""}
                       className="h-48 w-full rounded-md object-cover"
-                      {...(rest as unknown as Record<string, unknown>)}
+                      {...(rest as Record<string, unknown>)}
                     />
                   </span>
                 );

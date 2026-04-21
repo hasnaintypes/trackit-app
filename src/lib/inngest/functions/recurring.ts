@@ -9,7 +9,7 @@ import { calculateNextRunAt } from "@/lib/recurrence";
 import { sendEmail } from "@/lib/email";
 import { toNum } from "@shared/decimal";
 import { RecurringStatus } from "@prisma/client";
-import type { RecurrenceConfig } from "@/types/recurrence";
+import type { RecurrenceConfig, RecurringOverrides } from "@/types/recurrence";
 
 export const processRecurringTransaction = inngest.createFunction(
   {
@@ -34,7 +34,11 @@ export const processRecurringTransaction = inngest.createFunction(
         frequency: true,
         interval: true,
         dayOfMonth: true,
+        semiMonthlyDay: true,
         dayOfWeek: true,
+        weekOfMonth: true,
+        lastDayOfMonth: true,
+        overrides: true,
         startDate: true,
         endDate: true,
         nextRunAt: true,
@@ -49,14 +53,18 @@ export const processRecurringTransaction = inngest.createFunction(
       return;
     }
 
-    const runAt = new Date();
+    // Use the scheduled date (rule.nextRunAt) as the transaction date, not "now"
+    const scheduledDate = rule.nextRunAt;
 
     const cfg: RecurrenceConfig = {
-      frequency: rule.frequency as RecurrenceConfig["frequency"],
+      frequency: rule.frequency,
       interval: rule.interval ?? 1,
       dayOfMonth: rule.dayOfMonth ?? undefined,
+      semiMonthlyDay: rule.semiMonthlyDay ?? undefined,
       dayOfWeek: rule.dayOfWeek ?? undefined,
-      // schema guarantees startDate exists
+      weekOfMonth: rule.weekOfMonth ?? undefined,
+      lastDayOfMonth: rule.lastDayOfMonth ?? undefined,
+      overrides: (rule.overrides as RecurringOverrides) ?? undefined,
       startDate:
         rule.startDate instanceof Date
           ? rule.startDate
@@ -73,35 +81,60 @@ export const processRecurringTransaction = inngest.createFunction(
         : undefined,
     };
 
-    const nextRunAt = calculateNextRunAt(cfg, runAt);
+    // Compute next from the scheduled date (not "now") to keep the cadence anchored
+    const nextRunAt = calculateNextRunAt(cfg, scheduledDate);
 
     // Atomically create transaction and update rule to prevent duplicates on crash
-    await db.$transaction(async (tx) => {
-      const created = await tx.transaction.create({
-        data: {
-          userId: rule.userId,
-          accountId: rule.accountId,
-          categoryId: rule.categoryId ?? null,
-          amount: rule.amount,
-          type: rule.type,
-          description: rule.description ?? null,
-          notes: rule.notes ?? null,
-          date: runAt,
-          isRecurring: true,
-          recurringRuleId: rule.id,
-        },
-      });
+    try {
+      await db.$transaction(async (tx) => {
+        await tx.transaction.create({
+          data: {
+            userId: rule.userId,
+            accountId: rule.accountId,
+            categoryId: rule.categoryId ?? null,
+            amount: rule.amount,
+            type: rule.type,
+            description: rule.description ?? null,
+            notes: rule.notes ?? null,
+            date: scheduledDate,
+            scheduledDate,
+            isRecurring: true,
+            recurringRuleId: rule.id,
+          },
+        });
 
-      await tx.recurringRule.update({
-        where: { id: rule.id },
-        data: {
-          lastRunAt: runAt,
-          lastTransactionId: created.id,
-          status: nextRunAt ? RecurringStatus.ACTIVE : RecurringStatus.ENDED,
-          ...(nextRunAt && { nextRunAt }),
-        },
+        await tx.recurringRule.update({
+          where: { id: rule.id },
+          data: {
+            lastRunAt: new Date(),
+            status: nextRunAt ? RecurringStatus.ACTIVE : RecurringStatus.ENDED,
+            ...(nextRunAt && { nextRunAt }),
+          },
+        });
       });
-    });
+    } catch (error: unknown) {
+      // P2002 = unique constraint violation → duplicate transaction for this scheduledDate
+      if (
+        error &&
+        typeof error === "object" &&
+        "code" in error &&
+        error.code === "P2002"
+      ) {
+        logger.warn(
+          `Duplicate recurring transaction detected for rule ${rule.id}, advancing nextRunAt`,
+        );
+        // Advance the rule so it doesn't get stuck
+        if (nextRunAt) {
+          await db.recurringRule.update({
+            where: { id: rule.id },
+            data: { nextRunAt },
+          });
+          await enqueueRecurringRun(rule.id, nextRunAt);
+        }
+        return;
+      }
+      throw error;
+    }
 
     // Schedule the next occurrence, if any
     if (nextRunAt) {
@@ -114,7 +147,7 @@ export const processRecurringTransaction = inngest.createFunction(
       await sendEmail({
         to: userEmail,
         subject: "Recurring transaction processed",
-        html: `A recurring transaction for <strong>${rule.description ?? "Transaction"}</strong> was processed for ${toNum(rule.amount).toFixed(2)} on ${runAt.toDateString()}.`,
+        html: `A recurring transaction for <strong>${rule.description ?? "Transaction"}</strong> was processed for ${toNum(rule.amount).toFixed(2)} on ${scheduledDate.toDateString()}.`,
       });
     }
   },

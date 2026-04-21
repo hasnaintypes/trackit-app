@@ -41,9 +41,9 @@ function SpendingRadarChartInner({
       return {
         radarData: [],
         radarDataKeys: [],
-        radarConfig: {} as ChartConfig,
+        radarConfig: {},
         barData: [],
-        barConfig: {} as ChartConfig,
+        barConfig: {},
         categoryCount: 0,
       };
     }
