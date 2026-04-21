@@ -13,7 +13,7 @@ Thanks for your interest in contributing! This guide will help you get started.
 
 ```bash
 # 1. Fork and clone
-git clone https://github.com/<your-username>/trackit-app.git
+git clone https://github.com/hasnaintypes/trackit-app.git
 cd trackit-app
 
 # 2. Install dependencies
@@ -127,17 +127,6 @@ src/
 - New features should update relevant types in `src/types/`
 - Schema changes need `pnpm db:push` verification
 - UI changes should include a screenshot or recording
-
-## What to Work On
-
-Look for issues labeled:
-
-- **`good first issue`** — Great for newcomers, limited scope
-- **`help wanted`** — We'd appreciate community help here
-- **`bug`** — Something broken that needs fixing
-- **`enhancement`** — Feature improvements
-
-Check the [GAP.md](./GAP.md) file for a comprehensive list of known gaps and improvement areas.
 
 ## Reporting Bugs
 
