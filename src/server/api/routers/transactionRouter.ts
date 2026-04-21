@@ -228,9 +228,9 @@ export const transactionRouter = createTRPCRouter({
           let newRule: { id: string; nextRunAt?: Date | null } | null = null;
 
           if (input.isRecurring && recurrence) {
-            const startDate = new Date(
-              (recurrence.startDate ?? initialDate) as string,
-            );
+            const startDate = recurrence.startDate
+              ? new Date(recurrence.startDate)
+              : initialDate;
             const nextRunAt = startDate;
             const followingRun = calculateNextRunAt({
               frequency: recurrence.frequency,
@@ -779,12 +779,12 @@ export const transactionRouter = createTRPCRouter({
             {
               id: cat.id,
               name: cat.name,
-              type: cat.type as "INCOME" | "EXPENSE" | "TRANSFER",
+              type: cat.type,
             },
             ...(cat.children?.map((sub) => ({
               id: sub.id,
               name: sub.name,
-              type: sub.type as "INCOME" | "EXPENSE" | "TRANSFER",
+              type: sub.type,
               parentCategoryId: cat.id,
             })) ?? []),
           ]);

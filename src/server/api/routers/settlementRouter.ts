@@ -15,7 +15,7 @@ export const settlementRouter = createTRPCRouter({
         where: { id: input.groupId },
         select: { userId: true },
       });
-      if (!group || group.userId !== ctx.user.id) {
+      if (group?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Group not found",
@@ -63,7 +63,7 @@ export const settlementRouter = createTRPCRouter({
         where: { id: input.groupId },
         select: { userId: true, currency: true },
       });
-      if (!group || group.userId !== ctx.user.id) {
+      if (group?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Group not found",

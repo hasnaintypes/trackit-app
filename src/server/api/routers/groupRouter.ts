@@ -111,7 +111,7 @@ export const groupRouter = createTRPCRouter({
         },
       });
 
-      if (!group || group.userId !== ctx.user.id) {
+      if (group?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Group not found",
@@ -213,7 +213,7 @@ export const groupRouter = createTRPCRouter({
         select: { userId: true },
       });
 
-      if (!existing || existing.userId !== ctx.user.id) {
+      if (existing?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Group not found",
@@ -250,7 +250,7 @@ export const groupRouter = createTRPCRouter({
         where: { id: input.groupId },
         select: { userId: true },
       });
-      if (!group || group.userId !== ctx.user.id) {
+      if (group?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Group not found",
@@ -262,7 +262,7 @@ export const groupRouter = createTRPCRouter({
         where: { id: input.contactId },
         select: { userId: true },
       });
-      if (!contact || contact.userId !== ctx.user.id) {
+      if (contact?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Contact not found",
@@ -328,7 +328,7 @@ export const groupRouter = createTRPCRouter({
         },
       });
 
-      if (!member || member.group.userId !== ctx.user.id) {
+      if (member?.group.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Member not found",
@@ -363,7 +363,7 @@ export const groupRouter = createTRPCRouter({
         where: { id: input.id },
         select: { userId: true },
       });
-      if (!group || group.userId !== ctx.user.id) {
+      if (group?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Group not found",
@@ -385,7 +385,7 @@ export const groupRouter = createTRPCRouter({
         where: { id: input.id },
         select: { userId: true },
       });
-      if (!group || group.userId !== ctx.user.id) {
+      if (group?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Group not found",
@@ -407,7 +407,7 @@ export const groupRouter = createTRPCRouter({
         where: { id: input.id },
         select: { userId: true },
       });
-      if (!group || group.userId !== ctx.user.id) {
+      if (group?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Group not found",
@@ -438,7 +438,7 @@ export const groupRouter = createTRPCRouter({
           },
         },
       });
-      if (!group || group.userId !== ctx.user.id) {
+      if (group?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Group not found",
@@ -491,7 +491,7 @@ export const groupRouter = createTRPCRouter({
           },
         },
       });
-      if (!group || group.userId !== ctx.user.id) {
+      if (group?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Group not found",
@@ -543,7 +543,7 @@ export const groupRouter = createTRPCRouter({
           },
         },
       });
-      if (!group || group.userId !== ctx.user.id) {
+      if (group?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Group not found",
@@ -594,7 +594,7 @@ export const groupRouter = createTRPCRouter({
         where: { id: input.id },
         select: { userId: true },
       });
-      if (!group || group.userId !== ctx.user.id) {
+      if (group?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Group not found",

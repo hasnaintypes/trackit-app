@@ -57,7 +57,7 @@ export const processRecurringTransaction = inngest.createFunction(
     const scheduledDate = rule.nextRunAt;
 
     const cfg: RecurrenceConfig = {
-      frequency: rule.frequency as RecurrenceConfig["frequency"],
+      frequency: rule.frequency,
       interval: rule.interval ?? 1,
       dayOfMonth: rule.dayOfMonth ?? undefined,
       semiMonthlyDay: rule.semiMonthlyDay ?? undefined,

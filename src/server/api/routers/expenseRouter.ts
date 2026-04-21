@@ -18,7 +18,7 @@ export const expenseRouter = createTRPCRouter({
         where: { id: input.groupId },
         select: { userId: true },
       });
-      if (!group || group.userId !== ctx.user.id) {
+      if (group?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Group not found",
@@ -142,7 +142,7 @@ export const expenseRouter = createTRPCRouter({
         },
       });
 
-      if (!expense || expense.group.userId !== ctx.user.id) {
+      if (expense?.group.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Expense not found",
@@ -171,7 +171,7 @@ export const expenseRouter = createTRPCRouter({
         where: { id: input.groupId },
         select: { userId: true, currency: true },
       });
-      if (!group || group.userId !== ctx.user.id) {
+      if (group?.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Group not found",
@@ -184,7 +184,7 @@ export const expenseRouter = createTRPCRouter({
           where: { id: input.categoryId },
           select: { userId: true },
         });
-        if (!category || category.userId !== ctx.user.id) {
+        if (category?.userId !== ctx.user.id) {
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: "Category not found",
@@ -297,7 +297,7 @@ export const expenseRouter = createTRPCRouter({
         },
       });
 
-      if (!existing || existing.group.userId !== ctx.user.id) {
+      if (existing?.group.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Expense not found",
@@ -358,7 +358,7 @@ export const expenseRouter = createTRPCRouter({
         },
       });
 
-      if (!expense || expense.group.userId !== ctx.user.id) {
+      if (expense?.group.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Expense not found",

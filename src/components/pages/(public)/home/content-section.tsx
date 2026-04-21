@@ -1,10 +1,6 @@
 import { Cpu, Zap } from "lucide-react";
 import Image from "next/image";
-import { contentSection as rawContentSection } from "@content/site/home";
-import type { ContentSectionContent } from "@/types/site";
-
-const contentSection: ContentSectionContent =
-  rawContentSection as unknown as ContentSectionContent;
+import { contentSection } from "@content/site/home";
 
 export default function ContentSection() {
   return (

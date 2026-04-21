@@ -150,7 +150,7 @@ export function ExpenseFormSheet({
     },
   });
 
-  const splitMethod = form.watch("splitMethod") as SplitMethod;
+  const splitMethod = form.watch("splitMethod");
   const amount = form.watch("amount");
 
   const baseParticipants = useMemo(() => buildParticipants(members), [members]);

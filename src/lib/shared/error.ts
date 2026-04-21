@@ -12,12 +12,12 @@ export function toError(err: unknown): Error {
 function hasMessage(obj: object): obj is { message: string } {
   return (
     "message" in obj &&
-    typeof (obj as { message: unknown }).message === "string"
+    typeof (obj as Record<string, unknown>).message === "string"
   );
 }
 
 function hasErrorString(obj: object): obj is { error: string } {
   return (
-    "error" in obj && typeof (obj as { error: unknown }).error === "string"
+    "error" in obj && typeof (obj as Record<string, unknown>).error === "string"
   );
 }

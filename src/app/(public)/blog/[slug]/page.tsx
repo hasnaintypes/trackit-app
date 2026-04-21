@@ -28,7 +28,7 @@ export default function Page() {
           publishedDate: recent.date ?? "",
           content: recent.excerpt ? [recent.excerpt] : [],
           coverImage: recent.image,
-        } as BlogPost;
+        };
       }
     }
   }

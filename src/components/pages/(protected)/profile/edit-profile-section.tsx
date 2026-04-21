@@ -120,9 +120,7 @@ export default function EditProfileSection() {
     name: K,
     value: string,
   ) => {
-    setFormData(
-      (prev) => ({ ...prev, [name]: value as FormData[K] }) as FormData,
-    );
+    setFormData((prev) => ({ ...prev, [name]: value }) as FormData);
   };
 
   return (

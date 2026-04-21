@@ -98,7 +98,7 @@ export const aiRouter = createTRPCRouter({
         where: { id: input.groupId },
         select: { userId: true },
       });
-      if (!group || group.userId !== ctx.user.id) {
+      if (group?.userId !== ctx.user.id) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Group not found" });
       }
       return AIService.generateGroupInsights(input.groupId, ctx.user.id);
@@ -117,7 +117,7 @@ export const aiRouter = createTRPCRouter({
         where: { id: input.groupId },
         select: { userId: true },
       });
-      if (!group || group.userId !== ctx.user.id) {
+      if (group?.userId !== ctx.user.id) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Group not found" });
       }
       return AIService.suggestSplit(

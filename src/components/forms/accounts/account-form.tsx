@@ -147,7 +147,7 @@ export function AccountForm({
             typeof values.balance === "number"
               ? String(values.balance)
               : values.balance,
-        } as UpdateAccountInput;
+        };
         await updateAccount(payload);
         toast.success("Account updated");
         if (onSubmit) onSubmit(payload);

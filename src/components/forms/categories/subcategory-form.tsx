@@ -81,14 +81,13 @@ export function SubcategoryForm({
   type FormValues = CreateSubcategoryInput;
 
   const normalize = React.useCallback(
-    (vals?: SubcategoryFormProps["initialValues"]) =>
-      ({
-        name: vals?.name ?? "",
-        parentId: vals?.parentId ?? undefined,
-        icon: vals?.icon ?? undefined,
-        color: vals?.color ?? undefined,
-        sortOrder: vals?.sortOrder ?? undefined,
-      }) as Partial<FormValues>,
+    (vals?: SubcategoryFormProps["initialValues"]) => ({
+      name: vals?.name ?? "",
+      parentId: vals?.parentId ?? undefined,
+      icon: vals?.icon ?? undefined,
+      color: vals?.color ?? undefined,
+      sortOrder: vals?.sortOrder ?? undefined,
+    }),
     [],
   );
 
@@ -111,7 +110,7 @@ export function SubcategoryForm({
         const payload: UpdateSubcategoryInput = {
           id: initialValues.id,
           ...values,
-        } as UpdateSubcategoryInput;
+        };
         await updateSubcategory.mutateAsync(payload);
         toast.success("Subcategory updated successfully");
         if (onSubmit) onSubmit(payload);
