@@ -298,6 +298,7 @@ model Transaction {
   description            String?
   notes                  String?
   date                   DateTime
+  scheduledDate          DateTime?
   isRecurring            Boolean         @default(false)
   recurringRuleId        String?         @map("recurring_rule_id")
   receipt_url            String?
@@ -315,6 +316,7 @@ model Transaction {
   recurringRule          RecurringRule?  @relation(fields: [recurringRuleId], references: [id], onDelete: SetNull)
   user                   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([recurringRuleId, scheduledDate])
   @@index([userId])
   @@index([accountId])
   @@index([categoryId])
@@ -340,7 +342,11 @@ model RecurringRule {
   frequency         RecurringFrequency
   interval          Int                @default(1)
   dayOfMonth        Int?
+  semiMonthlyDay    Int?
   dayOfWeek         Int?
+  weekOfMonth       Int?
+  lastDayOfMonth    Boolean            @default(false)
+  overrides         Json?
   nextRunAt         DateTime
   lastRunAt         DateTime?
   status            RecurringStatus    @default(ACTIVE)
@@ -642,6 +648,7 @@ enum TransactionType {
 enum RecurringFrequency {
   DAILY
   WEEKLY
+  SEMI_MONTHLY
   MONTHLY
   YEARLY
 }
