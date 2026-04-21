@@ -23,8 +23,11 @@ import {
   createTransactionSchema,
   updateTransactionSchema,
   transactionListInput,
+  skipOccurrenceSchema,
+  rescheduleOccurrenceSchema,
 } from "@/validation/transaction";
 import type { RecurrenceInputStrict } from "@/types/transaction";
+import type { RecurringOverrides } from "@/types/recurrence";
 
 export const transactionRouter = createTRPCRouter({
   list: protectedProcedure
@@ -94,6 +97,12 @@ export const transactionRouter = createTRPCRouter({
           recurringRule: {
             select: {
               frequency: true,
+              interval: true,
+              dayOfMonth: true,
+              semiMonthlyDay: true,
+              dayOfWeek: true,
+              weekOfMonth: true,
+              lastDayOfMonth: true,
               nextRunAt: true,
             },
           },
@@ -118,6 +127,12 @@ export const transactionRouter = createTRPCRouter({
           recurringRule: t.recurringRule
             ? {
                 frequency: t.recurringRule.frequency,
+                interval: t.recurringRule.interval,
+                dayOfMonth: t.recurringRule.dayOfMonth,
+                semiMonthlyDay: t.recurringRule.semiMonthlyDay,
+                dayOfWeek: t.recurringRule.dayOfWeek,
+                weekOfMonth: t.recurringRule.weekOfMonth,
+                lastDayOfMonth: t.recurringRule.lastDayOfMonth,
                 nextRunAt: t.recurringRule.nextRunAt.toISOString(),
               }
             : null,
@@ -157,6 +172,12 @@ export const transactionRouter = createTRPCRouter({
           recurringRule: {
             select: {
               frequency: true,
+              interval: true,
+              dayOfMonth: true,
+              semiMonthlyDay: true,
+              dayOfWeek: true,
+              weekOfMonth: true,
+              lastDayOfMonth: true,
               nextRunAt: true,
             },
           },
@@ -172,6 +193,12 @@ export const transactionRouter = createTRPCRouter({
         recurringRule: t.recurringRule
           ? {
               frequency: t.recurringRule.frequency,
+              interval: t.recurringRule.interval,
+              dayOfMonth: t.recurringRule.dayOfMonth,
+              semiMonthlyDay: t.recurringRule.semiMonthlyDay,
+              dayOfWeek: t.recurringRule.dayOfWeek,
+              weekOfMonth: t.recurringRule.weekOfMonth,
+              lastDayOfMonth: t.recurringRule.lastDayOfMonth,
               nextRunAt: t.recurringRule.nextRunAt.toISOString(),
             }
           : null,
@@ -209,7 +236,10 @@ export const transactionRouter = createTRPCRouter({
               frequency: recurrence.frequency,
               interval: recurrence.interval,
               dayOfMonth: recurrence.dayOfMonth,
+              semiMonthlyDay: recurrence.semiMonthlyDay,
               dayOfWeek: recurrence.dayOfWeek,
+              weekOfMonth: recurrence.weekOfMonth,
+              lastDayOfMonth: recurrence.lastDayOfMonth,
               startDate,
               endDate: recurrence.endDate
                 ? new Date(recurrence.endDate)
@@ -233,7 +263,10 @@ export const transactionRouter = createTRPCRouter({
                 frequency: recurrence.frequency,
                 interval: recurrence.interval ?? 1,
                 dayOfMonth: recurrence.dayOfMonth ?? null,
+                semiMonthlyDay: recurrence.semiMonthlyDay ?? null,
                 dayOfWeek: recurrence.dayOfWeek ?? null,
+                weekOfMonth: recurrence.weekOfMonth ?? null,
+                lastDayOfMonth: recurrence.lastDayOfMonth ?? false,
                 nextRunAt: followingRun ?? nextRunAt,
                 timezone: recurrence.timezone ?? "UTC",
                 status: RecurringStatus.ACTIVE,
@@ -402,7 +435,10 @@ export const transactionRouter = createTRPCRouter({
                   frequency: recurrence.frequency,
                   interval: recurrence.interval,
                   dayOfMonth: recurrence.dayOfMonth,
+                  semiMonthlyDay: recurrence.semiMonthlyDay,
                   dayOfWeek: recurrence.dayOfWeek,
+                  weekOfMonth: recurrence.weekOfMonth,
+                  lastDayOfMonth: recurrence.lastDayOfMonth,
                   startDate,
                   endDate: recurrence.endDate
                     ? new Date(recurrence.endDate)
@@ -434,7 +470,10 @@ export const transactionRouter = createTRPCRouter({
                     frequency: recurrence.frequency,
                     interval: recurrence.interval ?? 1,
                     dayOfMonth: recurrence.dayOfMonth ?? null,
+                    semiMonthlyDay: recurrence.semiMonthlyDay ?? null,
                     dayOfWeek: recurrence.dayOfWeek ?? null,
+                    weekOfMonth: recurrence.weekOfMonth ?? null,
+                    lastDayOfMonth: recurrence.lastDayOfMonth ?? false,
                     nextRunAt: followingRun ?? startDate,
                     status: RecurringStatus.ACTIVE,
                   },
@@ -446,7 +485,10 @@ export const transactionRouter = createTRPCRouter({
                   frequency: recurrence.frequency,
                   interval: recurrence.interval,
                   dayOfMonth: recurrence.dayOfMonth,
+                  semiMonthlyDay: recurrence.semiMonthlyDay,
                   dayOfWeek: recurrence.dayOfWeek,
+                  weekOfMonth: recurrence.weekOfMonth,
+                  lastDayOfMonth: recurrence.lastDayOfMonth,
                   startDate,
                   endDate: recurrence.endDate
                     ? new Date(recurrence.endDate)
@@ -478,7 +520,10 @@ export const transactionRouter = createTRPCRouter({
                     frequency: recurrence.frequency,
                     interval: recurrence.interval ?? 1,
                     dayOfMonth: recurrence.dayOfMonth ?? null,
+                    semiMonthlyDay: recurrence.semiMonthlyDay ?? null,
                     dayOfWeek: recurrence.dayOfWeek ?? null,
+                    weekOfMonth: recurrence.weekOfMonth ?? null,
+                    lastDayOfMonth: recurrence.lastDayOfMonth ?? false,
                     nextRunAt: followingRun ?? startDate,
                     timezone: recurrence.timezone ?? "UTC",
                     status: RecurringStatus.ACTIVE,
@@ -842,6 +887,64 @@ export const transactionRouter = createTRPCRouter({
         success: true,
         count: createdTransactions.length,
       };
+    }),
+
+  skipOccurrence: protectedProcedure
+    .input(skipOccurrenceSchema)
+    .mutation(async ({ ctx, input }) => {
+      const prisma = ctx.db;
+      const rule = await prisma.recurringRule.findUnique({
+        where: { id: input.ruleId },
+        select: { userId: true, overrides: true },
+      });
+      if (rule?.userId !== ctx.user.id)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Recurring rule not found",
+        });
+
+      const existing = (rule.overrides as RecurringOverrides | null) ?? {
+        skipped: [],
+        rescheduled: {},
+      };
+      if (!existing.skipped.includes(input.date)) {
+        existing.skipped.push(input.date);
+      }
+
+      await prisma.recurringRule.update({
+        where: { id: input.ruleId },
+        data: { overrides: existing },
+      });
+
+      return { success: true };
+    }),
+
+  rescheduleOccurrence: protectedProcedure
+    .input(rescheduleOccurrenceSchema)
+    .mutation(async ({ ctx, input }) => {
+      const prisma = ctx.db;
+      const rule = await prisma.recurringRule.findUnique({
+        where: { id: input.ruleId },
+        select: { userId: true, overrides: true },
+      });
+      if (rule?.userId !== ctx.user.id)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Recurring rule not found",
+        });
+
+      const existing = (rule.overrides as RecurringOverrides | null) ?? {
+        skipped: [],
+        rescheduled: {},
+      };
+      existing.rescheduled[input.originalDate] = input.newDate;
+
+      await prisma.recurringRule.update({
+        where: { id: input.ruleId },
+        data: { overrides: existing },
+      });
+
+      return { success: true };
     }),
 });
 
