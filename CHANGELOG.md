@@ -1,3 +1,39 @@
+# [1.3.0](https://github.com/hasnaintypes/trackit-app/compare/v1.2.0...v1.3.0) (2026-04-21)
+
+### Bug Fixes
+
+- **lint:** remove remaining unnecessary type assertions ([f576d01](https://github.com/hasnaintypes/trackit-app/commit/f576d019e876c3286d9037827486c6e69102bd82))
+- **lint:** remove unnecessary type assertions and use optional chaining ([47887fd](https://github.com/hasnaintypes/trackit-app/commit/47887fd6e1816ff557c4359152948e9f0417a859))
+
+### Features
+
+- **auth:** add Google OAuth, forgot password, and Better Auth infra ([73107db](https://github.com/hasnaintypes/trackit-app/commit/73107dbd3decb3cd2755c2d7fd7308cf9e6619db))
+- **auth:** implement TOTP-based two-factor authentication ([76ab19f](https://github.com/hasnaintypes/trackit-app/commit/76ab19f0c467b76ef63296900dbd6c7fb33325b3))
+- **budget:** redesign budget cards with radial chart and status badges ([2d7d56a](https://github.com/hasnaintypes/trackit-app/commit/2d7d56a8095ea869eaaecdea3455c732a26e7180))
+- **db:** add splits schema with contacts, groups, expenses, and settlements ([3644cd5](https://github.com/hasnaintypes/trackit-app/commit/3644cd5e378f36f90e1b35952955de7773849b12))
+- **db:** add transaction seed script ([21c78bd](https://github.com/hasnaintypes/trackit-app/commit/21c78bdee0dff767ff43d17f6be41819db591549))
+- **db:** extend seed script with splits sample data ([08a9963](https://github.com/hasnaintypes/trackit-app/commit/08a9963245782fb2bb393feeea6ba7acdad9ad82))
+- **deps:** upgrade zod to v4 and fix breaking changes ([713880c](https://github.com/hasnaintypes/trackit-app/commit/713880c4f0750910be277a7fea91f9680f94c254))
+- **email:** add contact and waitlist email templates with cache fix ([574277c](https://github.com/hasnaintypes/trackit-app/commit/574277c526645d79db562c128d998d7b047868a6))
+- **export:** enhance export with PDF support and date range filtering ([8299265](https://github.com/hasnaintypes/trackit-app/commit/8299265896f2f86c6d63ac79ef252873619b00bc))
+- **import:** add OFX/QFX bank file import support ([4ffd4e9](https://github.com/hasnaintypes/trackit-app/commit/4ffd4e98d9678e7805300873cc5bec1b8cd78b16))
+- **recurrence:** implement SEMI_MONTHLY, nth-weekday, last-day, and overrides ([fd46724](https://github.com/hasnaintypes/trackit-app/commit/fd46724979329915d0f5b21f726a9280202e60ea))
+- **recurring:** add skip/reschedule endpoints, duplicate detection, and enhanced UI ([327b76f](https://github.com/hasnaintypes/trackit-app/commit/327b76f84af151ea4779ed767bcf521300ade992))
+- **reports:** add report preview component and PDF export ([05bd9e5](https://github.com/hasnaintypes/trackit-app/commit/05bd9e5adec40048d09c04244e5ec4da3b52e198))
+- **schema:** add SEMI_MONTHLY frequency and recurring rule fields ([7ba059f](https://github.com/hasnaintypes/trackit-app/commit/7ba059fc465495c9e85a98d91377d228ff546510))
+- **schema:** add TwoFactor, AuditLog models and twoFactorEnabled field ([1fe45a1](https://github.com/hasnaintypes/trackit-app/commit/1fe45a1c7002deb56395706bc883c93d70b69819))
+- **security:** add AES-256-GCM field-level encryption utility ([d01a089](https://github.com/hasnaintypes/trackit-app/commit/d01a089cddcc4292baf65079b6d71a9982c23400))
+- **security:** add CSRF protection, rate limiting, and audit middleware ([a979c08](https://github.com/hasnaintypes/trackit-app/commit/a979c08d99a7cecf256b815caa843dc1be60879c))
+- **security:** encrypt PII fields at rest in contact, audit, and contact router ([2150273](https://github.com/hasnaintypes/trackit-app/commit/215027352b598df1bebf3720050f807db469daf4))
+- **splits:** add AI expense parsing, group insights, and split suggestions ([e4eaf76](https://github.com/hasnaintypes/trackit-app/commit/e4eaf761f7a5b9651a712613c4b8fe191ee82984))
+- **splits:** add CRUD routers and overview integration ([d38c109](https://github.com/hasnaintypes/trackit-app/commit/d38c109711023eb4eef81fef5b353a4b618ac3cf))
+- **splits:** add group detail page with expense tracking and charts ([f427d30](https://github.com/hasnaintypes/trackit-app/commit/f427d3000f5935abbfe83deb4a1173414120b86b))
+- **splits:** add scheduled reminders and email templates ([3144851](https://github.com/hasnaintypes/trackit-app/commit/3144851d5994232d2dc4c2c5aa14f1bb595a058e))
+- **splits:** add split calculation service ([88a6074](https://github.com/hasnaintypes/trackit-app/commit/88a607490f7fdd049be8cac7fd69ad647782a053))
+- **splits:** add splits list page with contacts and groups UI ([9d25774](https://github.com/hasnaintypes/trackit-app/commit/9d257743eaae832301ce7d691463ba64047e3718))
+- **splits:** add validation schemas and TypeScript types ([2235cad](https://github.com/hasnaintypes/trackit-app/commit/2235cada738922f82dda2fa41d3256b141c8019b))
+- **types:** update recurrence types and validation for new frequencies ([638bedb](https://github.com/hasnaintypes/trackit-app/commit/638bedb15177f2b7f2a99a6a5a931f7fc8eae6f4))
+
 # [1.2.0](https://github.com/hasnaintypes/trackit-app/compare/v1.1.0...v1.2.0) (2026-03-18)
 
 ### Bug Fixes
