@@ -46,7 +46,7 @@
     style="
       margin: 0;
       padding: 0;
-      background-color: #fafafa;
+      background-color: #f8faf9;
       font-family:
         &quot;Inter&quot;,
         -apple-system,
@@ -63,7 +63,7 @@
         overflow: hidden;
         mso-hide: all;
         font-size: 0;
-        color: #fafafa;
+        color: #f8faf9;
         line-height: 0;
       "
     >
@@ -75,7 +75,7 @@
       cellpadding="0"
       cellspacing="0"
       border="0"
-      style="background-color: #fafafa"
+      style="background-color: #f8faf9"
     >
       <tr>
         <td align="center" style="padding: 48px 16px">
@@ -91,9 +91,24 @@
               width: 100%;
               background-color: #ffffff;
               border-radius: 16px;
-              border: 1px solid #e4e4e7;
+              border: 1px solid #e5e7eb;
+              overflow: hidden;
             "
           >
+            <!-- Green accent bar -->
+            <tr>
+              <td
+                style="
+                  height: 4px;
+                  background: linear-gradient(90deg, #006239, #4ade80);
+                  font-size: 0;
+                  line-height: 0;
+                "
+              >
+                &nbsp;
+              </td>
+            </tr>
+
             <!-- Logo -->
             <tr>
               <td style="padding: 32px 40px 0; text-align: center">
@@ -120,6 +135,7 @@
                     font-size: 15px;
                     line-height: 1.6;
                     color: #09090b;
+                    font-weight: 600;
                   "
                 >
                   New Contact Form Submission
@@ -143,19 +159,22 @@
                   cellspacing="0"
                   border="0"
                   style="
-                    background-color: #fafafa;
-                    border-radius: 8px;
+                    background-color: #f8faf9;
+                    border-radius: 12px;
+                    border-left: 3px solid #006239;
                     margin: 0 0 24px;
                   "
                 >
                   <tr>
-                    <td style="padding: 16px">
+                    <td style="padding: 20px">
                       <p
                         style="
-                          margin: 0 0 8px;
-                          font-size: 13px;
+                          margin: 0 0 4px;
+                          font-size: 11px;
                           font-weight: 600;
-                          color: #09090b;
+                          color: #6b7280;
+                          text-transform: uppercase;
+                          letter-spacing: 0.5px;
                         "
                       >
                         From
@@ -165,17 +184,20 @@
                           margin: 0 0 16px;
                           font-size: 14px;
                           line-height: 1.6;
-                          color: #52525b;
+                          color: #09090b;
+                          font-weight: 500;
                         "
                       >
                         {{name}} &lt;{{email}}&gt;
                       </p>
                       <p
                         style="
-                          margin: 0 0 8px;
-                          font-size: 13px;
+                          margin: 0 0 4px;
+                          font-size: 11px;
                           font-weight: 600;
-                          color: #09090b;
+                          color: #6b7280;
+                          text-transform: uppercase;
+                          letter-spacing: 0.5px;
                         "
                       >
                         Message
@@ -185,7 +207,7 @@
                           margin: 0;
                           font-size: 14px;
                           line-height: 1.7;
-                          color: #52525b;
+                          color: #3f3f46;
                           white-space: pre-wrap;
                         "
                       >
@@ -204,7 +226,7 @@
                   "
                 >
                   You can reply directly to
-                  <a href="mailto:{{email}}" style="color: #6366f1"
+                  <a href="mailto:{{email}}" style="color: #006239"
                     >{{email}}</a
                   >
                   to respond.
@@ -229,7 +251,7 @@
                     color: #a1a1aa;
                   "
                 >
-                  &copy; {{year}} Trackit
+                  &copy; {{year}} Trackit &middot; Smart personal finance
                 </p>
               </td>
             </tr>

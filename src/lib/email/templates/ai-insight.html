@@ -46,7 +46,7 @@
     style="
       margin: 0;
       padding: 0;
-      background-color: #fafafa;
+      background-color: #f8faf9;
       font-family:
         &quot;Inter&quot;,
         -apple-system,
@@ -63,7 +63,7 @@
         overflow: hidden;
         mso-hide: all;
         font-size: 0;
-        color: #fafafa;
+        color: #f8faf9;
         line-height: 0;
       "
     >
@@ -75,7 +75,7 @@
       cellpadding="0"
       cellspacing="0"
       border="0"
-      style="background-color: #fafafa"
+      style="background-color: #f8faf9"
     >
       <tr>
         <td align="center" style="padding: 48px 16px">
@@ -91,9 +91,25 @@
               width: 100%;
               background-color: #ffffff;
               border-radius: 16px;
-              border: 1px solid #e4e4e7;
+              border: 1px solid #e5e7eb;
+              overflow: hidden;
             "
           >
+            <!-- Green accent bar -->
+            <tr>
+              <td
+                style="
+                  height: 4px;
+                  background: linear-gradient(90deg, #006239, #4ade80);
+                  font-size: 0;
+                  line-height: 0;
+                "
+              >
+                &nbsp;
+              </td>
+            </tr>
+
+            <!-- Logo -->
             <tr>
               <td style="padding: 32px 40px 0; text-align: center">
                 <p
@@ -112,6 +128,8 @@
                 </p>
               </td>
             </tr>
+
+            <!-- Content -->
             <tr>
               <td class="content-pad" style="padding: 32px 40px">
                 <p
@@ -144,8 +162,9 @@
                   cellspacing="0"
                   border="0"
                   style="
-                    background-color: #fafafa;
-                    border-radius: 10px;
+                    background-color: #f0fdf4;
+                    border-radius: 12px;
+                    border-left: 3px solid #006239;
                     margin: 0 0 20px;
                   "
                 >
@@ -176,7 +195,8 @@
                   border="0"
                   style="
                     background-color: #fffbeb;
-                    border-radius: 10px;
+                    border-radius: 12px;
+                    border-left: 3px solid #f59e0b;
                     margin: 0 0 20px;
                   "
                 >
@@ -208,6 +228,7 @@
                 </table>
                 {{/if}}
 
+                <!-- CTA -->
                 <table
                   role="presentation"
                   width="100%"
@@ -222,7 +243,7 @@
                         target="_blank"
                         style="
                           display: inline-block;
-                          padding: 12px 32px;
+                          padding: 12px 36px;
                           font-size: 14px;
                           font-weight: 600;
                           font-family:
@@ -233,9 +254,9 @@
                             Roboto,
                             sans-serif;
                           color: #ffffff;
-                          background-color: #18181b;
+                          background-color: #006239;
                           text-decoration: none;
-                          border-radius: 8px;
+                          border-radius: 10px;
                         "
                         >View dashboard</a
                       >
@@ -244,6 +265,8 @@
                 </table>
               </td>
             </tr>
+
+            <!-- Footer -->
             <tr>
               <td
                 style="
@@ -274,7 +297,7 @@
                     color: #a1a1aa;
                   "
                 >
-                  &copy; {{year}} Trackit
+                  &copy; {{year}} Trackit &middot; Smart personal finance
                 </p>
               </td>
             </tr>

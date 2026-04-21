@@ -46,7 +46,7 @@
     style="
       margin: 0;
       padding: 0;
-      background-color: #fafafa;
+      background-color: #f8faf9;
       font-family:
         &quot;Inter&quot;,
         -apple-system,
@@ -63,7 +63,7 @@
         overflow: hidden;
         mso-hide: all;
         font-size: 0;
-        color: #fafafa;
+        color: #f8faf9;
         line-height: 0;
       "
     >
@@ -75,7 +75,7 @@
       cellpadding="0"
       cellspacing="0"
       border="0"
-      style="background-color: #fafafa"
+      style="background-color: #f8faf9"
     >
       <tr>
         <td align="center" style="padding: 48px 16px">
@@ -91,9 +91,24 @@
               width: 100%;
               background-color: #ffffff;
               border-radius: 16px;
-              border: 1px solid #e4e4e7;
+              border: 1px solid #e5e7eb;
+              overflow: hidden;
             "
           >
+            <!-- Green accent bar -->
+            <tr>
+              <td
+                style="
+                  height: 4px;
+                  background: linear-gradient(90deg, #006239, #4ade80);
+                  font-size: 0;
+                  line-height: 0;
+                "
+              >
+                &nbsp;
+              </td>
+            </tr>
+
             <!-- Logo -->
             <tr>
               <td style="padding: 32px 40px 0; text-align: center">
@@ -126,7 +141,7 @@
                 </p>
                 <p
                   style="
-                    margin: 0 0 24px;
+                    margin: 0 0 28px;
                     font-size: 14px;
                     line-height: 1.7;
                     color: #52525b;
@@ -152,7 +167,7 @@
                         target="_blank"
                         style="
                           display: inline-block;
-                          padding: 12px 32px;
+                          padding: 12px 36px;
                           font-size: 14px;
                           font-weight: 600;
                           font-family:
@@ -163,9 +178,9 @@
                             Roboto,
                             sans-serif;
                           color: #ffffff;
-                          background-color: #18181b;
+                          background-color: #006239;
                           text-decoration: none;
-                          border-radius: 8px;
+                          border-radius: 10px;
                         "
                         >Verify email address</a
                       >
@@ -175,7 +190,7 @@
 
                 <p
                   style="
-                    margin: 0 0 24px;
+                    margin: 0 0 28px;
                     font-size: 13px;
                     line-height: 1.5;
                     color: #a1a1aa;
@@ -193,8 +208,9 @@
                   cellspacing="0"
                   border="0"
                   style="
-                    background-color: #fafafa;
-                    border-radius: 8px;
+                    background-color: #f0fdf4;
+                    border-radius: 10px;
+                    border-left: 3px solid #006239;
                     margin: 0 0 24px;
                   "
                 >
@@ -205,7 +221,7 @@
                           margin: 0;
                           font-size: 13px;
                           line-height: 1.6;
-                          color: #71717a;
+                          color: #3f3f46;
                         "
                       >
                         If you didn't sign up for Trackit, you can safely ignore
@@ -227,7 +243,7 @@
                   If the button doesn't work, copy and paste this link:<br />
                   <a
                     href="{{verificationUrl}}"
-                    style="color: #6366f1; word-break: break-all"
+                    style="color: #006239; word-break: break-all"
                     >{{verificationUrl}}</a
                   >
                 </p>
@@ -251,7 +267,7 @@
                     color: #a1a1aa;
                   "
                 >
-                  &copy; {{year}} Trackit
+                  &copy; {{year}} Trackit &middot; Smart personal finance
                 </p>
               </td>
             </tr>

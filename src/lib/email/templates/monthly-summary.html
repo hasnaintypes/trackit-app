@@ -51,7 +51,7 @@
     style="
       margin: 0;
       padding: 0;
-      background-color: #fafafa;
+      background-color: #f8faf9;
       font-family:
         &quot;Inter&quot;,
         -apple-system,
@@ -68,7 +68,7 @@
         overflow: hidden;
         mso-hide: all;
         font-size: 0;
-        color: #fafafa;
+        color: #f8faf9;
         line-height: 0;
       "
     >
@@ -80,7 +80,7 @@
       cellpadding="0"
       cellspacing="0"
       border="0"
-      style="background-color: #fafafa"
+      style="background-color: #f8faf9"
     >
       <tr>
         <td align="center" style="padding: 48px 16px">
@@ -96,9 +96,25 @@
               width: 100%;
               background-color: #ffffff;
               border-radius: 16px;
-              border: 1px solid #e4e4e7;
+              border: 1px solid #e5e7eb;
+              overflow: hidden;
             "
           >
+            <!-- Green accent bar -->
+            <tr>
+              <td
+                style="
+                  height: 4px;
+                  background: linear-gradient(90deg, #006239, #4ade80);
+                  font-size: 0;
+                  line-height: 0;
+                "
+              >
+                &nbsp;
+              </td>
+            </tr>
+
+            <!-- Logo -->
             <tr>
               <td style="padding: 32px 40px 0; text-align: center">
                 <p
@@ -117,6 +133,8 @@
                 </p>
               </td>
             </tr>
+
+            <!-- Content -->
             <tr>
               <td class="content-pad" style="padding: 32px 40px">
                 <p
@@ -163,16 +181,20 @@
                         cellpadding="0"
                         cellspacing="0"
                         border="0"
-                        style="background-color: #f0fdf4; border-radius: 10px"
+                        style="
+                          background-color: #f0fdf4;
+                          border-radius: 12px;
+                          border: 1px solid #d1fae5;
+                        "
                       >
                         <tr>
-                          <td style="padding: 16px">
+                          <td style="padding: 18px">
                             <p
                               style="
                                 margin: 0 0 4px;
-                                font-size: 12px;
+                                font-size: 11px;
                                 font-weight: 600;
-                                color: #a1a1aa;
+                                color: #6b7280;
                                 text-transform: uppercase;
                                 letter-spacing: 0.5px;
                               "
@@ -205,16 +227,20 @@
                         cellpadding="0"
                         cellspacing="0"
                         border="0"
-                        style="background-color: #fef2f2; border-radius: 10px"
+                        style="
+                          background-color: #fef2f2;
+                          border-radius: 12px;
+                          border: 1px solid #fecaca;
+                        "
                       >
                         <tr>
-                          <td style="padding: 16px">
+                          <td style="padding: 18px">
                             <p
                               style="
                                 margin: 0 0 4px;
-                                font-size: 12px;
+                                font-size: 11px;
                                 font-weight: 600;
-                                color: #a1a1aa;
+                                color: #6b7280;
                                 text-transform: uppercase;
                                 letter-spacing: 0.5px;
                               "
@@ -246,13 +272,13 @@
                   cellspacing="0"
                   border="0"
                   style="
-                    background-color: #fafafa;
-                    border-radius: 10px;
-                    margin: 0 0 24px;
+                    background-color: #f8faf9;
+                    border-radius: 12px;
+                    margin: 0 0 28px;
                   "
                 >
                   <tr>
-                    <td style="padding: 14px 16px">
+                    <td style="padding: 16px 20px">
                       <table
                         role="presentation"
                         width="100%"
@@ -272,7 +298,7 @@
                           </td>
                           <td
                             style="
-                              font-size: 18px;
+                              font-size: 20px;
                               font-weight: 700;
                               text-align: right;
                               color: {{netSavingsColor}};
@@ -291,9 +317,9 @@
                 <p
                   style="
                     margin: 0 0 12px;
-                    font-size: 12px;
+                    font-size: 11px;
                     font-weight: 600;
-                    color: #a1a1aa;
+                    color: #6b7280;
                     text-transform: uppercase;
                     letter-spacing: 0.5px;
                   "
@@ -307,31 +333,31 @@
                   cellspacing="0"
                   border="0"
                   style="
-                    background-color: #fafafa;
-                    border-radius: 10px;
-                    margin: 0 0 24px;
+                    background-color: #f8faf9;
+                    border-radius: 12px;
+                    margin: 0 0 28px;
                   "
                 >
                   {{#each topCategories}}
                   <tr>
                     <td
                       style="
-                        padding: 12px 16px;
+                        padding: 14px 20px;
                         font-size: 14px;
-                        color: #52525b;
-                        border-bottom: 1px solid #f4f4f5;
+                        color: #3f3f46;
+                        border-bottom: 1px solid #e5e7eb;
                       "
                     >
                       {{name}}
                     </td>
                     <td
                       style="
-                        padding: 12px 16px;
+                        padding: 14px 20px;
                         text-align: right;
                         font-size: 14px;
                         font-weight: 600;
                         color: #09090b;
-                        border-bottom: 1px solid #f4f4f5;
+                        border-bottom: 1px solid #e5e7eb;
                       "
                     >
                       ${{amount}}
@@ -340,6 +366,7 @@
                   {{/each}}
                 </table>
 
+                <!-- CTA -->
                 <table
                   role="presentation"
                   width="100%"
@@ -354,7 +381,7 @@
                         target="_blank"
                         style="
                           display: inline-block;
-                          padding: 12px 32px;
+                          padding: 12px 36px;
                           font-size: 14px;
                           font-weight: 600;
                           font-family:
@@ -365,9 +392,9 @@
                             Roboto,
                             sans-serif;
                           color: #ffffff;
-                          background-color: #18181b;
+                          background-color: #006239;
                           text-decoration: none;
-                          border-radius: 8px;
+                          border-radius: 10px;
                         "
                         >View full report</a
                       >
@@ -376,6 +403,8 @@
                 </table>
               </td>
             </tr>
+
+            <!-- Footer -->
             <tr>
               <td
                 style="
@@ -406,7 +435,7 @@
                     color: #a1a1aa;
                   "
                 >
-                  &copy; {{year}} Trackit
+                  &copy; {{year}} Trackit &middot; Smart personal finance
                 </p>
               </td>
             </tr>
