@@ -306,7 +306,7 @@ export const ContentSection = ({
                       src={src}
                       alt={alt ?? ""}
                       className="h-48 w-full rounded-md object-cover"
-                      {...(rest as Record<string, unknown>)}
+                      {...rest}
                     />
                   </span>
                 );
