@@ -63,3 +63,45 @@ export function invalidateReports(utils: Utils) {
 export function invalidateUser(utils: Utils) {
   return utils.user.getMe.invalidate();
 }
+
+/** After creating/updating/deleting a contact */
+export function invalidateContacts(utils: Utils) {
+  return utils.contact.list.invalidate();
+}
+
+/** After creating/updating/deleting a group or group membership */
+export function invalidateGroups(utils: Utils) {
+  return Promise.all([
+    utils.group.list.invalidate(),
+    utils.overview.splitSummary.invalidate(),
+  ]);
+}
+
+/** After creating/updating/deleting an expense */
+export function invalidateExpenses(utils: Utils) {
+  return Promise.all([
+    utils.expense.list.invalidate(),
+    utils.overview.splitSummary.invalidate(),
+  ]);
+}
+
+/** After creating a settlement */
+export function invalidateSettlements(utils: Utils) {
+  return Promise.all([
+    utils.settlement.list.invalidate(),
+    utils.overview.splitSummary.invalidate(),
+  ]);
+}
+
+/** After any mutation inside a group detail page */
+export function invalidateGroupDetail(utils: Utils, groupId: string) {
+  return Promise.all([
+    utils.group.getById.invalidate({ id: groupId }),
+    utils.group.getBalances.invalidate({ id: groupId }),
+    utils.group.getSimplifiedDebts.invalidate({ id: groupId }),
+    utils.group.activityFeed.invalidate({ id: groupId }),
+    utils.expense.list.invalidate({ groupId }),
+    utils.settlement.list.invalidate({ groupId }),
+    utils.overview.splitSummary.invalidate(),
+  ]);
+}

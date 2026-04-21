@@ -782,4 +782,160 @@ export class AIService {
       });
     }
   }
+
+  // ─── Split AI Features ─────────────────────────────────────────────
+
+  static async parseExpenseFromText(
+    text: string,
+    contactNames: string[],
+  ): Promise<{
+    amount: number | null;
+    description: string | null;
+    payer: string | null;
+    participants: string[];
+    splitMethod: string;
+  }> {
+    const prompt = `Parse this expense description into structured data. Available contacts: ${JSON.stringify(contactNames)}.
+Input: "${text}"
+Return JSON only: { "amount": number|null, "description": string|null, "payer": "self" or contact name|null, "participants": [contact names], "splitMethod": "EQUAL"|"EXACT"|"PERCENTAGE"|"SHARES" }
+If payer is the speaker, use "self". Match participant names to the contact list. Default splitMethod to "EQUAL".`;
+
+    return callGeminiWithRetry(prompt, (response) => {
+      const parsed = extractJsonFromAI<{
+        amount?: number | null;
+        description?: string | null;
+        payer?: string | null;
+        participants?: string[];
+        splitMethod?: string;
+      }>(response, "parseExpenseFromText");
+      return {
+        amount: parsed.amount ?? null,
+        description: parsed.description ?? null,
+        payer: parsed.payer ?? "self",
+        participants: Array.isArray(parsed.participants)
+          ? parsed.participants
+          : [],
+        splitMethod: parsed.splitMethod ?? "EQUAL",
+      };
+    });
+  }
+
+  static async generateGroupInsights(
+    groupId: string,
+    _userId: string,
+  ): Promise<{
+    summary: string;
+    topSpender: string | null;
+    topCategory: string | null;
+    trend: string | null;
+  }> {
+    const expenses = await db.expense.findMany({
+      where: { groupId },
+      select: {
+        amount: true,
+        description: true,
+        date: true,
+        splitMethod: true,
+        participants: {
+          select: {
+            contactId: true,
+            paidAmount: true,
+            owedAmount: true,
+            contact: { select: { name: true } },
+          },
+        },
+        category: { select: { name: true } },
+      },
+      orderBy: { date: "desc" },
+      take: 100,
+    });
+
+    if (expenses.length === 0) {
+      return {
+        summary: "No expenses recorded in this group yet.",
+        topSpender: null,
+        topCategory: null,
+        trend: null,
+      };
+    }
+
+    const expenseData = expenses.map((e) => ({
+      amount: toNum(e.amount),
+      description: e.description,
+      date: e.date.toISOString().slice(0, 10),
+      category: e.category?.name ?? "Uncategorized",
+      participants: e.participants.map((p) => ({
+        name: p.contact?.name ?? "You",
+        paid: toNum(p.paidAmount),
+        owed: toNum(p.owedAmount),
+      })),
+    }));
+
+    const prompt = `Analyze these group expenses and provide insights.
+Expenses: ${JSON.stringify(expenseData)}
+Return JSON only: { "summary": "2-3 sentence overview", "topSpender": "name of person who paid the most", "topCategory": "most common expense category", "trend": "brief spending trend observation" }`;
+
+    return callGeminiWithRetry(prompt, (response) => {
+      const parsed = extractJsonFromAI<{
+        summary?: string;
+        topSpender?: string | null;
+        topCategory?: string | null;
+        trend?: string | null;
+      }>(response, "groupInsights");
+      return {
+        summary: parsed.summary ?? "Unable to generate insights.",
+        topSpender: parsed.topSpender ?? null,
+        topCategory: parsed.topCategory ?? null,
+        trend: parsed.trend ?? null,
+      };
+    });
+  }
+
+  static async suggestSplit(
+    groupId: string,
+    description: string,
+    amount: number,
+  ): Promise<{
+    suggestedPayer: string;
+    suggestedMethod: string;
+    reasoning: string;
+  }> {
+    const recentExpenses = await db.expense.findMany({
+      where: { groupId },
+      select: {
+        description: true,
+        splitMethod: true,
+        participants: {
+          where: { isPayer: true },
+          select: { contact: { select: { name: true } } },
+        },
+      },
+      orderBy: { date: "desc" },
+      take: 20,
+    });
+
+    const history = recentExpenses.map((e) => ({
+      description: e.description,
+      method: e.splitMethod,
+      payer: e.participants[0]?.contact?.name ?? "You",
+    }));
+
+    const prompt = `Based on past group expense patterns, suggest who should pay and how to split.
+Past expenses: ${JSON.stringify(history)}
+New expense: "${description}" for ${amount}
+Return JSON only: { "suggestedPayer": "name or self", "suggestedMethod": "EQUAL|EXACT|PERCENTAGE|SHARES", "reasoning": "brief explanation" }`;
+
+    return callGeminiWithRetry(prompt, (response) => {
+      const parsed = extractJsonFromAI<{
+        suggestedPayer?: string;
+        suggestedMethod?: string;
+        reasoning?: string;
+      }>(response, "suggestSplit");
+      return {
+        suggestedPayer: parsed.suggestedPayer ?? "self",
+        suggestedMethod: parsed.suggestedMethod ?? "EQUAL",
+        reasoning: parsed.reasoning ?? "Equal split is the most common method.",
+      };
+    });
+  }
 }

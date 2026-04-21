@@ -14,12 +14,12 @@ export const TransactionsHeader = React.memo(function TransactionsHeader({
   onImport,
 }: TransactionsHeaderProps) {
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
       <div>
-        <h1 className="text-primary-foreground text-2xl font-bold tracking-tight">
+        <h1 className="text-foreground text-3xl font-bold tracking-tight">
           Transactions
         </h1>
-        <p className="text-secondary mt-1 text-sm">
+        <p className="text-muted-foreground mt-1">
           Manage and track all your financial transactions
         </p>
       </div>

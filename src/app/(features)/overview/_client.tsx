@@ -16,31 +16,12 @@ import {
   type DateRange,
 } from "@/components/pages/(protected)/overview/spending-overview-card";
 import { SpendingByCategoryCard } from "@/components/pages/(protected)/overview/spending-by-category-card";
-import { DefaultView } from "@prisma/client";
-import { useRouter } from "next/navigation";
-import { useSettings } from "@/hooks/use-settings";
-import { useEffect } from "react";
 import { useFormatter } from "@/hooks/use-formatter";
 import type { Transaction } from "@/types/transaction";
 
 export default function OverviewPageClient() {
   const { formatAmount } = useFormatter();
-  const router = useRouter();
-  const { settings, isLoading: settingsLoading } = useSettings();
   const [barRange, setBarRange] = useState<DateRange>("6");
-
-  useEffect(() => {
-    if (!settingsLoading && settings?.display.defaultView) {
-      const defaultView = settings.display.defaultView;
-      if (defaultView === DefaultView.TRANSACTIONS) {
-        router.replace("/transactions");
-      } else if (defaultView === DefaultView.NETWORTH) {
-        router.replace("/reports");
-      } else if (defaultView === DefaultView.PORTFOLIO) {
-        router.replace("/accounts");
-      }
-    }
-  }, [settings, settingsLoading, router]);
 
   const { accounts, isLoading: accountsLoading } = useAccounts();
   const { listQuery, remove } = useTransactions();
@@ -95,6 +76,7 @@ export default function OverviewPageClient() {
           barChartData={barChartData}
           barRange={barRange}
           onBarRangeChange={setBarRange}
+          isLoading={txLoading}
           formatAmount={formatAmount}
         />
         <SpendingByCategoryCard

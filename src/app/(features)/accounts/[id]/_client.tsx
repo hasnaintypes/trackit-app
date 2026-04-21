@@ -95,7 +95,7 @@ export default function AccountDetailPageClient() {
   const formattedBalance = formatAmount(Number(account.balance));
 
   return (
-    <div className="space-y-8">
+    <div className="animate-in fade-in-50 flex flex-col space-y-12 duration-500">
       <Card>
         <CardContent className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">

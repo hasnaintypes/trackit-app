@@ -5,5 +5,5 @@ export type SessionItem = {
   ip: string;
   lastActivity: string;
   expiresAt?: string | null;
-  token?: string;
+  isCurrent?: boolean;
 };

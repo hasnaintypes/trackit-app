@@ -8,13 +8,14 @@ const AUTH_PATHS = [
   "/sign-in",
   "/sign-up",
   "/reset-password",
+  "/forgot-password",
   "/verify-success",
+  "/two-factor",
 ];
 
 // Public pages under src/app/(public)
 const PUBLIC_PATHS = [
   "/",
-  "/about",
   "/blog",
   "/changelog",
   "/contact",

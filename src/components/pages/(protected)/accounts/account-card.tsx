@@ -11,7 +11,6 @@ import {
 } from "@ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { ICON_MAP } from "@/constants/icons";
-import { format } from "date-fns";
 import type { BankAccount as Account } from "@/types/account";
 
 export type ApiAccount = Omit<Account, "createdAt" | "updatedAt"> & {
@@ -28,6 +27,7 @@ export interface AccountCardProps {
   onDelete: (e: React.MouseEvent, id: string) => void;
   onClick: () => void;
   formatAmount: (amount: number | string) => string;
+  formatDate: (date: Date | string) => string;
 }
 
 export const AccountCard = React.memo(function AccountCard({
@@ -36,19 +36,18 @@ export const AccountCard = React.memo(function AccountCard({
   onDelete,
   onClick,
   formatAmount,
+  formatDate,
 }: AccountCardProps) {
   const IconComponent = ICON_MAP.get(account.icon ?? "") ?? Wallet;
   const formattedBalance = formatAmount(Number(account.balance));
   const accentColor = account.color ?? "#6366f1";
 
-  const updatedLabel = account.updatedAt
-    ? format(new Date(account.updatedAt), "MMM d, yyyy")
-    : null;
+  const updatedLabel = account.updatedAt ? formatDate(account.updatedAt) : null;
 
   return (
     <div
       onClick={onClick}
-      className="group relative w-full cursor-pointer overflow-hidden rounded-2xl border border-white/[0.06] bg-gradient-to-br from-[#18181b] via-[#1a1a1f] to-[#111114] p-5 text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:ring-1 hover:ring-white/10"
+      className="group border-border bg-card hover:ring-ring/20 relative w-full cursor-pointer overflow-hidden rounded-2xl border p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:ring-1"
     >
       {/* Top accent line */}
       <div
@@ -70,16 +69,16 @@ export const AccountCard = React.memo(function AccountCard({
 
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <span className="text-[15px] leading-tight font-semibold tracking-tight">
+              <span className="text-card-foreground text-[15px] leading-tight font-semibold tracking-tight">
                 {account.name}
               </span>
               {account.isDefault && (
-                <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
+                <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-medium text-emerald-500 dark:text-emerald-400">
                   Default
                 </span>
               )}
             </div>
-            <span className="mt-0.5 text-[11px] font-medium text-white/35">
+            <span className="text-muted-foreground mt-0.5 text-[11px] font-medium">
               {account.type} &middot; {account.currency}
             </span>
           </div>
@@ -91,15 +90,12 @@ export const AccountCard = React.memo(function AccountCard({
               variant="ghost"
               size="icon"
               onClick={(e) => e.stopPropagation()}
-              className="h-8 w-8 rounded-lg text-white/40 transition hover:bg-white/10 hover:text-white"
+              className="text-muted-foreground hover:bg-accent hover:text-foreground h-8 w-8 rounded-lg transition"
             >
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            className="w-44 rounded-xl border-zinc-800 bg-zinc-900 text-zinc-200"
-          >
+          <DropdownMenuContent align="end" className="w-44 rounded-xl">
             <DropdownMenuItem
               onClick={(e) => onEdit(e, account)}
               className="cursor-pointer gap-2"
@@ -107,11 +103,11 @@ export const AccountCard = React.memo(function AccountCard({
               <Pencil className="h-3.5 w-3.5" />
               Edit
             </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-zinc-800" />
+            <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={(e) => onDelete(e, account.id)}
               disabled={account.isDefault}
-              className="cursor-pointer gap-2 text-red-400 focus:bg-red-400/10 focus:text-red-400"
+              className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer gap-2"
             >
               <Trash2 className="h-3.5 w-3.5" />
               Delete
@@ -122,13 +118,15 @@ export const AccountCard = React.memo(function AccountCard({
 
       {/* Balance */}
       <div className="mb-4">
-        <p className="mb-1.5 text-[11px] font-medium tracking-wider text-white/30 uppercase">
+        <p className="text-muted-foreground mb-1.5 text-[11px] font-medium tracking-wider uppercase">
           Balance
         </p>
         <h2
           className={cn(
             "text-3xl font-bold tracking-tight",
-            Number(account.balance) < 0 ? "text-red-400" : "text-white",
+            Number(account.balance) < 0
+              ? "text-destructive"
+              : "text-card-foreground",
           )}
         >
           {formattedBalance}
@@ -137,8 +135,8 @@ export const AccountCard = React.memo(function AccountCard({
 
       {/* Footer */}
       {updatedLabel && (
-        <div className="border-t border-white/[0.05] pt-3">
-          <span className="text-[10px] font-medium tracking-wider text-white/25 uppercase">
+        <div className="border-border border-t pt-3">
+          <span className="text-muted-foreground/70 text-[10px] font-medium tracking-wider uppercase">
             Updated {updatedLabel}
           </span>
         </div>

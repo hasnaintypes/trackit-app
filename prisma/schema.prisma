@@ -22,11 +22,18 @@ model User {
   gender            Gender?
   country           Country?
   timezone          Timezone?
+  twoFactorEnabled  Boolean?                 @default(false)
   role              String                   @default("user")
   accounts          Account[]
+  twoFactor         TwoFactor[]
   bankAccounts      BankAccount[]
   budgets           Budget[]
   categories        Category[]
+  contacts          Contact[]        @relation("UserContacts")
+  linkedContacts    Contact[]        @relation("LinkedContacts")
+  groups            Group[]
+  expenses          Expense[]
+  settlements       Settlement[]
   displaySettings   DisplaySettings?
   notifications     Notification[]
   notificationPrefs NotificationPreferences?
@@ -35,6 +42,7 @@ model User {
   sessions          Session[]
   transactions      Transaction[]
   userPreferences   UserPreferences?
+  auditLogs         AuditLog[]
 
   @@map("user")
 }
@@ -142,6 +150,16 @@ model Verification {
   @@map("verification")
 }
 
+model TwoFactor {
+  id          String @id
+  secret      String
+  backupCodes String
+  userId      String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("twoFactor")
+}
+
 model BankAccount {
   id             String          @id @default(cuid())
   userId         String
@@ -175,6 +193,7 @@ model Category {
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
   budgets          Budget[]
+  expenses         Expense[]
   parent           Category?       @relation("CategoryToParent", fields: [parentCategoryId], references: [id])
   children         Category[]      @relation("CategoryToParent")
   user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -231,6 +250,8 @@ enum NotificationType {
   BUDGET_ALERT
   TRANSACTION_RECURRING
   SYSTEM_ALERT
+  SPLIT_REMINDER
+  GROUP_EXPENSE
 }
 
 model Report {
@@ -288,6 +309,9 @@ model Transaction {
   paymentMethod          PaymentMethod?
   account                BankAccount     @relation(fields: [accountId], references: [id], onDelete: Cascade)
   category               Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  contact                Contact?        @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  group                  Group?          @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  expenses               Expense[]
   recurringRule          RecurringRule?  @relation(fields: [recurringRuleId], references: [id], onDelete: SetNull)
   user                   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -331,6 +355,154 @@ model RecurringRule {
   @@index([userId])
   @@index([status, nextRunAt])
   @@map("recurring_rules")
+}
+
+model Contact {
+  id           String        @id @default(cuid())
+  userId       String
+  linkedUserId String?
+  name         String
+  email        String?
+  phone        String?
+  avatarUrl    String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  user         User          @relation("UserContacts", fields: [userId], references: [id], onDelete: Cascade)
+  linkedUser   User?         @relation("LinkedContacts", fields: [linkedUserId], references: [id], onDelete: SetNull)
+  expenseParticipants ExpenseParticipant[] @relation("ContactPayer")
+  groupMembers        GroupMember[]
+  transactions        Transaction[]
+
+  @@unique([userId, email])
+  @@index([userId])
+  @@map("contacts")
+}
+
+model Group {
+  id          String        @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  icon        String?
+  color       String?
+  type        GroupType     @default(OTHER)
+  currency    Currency      @default(USD)
+  isArchived  Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expenses    Expense[]
+  members     GroupMember[]
+  settlements Settlement[]
+  transactions Transaction[]
+
+  @@index([userId])
+  @@map("groups")
+}
+
+model GroupMember {
+  id        String    @id @default(cuid())
+  groupId   String
+  contactId String?
+  userId    String
+  role      GroupRole @default(MEMBER)
+  joinedAt  DateTime @default(now())
+
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  contact   Contact? @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, contactId])
+  @@index([groupId])
+  @@map("group_members")
+}
+
+enum GroupType {
+  ROOMMATES
+  TRIP
+  COUPLE
+  FRIENDS
+  FAMILY
+  WORK
+  OTHER
+}
+
+enum GroupRole {
+  OWNER
+  MEMBER
+}
+
+model Expense {
+  id            String        @id @default(cuid())
+  groupId       String
+  createdById   String
+  description   String
+  notes         String?
+  amount        Decimal       @db.Decimal(18, 2)
+  currency      Currency      @default(USD)
+  categoryId    String?
+  date          DateTime      @default(now())
+  receiptUrl    String?
+  splitMethod   SplitMethod   @default(EQUAL)
+  isSettlement  Boolean       @default(false)
+  transactionId String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  group         Group         @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  createdBy     User          @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  category      Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  transaction   Transaction?  @relation(fields: [transactionId], references: [id], onDelete: SetNull)
+  participants  ExpenseParticipant[]
+
+  @@index([groupId])
+  @@index([createdById])
+  @@index([groupId, date])
+  @@map("expenses")
+}
+
+model ExpenseParticipant {
+  id         String   @id @default(cuid())
+  expenseId  String
+  contactId  String?
+  isPayer    Boolean  @default(false)
+  paidAmount Decimal  @db.Decimal(18, 2) @default(0)
+  owedAmount Decimal  @db.Decimal(18, 2) @default(0)
+
+  expense    Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  contact    Contact? @relation("ContactPayer", fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@unique([expenseId, contactId])
+  @@index([expenseId])
+  @@map("expense_participants")
+}
+
+enum SplitMethod {
+  EQUAL
+  EXACT
+  PERCENTAGE
+  SHARES
+}
+
+model Settlement {
+  id            String   @id @default(cuid())
+  groupId       String
+  createdById   String
+  fromContactId String?
+  toContactId   String?
+  amount        Decimal  @db.Decimal(18, 2)
+  currency      Currency @default(USD)
+  notes         String?
+  date          DateTime @default(now())
+  transactionId String?
+  createdAt     DateTime @default(now())
+
+  group         Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  createdBy     User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([groupId])
+  @@map("settlements")
 }
 
 enum Gender {
@@ -488,4 +660,41 @@ enum PaymentMethod {
   AUTO_DEBIT
   UPI
   OTHER
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action       String
+  resourceType String
+  resourceId   String?
+  metadata     Json?
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([resourceType, resourceId])
+  @@index([createdAt])
+  @@index([action])
+  @@map("audit_logs")
+}
+
+model WaitlistEntry {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("waitlist_entries")
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("contact_messages")
 }

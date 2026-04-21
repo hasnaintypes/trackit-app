@@ -234,14 +234,9 @@ export function TransactionForm({
 
             <div className="flex-1 overflow-y-auto px-6 py-6">
               <div className={cn("space-y-5", className)}>
-                <BasicInfoStep
-                  form={form}
-                  accounts={accounts}
-                  accountId={accountId}
-                  defaultAccountId={defaultAccountId}
-                />
-
                 <ReceiptStep form={form} categories={categories} />
+
+                <BasicInfoStep form={form} />
 
                 <CategoryStep form={form} categories={categories} />
 

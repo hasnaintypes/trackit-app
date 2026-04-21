@@ -33,7 +33,7 @@ export const createTransactionSchema = z.object({
   paymentMethod: z
     .enum(["CARD", "CASH", "BANK_TRANSFER", "AUTO_DEBIT", "UPI", "OTHER"])
     .optional(),
-  receipt_url: z.string().nullable().optional(),
+  receipt_url: z.string().url().nullable().optional(),
   receipt_extracted_text: z.string().nullable().optional(),
 });
 
@@ -61,7 +61,7 @@ export const updateTransactionSchema = z.object({
   paymentMethod: z
     .enum(["CARD", "CASH", "BANK_TRANSFER", "AUTO_DEBIT", "UPI", "OTHER"])
     .optional(),
-  receipt_url: z.string().nullable().optional(),
+  receipt_url: z.string().url().nullable().optional(),
   receipt_extracted_text: z.string().nullable().optional(),
 });
 

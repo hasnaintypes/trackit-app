@@ -51,6 +51,11 @@ config.images = {
       hostname: "randomuser.me",
       pathname: "/api/portraits/**",
     },
+    {
+      protocol: "https",
+      hostname: "www.comarch.com",
+      pathname: "/**",
+    },
   ],
 };
 

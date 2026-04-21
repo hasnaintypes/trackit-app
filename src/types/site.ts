@@ -104,27 +104,23 @@ export type AboutContent = {
   blogCards?: BlogCard[];
 };
 
-// Features and Blog types
-export type FeatureCardItem = {
-  iconName?: string;
+// Features page types
+export type FeatureSectionItem = {
   title: string;
   description: string;
-  position?: "left" | "right";
-  cornerStyle?: string;
+};
+
+export type FeatureSection = {
+  id: string;
+  title: string;
+  description: string;
+  items: FeatureSectionItem[];
 };
 
 export type FeaturesContent = {
-  heading?: string;
-  subheading?: string;
-  leftFeatures: FeatureCardItem[];
-  rightFeatures: FeatureCardItem[];
-  center?: { title?: string; description?: string };
-  teaser?: {
-    heading?: string;
-    subheading?: string;
-    title?: string;
-    description?: string;
-  };
+  heading: string;
+  description: string;
+  sections: FeatureSection[];
 };
 
 export type BlogPost = {
@@ -170,7 +166,6 @@ export type HelpFAQItem = {
 };
 
 export type HelpContent = {
-  searchPlaceholder: string;
   hero?: { title: string; description?: string };
   cards: HelpCard[];
   faqHeading?: string;

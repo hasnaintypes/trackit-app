@@ -26,6 +26,8 @@ export interface User {
   /** Location and preferences */
   country: Country | null;
   timezone: Timezone | null;
+  /** Two-factor authentication */
+  twoFactorEnabled: boolean;
   /** Admin/ban fields */
   banned: boolean;
   banReason: string | null;

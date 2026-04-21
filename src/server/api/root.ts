@@ -10,6 +10,10 @@ import { reportRouter } from "@/server/api/routers/reportRouter";
 import { aiRouter } from "@/server/api/routers/aiRouter";
 import { settingsRouter } from "@/server/api/routers/settingsRouter";
 import { overviewRouter } from "@/server/api/routers/overviewRouter";
+import { contactRouter } from "@/server/api/routers/contactRouter";
+import { groupRouter } from "@/server/api/routers/groupRouter";
+import { expenseRouter } from "@/server/api/routers/expenseRouter";
+import { settlementRouter } from "@/server/api/routers/settlementRouter";
 
 /**
  * This is the primary router for your server.
@@ -28,6 +32,10 @@ export const appRouter = createTRPCRouter({
   ai: aiRouter,
   settings: settingsRouter,
   overview: overviewRouter,
+  contact: contactRouter,
+  group: groupRouter,
+  expense: expenseRouter,
+  settlement: settlementRouter,
 });
 
 // export type definition of API

@@ -6,11 +6,22 @@ const logger = createLogger("reportRouter");
 import { TRPCError } from "@trpc/server";
 import { ReportService } from "@/server/services/reportService";
 import { ReportType } from "@prisma/client";
+import type { SendTemplateEmailOptions } from "@/lib/email";
 import {
   reportListSchema,
   generateReportSchema,
   resendReportSchema,
 } from "@/validation/report";
+
+const REPORT_TYPE_TO_TEMPLATE: Record<
+  ReportType,
+  SendTemplateEmailOptions["template"]
+> = {
+  MONTHLY_SUMMARY: "monthly-summary",
+  WEEKLY_DIGEST: "weekly-digest",
+  BUDGET_EXCEEDED: "budget-alert",
+  SPENDING_INSIGHTS: "ai-insight",
+};
 
 export const reportRouter = createTRPCRouter({
   list: protectedProcedure
@@ -73,16 +84,35 @@ export const reportRouter = createTRPCRouter({
 
       // Use the actual email service to resend
       try {
+        const rawData =
+          typeof report.data === "object" && report.data !== null
+            ? (report.data as Record<string, unknown>)
+            : {};
+
+        // Compute template-specific fields that aren't stored in report.data
+        const netSavings =
+          typeof rawData.totalIncome === "number" &&
+          typeof rawData.totalExpenses === "number"
+            ? rawData.totalIncome - rawData.totalExpenses
+            : 0;
+
         await sendTemplateEmail({
           to: userEmail,
-          subject: `Report: ${report.type} - ${report.period}`,
-          template: "monthly-summary",
+          subject: `Report: ${report.type
+            .replace(/_/g, " ")
+            .toLowerCase()
+            .replace(/\b\w/g, (l) => l.toUpperCase())} - ${report.period}`,
+          template: REPORT_TYPE_TO_TEMPLATE[report.type],
           data: {
             userName: ctx.user.name ?? "User",
             period: report.period,
-            ...(typeof report.data === "object" && report.data !== null
-              ? (report.data as Record<string, unknown>)
-              : {}),
+            ...rawData,
+            netSavingsColor: netSavings >= 0 ? "#10b981" : "#ef4444",
+            remaining:
+              typeof rawData.limit === "number" &&
+              typeof rawData.spent === "number"
+                ? rawData.limit - rawData.spent
+                : undefined,
           },
         });
 

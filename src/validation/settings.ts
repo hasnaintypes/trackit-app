@@ -5,10 +5,8 @@ import {
   DateFormat,
   TimeFormat,
   WeekDay,
-  DefaultView,
   CurrencyPosition,
   ThousandSeparator,
-  ColorScheme,
 } from "@prisma/client";
 
 export const updateNotificationsSchema = z.object({
@@ -30,11 +28,9 @@ export const updateNotificationsSchema = z.object({
 });
 
 export const updateDisplaySchema = z.object({
-  defaultView: z.nativeEnum(DefaultView).optional(),
   decimalPlaces: z.number().int().min(0).max(4).optional(),
   currencyPosition: z.nativeEnum(CurrencyPosition).optional(),
   thousandSeparator: z.nativeEnum(ThousandSeparator).optional(),
-  colorScheme: z.nativeEnum(ColorScheme).optional(),
   compactNumbers: z.boolean().optional(),
 });
 

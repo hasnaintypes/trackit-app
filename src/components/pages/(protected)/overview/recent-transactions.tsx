@@ -43,6 +43,7 @@ export const RecentTransactions = React.memo(function RecentTransactions({
           onEdit={onEdit}
           onDelete={onDelete}
           onView={onView}
+          hidePagination
           className="border-none shadow-none"
         />
       </CardContent>

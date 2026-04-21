@@ -5,6 +5,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AnalyticsPage() {
   void api.transaction.list.prefetch({ limit: 100 });
+  void api.category.list.prefetch();
   void api.settings.getAll.prefetch();
 
   return (

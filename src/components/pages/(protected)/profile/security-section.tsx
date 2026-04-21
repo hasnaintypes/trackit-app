@@ -7,17 +7,30 @@ import useSessions from "@/hooks/use-sessions";
 import { formatTimestamp } from "@/constants/formatting";
 import { prettyDeviceFromUA } from "@/lib/device-map";
 import { toast } from "sonner";
+import { api } from "@/trpc/react";
 import { Card, CardContent } from "@ui/card";
 import { Input } from "@ui/input";
 import { Button } from "@ui/button";
 import { Label } from "@ui/label";
 import { Badge } from "@ui/badge";
-import { LogOut, Smartphone } from "lucide-react";
+import { LogOut, ShieldCheck, Smartphone } from "lucide-react";
+import TwoFactorSetupDialog from "./two-factor-setup-dialog";
+import TwoFactorDisableDialog from "./two-factor-disable-dialog";
+import TwoFactorBackupDialog from "./two-factor-backup-dialog";
 
 export default function SecuritySection() {
   const { changePassword } = useAuth();
-  const { sessions, revoke } = useSessions();
+  const { sessions, revoke, revokeAll } = useSessions();
+  const userQuery = api.user.getMe.useQuery();
+  const utils = api.useUtils();
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+  const [isRevokingAll, setIsRevokingAll] = useState(false);
+  const [setupDialogOpen, setSetupDialogOpen] = useState(false);
+  const [disableDialogOpen, setDisableDialogOpen] = useState(false);
+  const [backupDialogOpen, setBackupDialogOpen] = useState(false);
+
+  const twoFactorEnabled = userQuery.data?.twoFactorEnabled ?? false;
 
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
@@ -66,11 +79,16 @@ export default function SecuritySection() {
     }
   };
 
+  const handleTwoFactorChange = () => {
+    void utils.user.getMe.invalidate();
+  };
+
   const activeSessions = (sessions ?? []).map((s) => ({
     id: s.id,
     device: prettyDeviceFromUA(s.device),
     ip: s.ip,
     lastActivity: s.lastActivity,
+    isCurrent: s.isCurrent ?? false,
   }));
 
   const loginHistory = (sessions ?? []).map((s) => ({
@@ -140,6 +158,74 @@ export default function SecuritySection() {
         </CardContent>
       </Card>
 
+      {/* Two-Factor Authentication */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="mb-1 flex items-center gap-2">
+                <h3 className="text-foreground font-semibold">
+                  Two-Factor Authentication
+                </h3>
+                {twoFactorEnabled && (
+                  <Badge variant="default" className="text-[10px]">
+                    Enabled
+                  </Badge>
+                )}
+              </div>
+              <p className="text-muted-foreground mb-4 text-xs">
+                {twoFactorEnabled
+                  ? "Your account is protected with an authenticator app. You will need to enter a verification code when signing in."
+                  : "Add an extra layer of security to your account by requiring a verification code from an authenticator app when signing in."}
+              </p>
+            </div>
+            <ShieldCheck
+              className={`h-5 w-5 shrink-0 ${twoFactorEnabled ? "text-green-500" : "text-muted-foreground"}`}
+            />
+          </div>
+
+          {twoFactorEnabled ? (
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setBackupDialogOpen(true)}
+              >
+                Regenerate Backup Codes
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-destructive hover:text-destructive"
+                onClick={() => setDisableDialogOpen(true)}
+              >
+                Disable 2FA
+              </Button>
+            </div>
+          ) : (
+            <Button size="sm" onClick={() => setSetupDialogOpen(true)}>
+              Enable 2FA
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* 2FA Dialogs */}
+      <TwoFactorSetupDialog
+        open={setupDialogOpen}
+        onOpenChange={setSetupDialogOpen}
+        onComplete={handleTwoFactorChange}
+      />
+      <TwoFactorDisableDialog
+        open={disableDialogOpen}
+        onOpenChange={setDisableDialogOpen}
+        onComplete={handleTwoFactorChange}
+      />
+      <TwoFactorBackupDialog
+        open={backupDialogOpen}
+        onOpenChange={setBackupDialogOpen}
+      />
+
       {/* Active Sessions */}
       <Card>
         <CardContent className="p-6">
@@ -149,6 +235,28 @@ export default function SecuritySection() {
           <p className="text-muted-foreground mb-4 text-xs">
             Devices currently logged into your account.
           </p>
+          {activeSessions.length >= 2 && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="mb-3"
+              disabled={isRevokingAll}
+              onClick={async () => {
+                try {
+                  setIsRevokingAll(true);
+                  await revokeAll();
+                  toast.success("All other sessions revoked");
+                } catch {
+                  toast.error("Failed to revoke sessions");
+                } finally {
+                  setIsRevokingAll(false);
+                }
+              }}
+            >
+              <LogOut className="mr-1.5 h-3.5 w-3.5" />
+              {isRevokingAll ? "Revoking..." : "Revoke All Other Sessions"}
+            </Button>
+          )}
           <div className="space-y-3">
             {activeSessions.map((session) => (
               <div
@@ -158,8 +266,13 @@ export default function SecuritySection() {
                 <div className="flex gap-3">
                   <Smartphone className="text-muted-foreground mt-0.5 h-4 w-4" />
                   <div>
-                    <p className="text-foreground text-sm font-medium">
+                    <p className="text-foreground flex items-center gap-2 text-sm font-medium">
                       {session.device}
+                      {session.isCurrent && (
+                        <Badge variant="default" className="text-[10px]">
+                          Current
+                        </Badge>
+                      )}
                     </p>
                     <p className="text-muted-foreground text-xs">
                       IP: {session.ip} &middot; Last:{" "}
@@ -167,22 +280,24 @@ export default function SecuritySection() {
                     </p>
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-destructive hover:text-destructive h-8 gap-1.5 text-xs"
-                  onClick={async () => {
-                    try {
-                      await revoke({ id: session.id });
-                      toast.success("Session revoked");
-                    } catch {
-                      toast.error("Failed to revoke session");
-                    }
-                  }}
-                >
-                  <LogOut className="h-3.5 w-3.5" />
-                  Revoke
-                </Button>
+                {!session.isCurrent && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-destructive hover:text-destructive h-8 gap-1.5 text-xs"
+                    onClick={async () => {
+                      try {
+                        await revoke({ id: session.id });
+                        toast.success("Session revoked");
+                      } catch {
+                        toast.error("Failed to revoke session");
+                      }
+                    }}
+                  >
+                    <LogOut className="h-3.5 w-3.5" />
+                    Revoke
+                  </Button>
+                )}
               </div>
             ))}
             {activeSessions.length === 0 && (

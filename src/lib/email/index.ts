@@ -12,7 +12,7 @@ interface SendEmailOptions {
   html: string;
 }
 
-interface SendTemplateEmailOptions {
+export interface SendTemplateEmailOptions {
   to: string;
   subject: string;
   template:
@@ -22,7 +22,10 @@ interface SendTemplateEmailOptions {
     | "transaction-alert"
     | "ai-insight"
     | "verification"
-    | "password-reset";
+    | "password-reset"
+    | "contact-admin-notification"
+    | "contact-confirmation"
+    | "waitlist-welcome";
   data: Record<string, unknown>;
 }
 

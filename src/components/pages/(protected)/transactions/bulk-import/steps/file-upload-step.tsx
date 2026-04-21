@@ -4,11 +4,23 @@ import React, { useRef, useState } from "react";
 import { Upload, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@ui/alert";
 import { parseCSV } from "@shared/file-parser";
+import { parseOFX } from "@shared/ofx-parser";
 import { env } from "@/env";
 import { Skeleton } from "@ui/skeleton";
+import type { ImportTransaction } from "@/types/bulk-import";
+
+type FileUploadResult =
+  | { type: "csv"; csvData: Record<string, string>[] }
+  | { type: "ofx"; transactions: ImportTransaction[] };
 
 interface FileUploadStepProps {
-  onNext: (file: File, csvData: Record<string, string>[]) => void;
+  onNext: (file: File, result: FileUploadResult) => void;
+}
+
+const ACCEPTED_EXTENSIONS = [".csv", ".ofx", ".qfx"];
+
+function getFileExtension(filename: string): string {
+  return filename.slice(filename.lastIndexOf(".")).toLowerCase();
 }
 
 export function FileUploadStep({ onNext }: FileUploadStepProps) {
@@ -21,41 +33,53 @@ export function FileUploadStep({ onNext }: FileUploadStepProps) {
     setIsLoading(true);
 
     try {
-      // Validate file
+      // Validate file size
       if (file.size > 5 * 1024 * 1024) {
         throw new Error("File size must be less than 5MB");
       }
 
-      if (!file.name.endsWith(".csv")) {
-        throw new Error("Only CSV files are supported");
+      const ext = getFileExtension(file.name);
+      if (!ACCEPTED_EXTENSIONS.includes(ext)) {
+        throw new Error("Only CSV, OFX, and QFX files are supported");
       }
 
-      // Parse CSV
-      const csvData = await parseCSV(file);
+      if (ext === ".csv") {
+        // Existing CSV flow
+        const csvData = await parseCSV(file);
 
-      if (!Array.isArray(csvData) || csvData.length === 0) {
-        throw new Error("CSV file is empty");
+        if (!Array.isArray(csvData) || csvData.length === 0) {
+          throw new Error("CSV file is empty");
+        }
+
+        const maxRows = env.NEXT_PUBLIC_GEMINI_MAX_ROWS
+          ? Number(env.NEXT_PUBLIC_GEMINI_MAX_ROWS)
+          : 50;
+        if (csvData.length > maxRows) {
+          throw new Error(
+            `CSV file contains ${csvData.length} rows, but maximum allowed is ${maxRows}. Please reduce the file size or contact support to increase the limit.`,
+          );
+        }
+
+        const firstRow = csvData[0];
+        if (!firstRow || typeof firstRow !== "object") {
+          throw new Error("Invalid CSV format");
+        }
+
+        onNext(file, { type: "csv", csvData });
+      } else {
+        // OFX/QFX flow
+        const transactions = await parseOFX(file);
+
+        if (transactions.length === 0) {
+          throw new Error(
+            "No transactions found in the bank file. Please verify the file is a valid OFX/QFX export.",
+          );
+        }
+
+        onNext(file, { type: "ofx", transactions });
       }
-
-      // Validate row count against configured maximum
-      const maxRows = env.NEXT_PUBLIC_GEMINI_MAX_ROWS
-        ? Number(env.NEXT_PUBLIC_GEMINI_MAX_ROWS)
-        : 50;
-      if (csvData.length > maxRows) {
-        throw new Error(
-          `CSV file contains ${csvData.length} rows, but maximum allowed is ${maxRows}. Please reduce the file size or contact support to increase the limit.`,
-        );
-      }
-
-      const firstRow = csvData[0];
-      if (!firstRow || typeof firstRow !== "object") {
-        throw new Error("Invalid CSV format");
-      }
-
-      // Immediately proceed to mapping step
-      onNext(file, csvData);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to parse CSV file");
+      setError(err instanceof Error ? err.message : "Failed to parse file");
     } finally {
       setIsLoading(false);
     }
@@ -81,7 +105,7 @@ export function FileUploadStep({ onNext }: FileUploadStepProps) {
           <input
             ref={fileInputRef}
             type="file"
-            accept=".csv"
+            accept=".csv,.ofx,.qfx"
             onChange={(e) =>
               e.target.files?.[0] && handleFileSelect(e.target.files[0])
             }
@@ -89,7 +113,7 @@ export function FileUploadStep({ onNext }: FileUploadStepProps) {
           />
           <Upload className="text-muted-foreground mx-auto h-8 w-8" />
           <h3 className="text-foreground mt-4 text-sm font-medium">
-            Drop your CSV file here
+            Drop your CSV, OFX, or QFX file here
           </h3>
           <p className="text-muted-foreground mt-2 text-sm">
             or{" "}

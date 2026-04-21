@@ -6,13 +6,12 @@ import {
   Camera,
   Calendar,
   ShieldAlert,
-  Moon,
-  Sun,
-  Laptop,
   Mail,
   BarChart3,
-  DollarSign,
+  Coins,
   Languages,
+  MapPin,
+  UserCircle,
 } from "lucide-react";
 import { Button } from "@ui/button";
 import { Label } from "@ui/label";
@@ -30,14 +29,18 @@ import {
   Currency,
   Language,
   DateFormat,
-  DefaultView,
   Gender,
-  Country,
-  Timezone,
+  type Country,
+  type Timezone,
   WeekDay,
-  ColorScheme,
 } from "@prisma/client";
 import { motion } from "framer-motion";
+import {
+  CountryOptions,
+  TimezoneOptions,
+  CURRENCY_SYMBOLS,
+} from "@/constants/formatting";
+import { cn } from "@/lib/utils";
 
 // Re-using the types from your original file or a shared types file
 interface OnboardingState {
@@ -53,8 +56,6 @@ interface OnboardingState {
   weekStartsOn: WeekDay;
   largeTx: number;
   lowBalance: number;
-  defaultView: DefaultView;
-  colorScheme: ColorScheme;
   emailWeekly: boolean;
   emailMonthly: boolean;
   compactNumbers: boolean;
@@ -68,6 +69,64 @@ interface StepFormsProps {
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
 }
+
+// ---------------------------------------------------------------------------
+// Shared row — matches display-settings.tsx SettingRow
+// ---------------------------------------------------------------------------
+function SettingRow({
+  icon: Icon,
+  label,
+  description,
+  children,
+  className,
+}: {
+  icon?: React.ComponentType<{ className?: string }>;
+  label: string;
+  description?: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between",
+        className,
+      )}
+    >
+      <div className="flex items-start gap-3">
+        {Icon && (
+          <div className="bg-muted flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border">
+            <Icon className="text-muted-foreground h-4 w-4" />
+          </div>
+        )}
+        <div className="space-y-0.5">
+          <Label className="text-sm font-medium">{label}</Label>
+          {description && (
+            <p className="text-muted-foreground text-xs">{description}</p>
+          )}
+        </div>
+      </div>
+      <div className="w-full sm:w-48">{children}</div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Currency display map — matches display-settings.tsx
+// ---------------------------------------------------------------------------
+const CURRENCY_LABELS: Record<Currency, { symbol: string; name: string }> = {
+  [Currency.USD]: { symbol: "$", name: "US Dollar" },
+  [Currency.EUR]: { symbol: "\u20AC", name: "Euro" },
+  [Currency.GBP]: { symbol: "\u00A3", name: "British Pound" },
+  [Currency.JPY]: { symbol: "\u00A5", name: "Japanese Yen" },
+  [Currency.AUD]: { symbol: "A$", name: "Australian Dollar" },
+  [Currency.CAD]: { symbol: "C$", name: "Canadian Dollar" },
+  [Currency.CHF]: { symbol: "Fr", name: "Swiss Franc" },
+  [Currency.CNY]: { symbol: "\u00A5", name: "Chinese Yuan" },
+  [Currency.INR]: { symbol: "\u20B9", name: "Indian Rupee" },
+  [Currency.SGD]: { symbol: "S$", name: "Singapore Dollar" },
+  [Currency.PKR]: { symbol: "Rs", name: "Pakistani Rupee" },
+};
 
 export function StepForms({
   step,
@@ -90,6 +149,8 @@ export function StepForms({
     setPrefs((prev) => ({ ...prev, [key]: value }));
   };
 
+  const currencySymbol = CURRENCY_SYMBOLS[prefs.currency] ?? "$";
+
   return (
     <motion.div
       key={step}
@@ -97,38 +158,38 @@ export function StepForms({
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="mx-auto w-full max-w-md py-4"
+      className="mx-auto w-full py-4"
     >
       {/* STEP 1: IDENTITY */}
       {step === 1 && (
-        <div className="space-y-8">
-          <div className="flex flex-col items-center gap-6">
+        <div className="space-y-6">
+          {/* Avatar */}
+          <div className="flex flex-col items-center gap-4">
             <div className="group relative">
-              <Avatar className="border-background ring-muted h-32 w-32 border-4 shadow-2xl ring-2 transition-transform group-hover:scale-[1.02]">
+              <Avatar className="border-background ring-muted h-36 w-36 border-4 shadow-xl ring-2 transition-transform group-hover:scale-[1.02]">
                 <AvatarImage src={prefs.avatarUrl} className="object-cover" />
                 <AvatarFallback className="bg-muted text-muted-foreground">
-                  <UserIcon className="h-12 w-12" />
+                  <UserIcon className="h-14 w-14" />
                 </AvatarFallback>
               </Avatar>
-
               <div className="absolute -bottom-2 left-1/2 flex -translate-x-1/2 gap-2">
                 <Button
                   size="icon"
                   variant="outline"
-                  className="bg-background hover:bg-muted h-9 w-9 rounded-full shadow-sm"
+                  className="bg-background hover:bg-muted h-8 w-8 rounded-full shadow-sm"
                   onClick={handleShuffleAvatar}
                   type="button"
                 >
-                  <RefreshCw className="h-4 w-4" />
+                  <RefreshCw className="h-3.5 w-3.5" />
                 </Button>
                 <Button
                   size="icon"
                   variant="outline"
-                  className="bg-background hover:bg-muted h-9 w-9 rounded-full shadow-sm"
+                  className="bg-background hover:bg-muted h-8 w-8 rounded-full shadow-sm"
                   onClick={() => fileInputRef.current?.click()}
                   type="button"
                 >
-                  <Camera className="h-4 w-4" />
+                  <Camera className="h-3.5 w-3.5" />
                 </Button>
                 <input
                   type="file"
@@ -139,178 +200,188 @@ export function StepForms({
                 />
               </div>
             </div>
+          </div>
 
-            <div className="w-full space-y-4">
-              <div className="space-y-2">
-                <Label>Display Name</Label>
-                <Input
-                  className="bg-muted/30 h-11"
-                  placeholder="e.g. John Doe"
-                  value={prefs.name}
-                  onChange={(e) => updatePref("name", e.target.value)}
-                />
-              </div>
+          {/* Fields */}
+          <div className="divide-border divide-y">
+            <SettingRow
+              icon={UserCircle}
+              label="Display Name"
+              description="How you appear across Trackit"
+            >
+              <Input
+                className="w-full"
+                placeholder="e.g. John Doe"
+                value={prefs.name}
+                onChange={(e) => updatePref("name", e.target.value)}
+              />
+            </SettingRow>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Gender</Label>
-                  <Select
-                    value={prefs.gender}
-                    onValueChange={(v) => updatePref("gender", v as Gender)}
-                  >
-                    <SelectTrigger className="bg-muted/30 h-11">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={Gender.MALE}>Male</SelectItem>
-                      <SelectItem value={Gender.FEMALE}>Female</SelectItem>
-                      <SelectItem value={Gender.OTHER}>
-                        Other / Private
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Country</Label>
-                  <Select
-                    value={prefs.country}
-                    onValueChange={(v) => updatePref("country", v as Country)}
-                  >
-                    <SelectTrigger className="bg-muted/30 h-11">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.values(Country).map((c) => (
-                        <SelectItem key={c} value={c}>
-                          {c}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+            <SettingRow
+              icon={UserIcon}
+              label="Gender"
+              description="Used for personalization"
+            >
+              <Select
+                value={prefs.gender}
+                onValueChange={(v) => updatePref("gender", v as Gender)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={Gender.MALE}>Male</SelectItem>
+                  <SelectItem value={Gender.FEMALE}>Female</SelectItem>
+                  <SelectItem value={Gender.OTHER}>Other / Private</SelectItem>
+                </SelectContent>
+              </Select>
+            </SettingRow>
 
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <Globe className="text-muted-foreground h-3.5 w-3.5" />{" "}
-                  Timezone
-                </Label>
-                <Select
-                  value={prefs.timezone}
-                  onValueChange={(v) => updatePref("timezone", v as Timezone)}
-                >
-                  <SelectTrigger className="bg-muted/30 h-11">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.values(Timezone).map((tz) => (
-                      <SelectItem key={tz} value={tz}>
-                        {tz}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+            <SettingRow
+              icon={MapPin}
+              label="Country"
+              description="Your primary location"
+            >
+              <Select
+                value={prefs.country}
+                onValueChange={(v) => updatePref("country", v as Country)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(CountryOptions).map(([code, name]) => (
+                    <SelectItem key={code} value={code}>
+                      {name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </SettingRow>
+
+            <SettingRow
+              icon={Globe}
+              label="Timezone"
+              description="For scheduling and reports"
+            >
+              <Select
+                value={prefs.timezone}
+                onValueChange={(v) => updatePref("timezone", v as Timezone)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(TimezoneOptions).map(([code, label]) => (
+                    <SelectItem key={code} value={code}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </SettingRow>
           </div>
         </div>
       )}
 
       {/* STEP 2: REGIONAL */}
       {step === 2 && (
-        <div className="space-y-6">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <DollarSign className="text-muted-foreground h-3.5 w-3.5" />{" "}
-                Primary Currency
-              </Label>
-              <Select
-                value={prefs.currency}
-                onValueChange={(v) => updatePref("currency", v as Currency)}
-              >
-                <SelectTrigger className="bg-muted/30 h-12 text-lg font-medium">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.values(Currency).map((c) => (
+        <div className="divide-border divide-y">
+          <SettingRow
+            icon={Coins}
+            label="Primary Currency"
+            description="Default currency for accounts"
+          >
+            <Select
+              value={prefs.currency}
+              onValueChange={(v) => updatePref("currency", v as Currency)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(Currency).map((c) => {
+                  const info = CURRENCY_LABELS[c];
+                  return (
                     <SelectItem key={c} value={c}>
-                      {c}
+                      <span className="flex items-center gap-2">
+                        <span className="text-muted-foreground w-6 text-center font-mono text-xs">
+                          {info?.symbol}
+                        </span>
+                        {c} — {info?.name}
+                      </span>
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </SettingRow>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <Languages className="text-muted-foreground h-3.5 w-3.5" />{" "}
-                  Language
-                </Label>
-                <Select
-                  value={prefs.language}
-                  onValueChange={(v) => updatePref("language", v as Language)}
-                >
-                  <SelectTrigger className="bg-muted/30 h-11">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={Language.EN}>English</SelectItem>
-                    <SelectItem value={Language.ES}>Spanish</SelectItem>
-                    <SelectItem value={Language.FR}>French</SelectItem>
-                    <SelectItem value={Language.DE}>German</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Date Format</Label>
-                <Select
-                  value={prefs.dateFormat}
-                  onValueChange={(v) =>
-                    updatePref("dateFormat", v as DateFormat)
-                  }
-                >
-                  <SelectTrigger className="bg-muted/30 h-11">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={DateFormat.MM_DD_YYYY}>
-                      MM/DD/YYYY
-                    </SelectItem>
-                    <SelectItem value={DateFormat.DD_MM_YYYY}>
-                      DD/MM/YYYY
-                    </SelectItem>
-                    <SelectItem value={DateFormat.YYYY_MM_DD}>
-                      YYYY-MM-DD
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+          <SettingRow
+            icon={Languages}
+            label="Language"
+            description="Display language"
+          >
+            <Select
+              value={prefs.language}
+              onValueChange={(v) => updatePref("language", v as Language)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={Language.EN}>English</SelectItem>
+                <SelectItem value={Language.ES}>Espa&#241;ol</SelectItem>
+                <SelectItem value={Language.FR}>Fran&#231;ais</SelectItem>
+                <SelectItem value={Language.DE}>Deutsch</SelectItem>
+              </SelectContent>
+            </Select>
+          </SettingRow>
 
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Calendar className="text-muted-foreground h-3.5 w-3.5" /> Week
-                Starts On
-              </Label>
-              <Select
-                value={prefs.weekStartsOn}
-                onValueChange={(v) => updatePref("weekStartsOn", v as WeekDay)}
-              >
-                <SelectTrigger className="bg-muted/30 h-11">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.values(WeekDay).map((day) => (
-                    <SelectItem key={day} value={day}>
-                      {day}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <SettingRow
+            icon={Calendar}
+            label="Date Format"
+            description="How dates are displayed"
+          >
+            <Select
+              value={prefs.dateFormat}
+              onValueChange={(v) => updatePref("dateFormat", v as DateFormat)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={DateFormat.MM_DD_YYYY}>
+                  MM/DD/YYYY
+                </SelectItem>
+                <SelectItem value={DateFormat.DD_MM_YYYY}>
+                  DD/MM/YYYY
+                </SelectItem>
+                <SelectItem value={DateFormat.YYYY_MM_DD}>
+                  YYYY-MM-DD
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </SettingRow>
+
+          <SettingRow
+            icon={Calendar}
+            label="Week Starts On"
+            description="First day of the week"
+          >
+            <Select
+              value={prefs.weekStartsOn}
+              onValueChange={(v) => updatePref("weekStartsOn", v as WeekDay)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={WeekDay.SUNDAY}>Sunday</SelectItem>
+                <SelectItem value={WeekDay.MONDAY}>Monday</SelectItem>
+              </SelectContent>
+            </Select>
+          </SettingRow>
         </div>
       )}
 
@@ -320,126 +391,64 @@ export function StepForms({
           <div className="flex gap-3 rounded-lg border border-amber-500/20 bg-amber-500/10 p-4 text-amber-600 dark:text-amber-400">
             <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0" />
             <p className="text-sm leading-relaxed">
-              We use these limits to detect unusual activity. You&apos;ll be
-              alerted immediately if transactions exceed these thresholds.
+              Set your safety thresholds. You&apos;ll be alerted immediately
+              when transactions exceed these limits or your balance runs low.
             </p>
           </div>
 
-          <div className="grid gap-6 pt-2">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label className="text-base">Large Transaction Alert</Label>
-                <div className="relative">
-                  <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
-                    $
-                  </span>
-                  <Input
-                    type="number"
-                    value={prefs.largeTx}
-                    onChange={(e) =>
-                      updatePref("largeTx", Number(e.target.value))
-                    }
-                    className="bg-muted/30 h-12 pl-8 text-lg"
-                  />
-                </div>
-                <p className="text-muted-foreground text-xs">
-                  Transactions above this amount trigger an email.
-                </p>
+          <div className="divide-border divide-y">
+            <SettingRow
+              icon={ShieldAlert}
+              label="Large Transaction Alert"
+              description="Notify me for transactions above this amount"
+            >
+              <div className="relative">
+                <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2 text-sm">
+                  {currencySymbol}
+                </span>
+                <Input
+                  type="number"
+                  value={prefs.largeTx}
+                  onChange={(e) =>
+                    updatePref("largeTx", Number(e.target.value))
+                  }
+                  className="w-full pl-8"
+                />
               </div>
+            </SettingRow>
 
-              <div className="space-y-2">
-                <Label className="text-base">Low Balance Warning</Label>
-                <div className="relative">
-                  <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
-                    $
-                  </span>
-                  <Input
-                    type="number"
-                    value={prefs.lowBalance}
-                    onChange={(e) =>
-                      updatePref("lowBalance", Number(e.target.value))
-                    }
-                    className="bg-muted/30 h-12 pl-8 text-lg"
-                  />
-                </div>
-                <p className="text-muted-foreground text-xs">
-                  We&apos;ll warn you when liquidity drops below this.
-                </p>
+            <SettingRow
+              icon={Coins}
+              label="Low Balance Warning"
+              description="Warn me when account balance drops below this"
+            >
+              <div className="relative">
+                <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2 text-sm">
+                  {currencySymbol}
+                </span>
+                <Input
+                  type="number"
+                  value={prefs.lowBalance}
+                  onChange={(e) =>
+                    updatePref("lowBalance", Number(e.target.value))
+                  }
+                  className="w-full pl-8"
+                />
               </div>
-            </div>
+            </SettingRow>
           </div>
         </div>
       )}
 
       {/* STEP 4: EXPERIENCE */}
       {step === 4 && (
-        <div className="space-y-8">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Default View</Label>
-              <Select
-                value={prefs.defaultView}
-                onValueChange={(v) =>
-                  updatePref("defaultView", v as DefaultView)
-                }
-              >
-                <SelectTrigger className="bg-muted/30 h-11">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={DefaultView.OVERVIEW}>Overview</SelectItem>
-                  <SelectItem value={DefaultView.TRANSACTIONS}>
-                    Transactions
-                  </SelectItem>
-                  <SelectItem value={DefaultView.NETWORTH}>
-                    Net Worth
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Theme</Label>
-              <Select
-                value={prefs.colorScheme}
-                onValueChange={(v) =>
-                  updatePref("colorScheme", v as ColorScheme)
-                }
-              >
-                <SelectTrigger className="bg-muted/30 h-11">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ColorScheme.LIGHT}>
-                    <div className="flex items-center gap-2">
-                      <Sun className="h-4 w-4" /> Light
-                    </div>
-                  </SelectItem>
-                  <SelectItem value={ColorScheme.DARK}>
-                    <div className="flex items-center gap-2">
-                      <Moon className="h-4 w-4" /> Dark
-                    </div>
-                  </SelectItem>
-                  <SelectItem value={ColorScheme.SYSTEM}>
-                    <div className="flex items-center gap-2">
-                      <Laptop className="h-4 w-4" /> Auto
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="bg-muted/20 divide-y rounded-xl border">
-            <div className="flex items-center justify-between p-4">
-              <div className="space-y-0.5">
-                <div className="flex items-center gap-2">
-                  <Mail className="text-muted-foreground h-4 w-4" />
-                  <span className="text-sm font-medium">Weekly Digest</span>
-                </div>
-                <p className="text-muted-foreground pl-6 text-xs">
-                  Receive a summary every Monday.
-                </p>
-              </div>
+        <div className="divide-border divide-y">
+          <SettingRow
+            icon={Mail}
+            label="Weekly Digest"
+            description="Receive a spending summary every Monday"
+          >
+            <div className="flex justify-end">
               <Switch
                 checked={prefs.emailWeekly}
                 onCheckedChange={(c) => {
@@ -448,23 +457,20 @@ export function StepForms({
                 }}
               />
             </div>
+          </SettingRow>
 
-            <div className="flex items-center justify-between p-4">
-              <div className="space-y-0.5">
-                <div className="flex items-center gap-2">
-                  <BarChart3 className="text-muted-foreground h-4 w-4" />
-                  <span className="text-sm font-medium">Compact Numbers</span>
-                </div>
-                <p className="text-muted-foreground pl-6 text-xs">
-                  Display 1,500,000 as &quot;1.5M&quot;
-                </p>
-              </div>
+          <SettingRow
+            icon={BarChart3}
+            label="Compact Numbers"
+            description='Display 1,500,000 as "1.5M" in charts'
+          >
+            <div className="flex justify-end">
               <Switch
                 checked={prefs.compactNumbers}
                 onCheckedChange={(c) => updatePref("compactNumbers", c)}
               />
             </div>
-          </div>
+          </SettingRow>
         </div>
       )}
     </motion.div>

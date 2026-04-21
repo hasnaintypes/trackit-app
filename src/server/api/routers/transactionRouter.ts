@@ -1,6 +1,10 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  uploadRateLimitedProcedure,
+} from "@/server/api/trpc";
 import { createLogger } from "@/lib/logging";
 
 const logger = createLogger("transactionRouter");
@@ -351,10 +355,20 @@ export const transactionRouter = createTRPCRouter({
               data.category = { disconnect: true };
             }
           }
-          if (Object.prototype.hasOwnProperty.call(input, "contactId"))
-            data.contactId = input.contactId ?? null;
-          if (Object.prototype.hasOwnProperty.call(input, "groupId"))
-            data.groupId = input.groupId ?? null;
+          if (Object.prototype.hasOwnProperty.call(input, "contactId")) {
+            if (input.contactId) {
+              data.contact = { connect: { id: input.contactId } };
+            } else {
+              data.contact = { disconnect: true };
+            }
+          }
+          if (Object.prototype.hasOwnProperty.call(input, "groupId")) {
+            if (input.groupId) {
+              data.group = { connect: { id: input.groupId } };
+            } else {
+              data.group = { disconnect: true };
+            }
+          }
           if (Object.prototype.hasOwnProperty.call(input, "description"))
             data.description = input.description ?? null;
           if (Object.prototype.hasOwnProperty.call(input, "notes"))
@@ -528,7 +542,7 @@ export const transactionRouter = createTRPCRouter({
       };
     }),
 
-  uploadReceipt: protectedProcedure
+  uploadReceipt: uploadRateLimitedProcedure
     .input(
       z.object({
         transactionId: z.string().optional(),

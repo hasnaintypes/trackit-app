@@ -1,10 +1,10 @@
 import {
-  GooglePaLM,
-  Gemini,
-  Replit,
-  MagicUI,
-  VSCodium,
-  MediaWiki,
+  GoogleSheets,
+  Notion,
+  Excel,
+  GoogleDrive,
+  Gmail,
+  GoogleCalendar,
 } from "public/images/logos";
 import { LogoIcon } from "@common/branding/logo";
 import { cn } from "@/lib/utils";
@@ -28,15 +28,15 @@ export default function IntegrationsSection() {
               />
               <div className="mx-auto mb-2 flex w-fit justify-center gap-2">
                 <IntegrationCard>
-                  <Gemini />
+                  <GoogleSheets />
                 </IntegrationCard>
                 <IntegrationCard>
-                  <Replit />
+                  <Notion />
                 </IntegrationCard>
               </div>
               <div className="mx-auto my-2 flex w-fit justify-center gap-2">
                 <IntegrationCard>
-                  <MagicUI />
+                  <Excel />
                 </IntegrationCard>
                 <IntegrationCard
                   borderClassName="shadow-black-950/10 shadow-xl border-black/25 dark:border-white/25"
@@ -45,17 +45,17 @@ export default function IntegrationsSection() {
                   <LogoIcon />
                 </IntegrationCard>
                 <IntegrationCard>
-                  <VSCodium />
+                  <Gmail />
                 </IntegrationCard>
               </div>
 
               <div className="mx-auto flex w-fit justify-center gap-2">
                 <IntegrationCard>
-                  <MediaWiki />
+                  <GoogleDrive />
                 </IntegrationCard>
 
                 <IntegrationCard>
-                  <GooglePaLM />
+                  <GoogleCalendar />
                 </IntegrationCard>
               </div>
             </div>

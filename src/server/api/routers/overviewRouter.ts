@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { Prisma } from "@prisma/client";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { toNum } from "@shared/decimal";
+import { SplitService } from "@/server/services/splitService";
 
 export const overviewRouter = createTRPCRouter({
   /**
@@ -144,7 +144,9 @@ export const overviewRouter = createTRPCRouter({
    */
   balanceOverview: protectedProcedure
     .input(
-      z.object({ months: z.number().min(1).max(24).default(6) }).default({}),
+      z
+        .object({ months: z.number().min(1).max(24).default(6) })
+        .default(() => ({ months: 6 })),
     )
     .query(async ({ ctx, input }) => {
       const userId = ctx.user.id;
@@ -170,34 +172,22 @@ export const overviewRouter = createTRPCRouter({
         });
       }
 
-      // Aggregate in SQL instead of loading all rows into JS
-      const rows = await db.$queryRaw<
-        Array<{
-          key: string;
-          month: string;
-          year: number;
-          income: number;
-          expense: number;
-        }>
-      >(Prisma.sql`
-        SELECT
-          TO_CHAR(date, 'YYYY-MM') AS key,
-          TO_CHAR(date, 'Mon') AS month,
-          EXTRACT(YEAR FROM date)::int AS year,
-          COALESCE(SUM(CASE WHEN type = 'CREDIT' THEN ABS(amount) ELSE 0 END), 0)::float AS income,
-          COALESCE(SUM(CASE WHEN type = 'DEBIT' THEN ABS(amount) ELSE 0 END), 0)::float AS expense
-        FROM "Transaction"
-        WHERE "userId" = ${userId} AND date >= ${startDate}
-        GROUP BY 1, 2, 3
-        ORDER BY 1 ASC
-      `);
+      // Fetch transactions with minimal select and aggregate in JS
+      const transactions = await db.transaction.findMany({
+        where: { userId, date: { gte: startDate } },
+        select: { date: true, type: true, amount: true },
+      });
 
-      // Merge SQL results into the pre-filled month map
-      for (const row of rows) {
-        const bucket = monthlyMap.get(row.key);
+      for (const tx of transactions) {
+        const key = format(tx.date, "yyyy-MM");
+        const bucket = monthlyMap.get(key);
         if (bucket) {
-          bucket.income = Number(row.income);
-          bucket.expense = Number(row.expense);
+          const amt = Math.abs(toNum(tx.amount));
+          if (tx.type === "CREDIT") {
+            bucket.income += amt;
+          } else if (tx.type === "DEBIT") {
+            bucket.expense += amt;
+          }
         }
       }
 
@@ -279,6 +269,37 @@ export const overviewRouter = createTRPCRouter({
       yearly: toNum(yearlyAgg._sum.amount),
       total: totalSpending,
       categories: breakdown,
+    };
+  }),
+
+  splitSummary: protectedProcedure.query(async ({ ctx }) => {
+    const groups = await ctx.db.group.findMany({
+      where: { userId: ctx.user.id, isArchived: false },
+      select: { id: true },
+    });
+
+    let youOwe = 0;
+    let youAreOwed = 0;
+
+    for (const group of groups) {
+      const balances = await SplitService.calculateGroupBalances(
+        group.id,
+        ctx.user.id,
+        ctx.db,
+      );
+      const selfBalance = balances.get("self") ?? 0;
+
+      if (selfBalance < 0) {
+        youOwe += Math.abs(selfBalance);
+      } else if (selfBalance > 0) {
+        youAreOwed += selfBalance;
+      }
+    }
+
+    return {
+      youOwe: Math.round(youOwe * 100) / 100,
+      youAreOwed: Math.round(youAreOwed * 100) / 100,
+      unsettledGroups: groups.length,
     };
   }),
 });

@@ -6,9 +6,9 @@ import { invalidateCategories } from "@/trpc/invalidation";
 import { useCategories } from "@/hooks/use-categories";
 import CategoryForm from "@/components/forms/categories/category-form";
 import SubcategoryForm from "@/components/forms/categories/subcategory-form";
+import { cn } from "@/lib/utils";
 import { Button } from "@ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@ui/card";
-// Tabs/Separator removed (not used)
+import { Badge } from "@ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@ui/alert";
 import {
   Trash2,
@@ -16,11 +16,10 @@ import {
   PlusCircle,
   AlertTriangle,
   FolderOpen,
-  LayoutGrid,
-  List,
+  ChevronDown,
+  Plus,
 } from "lucide-react";
 import { ICONS } from "@/constants/icons";
-// toast removed (not used in this file)
 import type { Category } from "@/types/category";
 import type {
   CreateCategoryInput,
@@ -30,153 +29,231 @@ import { DeleteDialog } from "@common/delete-dialog";
 
 type CategoryWithChildren = Category & { children?: CategoryWithChildren[] };
 
-// --- SKELETON, EMPTY, AND STATUS COMPONENTS ---
+// ---------------------------------------------------------------------------
+// Icon resolver helper
+// ---------------------------------------------------------------------------
+// Type badge color map
+function typeBadgeClass(type: string) {
+  switch (type) {
+    case "INCOME":
+      return "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400";
+    case "EXPENSE":
+      return "border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400";
+    case "TRANSFER":
+      return "border-blue-500/30 bg-blue-500/10 text-blue-600 dark:text-blue-400";
+    default:
+      return "border-border bg-muted text-muted-foreground";
+  }
+}
 
-const CategoryListSkeleton: React.FC = () => (
-  <div className="space-y-4 p-4">
-    {Array.from({ length: 5 }).map((_, i) => (
-      <div key={i} className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="bg-muted h-8 w-8 animate-pulse rounded-full" />
-          <div className="space-y-1">
-            <div className="bg-muted h-4 w-32 animate-pulse rounded" />
-            <div className="bg-muted h-3 w-20 animate-pulse rounded" />
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="bg-muted h-8 w-8 animate-pulse rounded-md" />
-          <div className="bg-muted h-8 w-8 animate-pulse rounded-md" />
-        </div>
-      </div>
-    ))}
-  </div>
-);
-
-const EmptyState: React.FC<{
-  title: string;
-  description: string;
-  action: React.ReactNode;
-}> = ({ title, description, action }) => (
-  <div className="border-border/70 bg-muted/20 flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-12 text-center">
-    <FolderOpen className="text-muted-foreground mb-4 h-10 w-10" />
-    <h3 className="text-xl font-semibold">{title}</h3>
-    <p className="text-muted-foreground mb-6 text-sm">{description}</p>
-    {action}
-  </div>
-);
-
-const noop = () => undefined;
-
-function CategoryItem({
-  category,
-  onEdit,
-  onAddSub,
-  onDelete,
-  isSubcategory = false,
+function CategoryIcon({
+  icon,
+  color,
+  name,
+  size = "md",
 }: {
-  category: CategoryWithChildren;
-  onEdit: (c: Category) => void;
-  onAddSub: (c: Category) => void;
-  onDelete: (c: Category) => void;
-  isSubcategory?: boolean;
+  icon?: string | null;
+  color?: string | null;
+  name: string;
+  size?: "sm" | "md";
 }) {
-  const IconEntry = ICONS.find((i) => i.name === category.icon);
+  const IconEntry = ICONS.find((i) => i.name === icon);
   const IconComp = IconEntry?.Icon;
-  const isParent = !isSubcategory;
-  // Subcategories are handled within the parent Card Header, so this is now only used for sub-items
-  const canAddSub = isParent && !category.parentCategoryId;
+  const dims = size === "sm" ? "h-7 w-7" : "h-9 w-9";
+  const iconDims = size === "sm" ? "h-3.5 w-3.5" : "h-4 w-4";
+  const iconColor = color ?? "#666";
 
   return (
     <div
-      className={`border-border/50 hover:bg-muted/50 flex items-center justify-between gap-4 rounded-lg border px-2 py-2 transition-colors ${
-        isSubcategory ? "bg-background shadow-sm" : ""
-      }`}
+      className={cn(
+        "bg-muted flex shrink-0 items-center justify-center rounded-lg",
+        dims,
+      )}
     >
-      <div className="flex items-center gap-3">
-        <div
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-white"
-          style={{ background: category.color ?? "#666" }}
-        >
-          {IconComp ? (
-            <IconComp className="h-4 w-4" />
-          ) : (
-            <span className="text-xs font-semibold">
-              {category.name?.charAt(0)}
-            </span>
-          )}
-        </div>
-        <div className="flex min-w-0 flex-col">
-          <div className="truncate text-sm font-medium">{category.name}</div>
-          <div className="text-muted-foreground text-xs tracking-wider uppercase">
-            {isSubcategory ? "Subcategory" : "Main Category"}
-            {isParent && (
-              <span className="text-primary/80 ml-2">
-                ({category.children?.length ?? 0} subs)
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex shrink-0 items-center gap-1">
-        {isParent && (
-          // This button is kept but hidden for main categories here, as the primary add sub is in the CardHeader
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onAddSub(category)}
-            disabled={!canAddSub}
-            title={
-              canAddSub
-                ? "Add Subcategory"
-                : "Cannot nest subcategories further"
-            }
-            className="hidden"
-          >
-            <PlusCircle className="text-primary/80 h-4 w-4" />
-          </Button>
-        )}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onEdit(category)}
-          title="Edit"
-        >
-          <Edit2 className="text-muted-foreground hover:text-foreground h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onDelete(category)}
-          className="text-destructive hover:bg-destructive/10"
-          title="Delete"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </div>
+      {IconComp ? (
+        <IconComp className={iconDims} style={{ color: iconColor }} />
+      ) : (
+        <span className="text-xs font-bold" style={{ color: iconColor }}>
+          {name.charAt(0)}
+        </span>
+      )}
     </div>
   );
 }
 
-// --- MAIN SETTINGS COMPONENT ---
+// ---------------------------------------------------------------------------
+// Parent category row with collapsible subcategories
+// ---------------------------------------------------------------------------
+function ParentRow({
+  category,
+  onEditParent,
+  onEditSub,
+  onAddSub,
+  onDelete,
+}: {
+  category: CategoryWithChildren;
+  onEditParent: (c: Category) => void;
+  onEditSub: (c: Category) => void;
+  onAddSub: (c: Category) => void;
+  onDelete: (c: CategoryWithChildren) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const children = category.children ?? [];
 
+  return (
+    <div className="bg-card border-border/60 rounded-xl border">
+      {/* Parent header */}
+      <div className="flex items-center gap-3 px-4 py-3">
+        {/* Expand toggle */}
+        <button
+          onClick={() => setOpen((s) => !s)}
+          className="text-muted-foreground hover:text-foreground -ml-1 p-0.5 transition-colors"
+        >
+          <ChevronDown
+            className={cn(
+              "h-4 w-4 transition-transform duration-200",
+              open && "rotate-180",
+            )}
+          />
+        </button>
+
+        <CategoryIcon
+          icon={category.icon}
+          color={category.color}
+          name={category.name}
+        />
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="truncate text-sm font-medium">
+              {category.name}
+            </span>
+            <Badge
+              variant="outline"
+              className={cn(
+                "text-[10px] uppercase",
+                typeBadgeClass(category.type),
+              )}
+            >
+              {category.type}
+            </Badge>
+          </div>
+          <p className="text-muted-foreground text-xs">
+            {children.length} subcategor{children.length === 1 ? "y" : "ies"}
+          </p>
+        </div>
+
+        {/* Actions */}
+        <div className="flex shrink-0 items-center gap-0.5">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => onAddSub(category)}
+            title="Add subcategory"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => onEditParent(category)}
+            title="Edit"
+          >
+            <Edit2 className="text-muted-foreground h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-destructive hover:bg-destructive/10 h-8 w-8"
+            onClick={() => onDelete(category)}
+            title="Delete"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Subcategories (collapsible) */}
+      {open && (
+        <div className="border-border/60 border-t">
+          {children.length > 0 ? (
+            <div className="divide-border/40 divide-y">
+              {children.map((sub) => (
+                <div
+                  key={sub.id}
+                  className="bg-card hover:bg-muted/40 flex items-center gap-3 py-2.5 pr-4 pl-12 transition-colors"
+                >
+                  <CategoryIcon
+                    icon={sub.icon}
+                    color={sub.color}
+                    name={sub.name}
+                    size="sm"
+                  />
+                  <span className="min-w-0 flex-1 truncate text-sm">
+                    {sub.name}
+                  </span>
+                  <div className="flex shrink-0 items-center gap-0.5">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => onEditSub(sub)}
+                      title="Edit"
+                    >
+                      <Edit2 className="text-muted-foreground h-3 w-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive hover:bg-destructive/10 h-7 w-7"
+                      onClick={() => onDelete(sub)}
+                      title="Delete"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-muted-foreground flex items-center justify-center gap-2 py-6 text-sm">
+              <span>No subcategories</span>
+              <Button
+                variant="outline"
+                size="sm"
+                className="ml-2 h-7 text-xs"
+                onClick={() => onAddSub(category)}
+              >
+                <Plus className="mr-1 h-3 w-3" />
+                Add one
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main component
+// ---------------------------------------------------------------------------
 export default function CategoriesSettings() {
   const { all, categories: categoryTree, remove } = useCategories();
   const utils = api.useUtils();
 
-  // Category Form State
   const [openCategory, setOpenCategory] = useState(false);
   const [categoryToEdit, setCategoryToEdit] = useState<
     (Partial<CreateCategoryInput> & { id?: string }) | null
   >(null);
 
-  // Subcategory Form State
   const [openSub, setOpenSub] = useState(false);
   const [subInitial, setSubInitial] = useState<
     (Partial<CreateSubcategoryInput> & { id?: string }) | null
   >(null);
 
-  // Deletion Confirmation State
   const [deleteCandidate, setDeleteCandidate] =
     useState<CategoryWithChildren | null>(null);
 
@@ -184,8 +261,6 @@ export default function CategoriesSettings() {
     void invalidateCategories(utils);
   }, [utils]);
 
-  // Use the tree built by the hook so `children` arrays are already attached
-  // Ensure stable ordering by creation time (oldest first)
   const parentCategories: CategoryWithChildren[] = (
     (categoryTree ?? []) as CategoryWithChildren[]
   )
@@ -204,8 +279,7 @@ export default function CategoriesSettings() {
         ),
     }));
 
-  const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
-  // --- HANDLERS ---
+  // --- Handlers ---
 
   const handleAddCategory = () => {
     setCategoryToEdit(null);
@@ -224,8 +298,6 @@ export default function CategoriesSettings() {
     });
     setOpenCategory(true);
   };
-
-  // listExpanded will be added when list expand behavior is implemented
 
   const handleAddSub = (cat: Category) => {
     setSubInitial({ parentId: cat.id });
@@ -252,276 +324,113 @@ export default function CategoriesSettings() {
     return total;
   };
 
-  const prepareDelete = (cat: CategoryWithChildren) => {
-    setDeleteCandidate(cat);
-  };
-
-  const onCategorySaved = () => {
-    setOpenCategory(false);
-    void refresh();
-  };
-
-  const onSubSaved = () => {
-    setOpenSub(false);
-    void refresh();
-  };
-
-  // --- RENDERING STATUS STATES ---
+  // --- Loading / Error ---
 
   if (all.status === "pending") {
     return (
-      <div className="flex-1 space-y-6">
-        <div className="bg-muted h-8 w-64 animate-pulse rounded" />
-        <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i} className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="bg-muted h-6 w-1/3 animate-pulse rounded" />
-              </CardHeader>
-              <CardContent>
-                <CategoryListSkeleton />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+      <div className="space-y-3">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="bg-muted/50 h-16 animate-pulse rounded-xl" />
+        ))}
       </div>
     );
   }
 
   if (all.status === "error") {
     return (
-      <div className="flex-1 space-y-6">
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Error Loading Categories</AlertTitle>
-          <AlertDescription>
-            Failed to fetch category data. Please try again. (
-            {all.error?.message})
-          </AlertDescription>
-        </Alert>
-      </div>
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertTitle>Error Loading Categories</AlertTitle>
+        <AlertDescription>
+          Failed to fetch category data. ({all.error?.message})
+        </AlertDescription>
+      </Alert>
     );
   }
 
-  // --- MAIN RENDER ---
+  // --- Render ---
 
   return (
-    <div className="flex-1 space-y-6">
+    <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-foreground text-lg font-semibold">
-          Category Groups ({parentCategories.length})
-        </h2>
-        <div className="flex items-center gap-3">
-          <div className="bg-muted/10 hidden items-center gap-2 rounded-md px-2 py-1 sm:flex">
-            <Button
-              variant={viewMode === "cards" ? "default" : "ghost"}
-              size="icon"
-              onClick={() => setViewMode("cards")}
-              title="Card view"
-            >
-              <LayoutGrid className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={viewMode === "list" ? "default" : "ghost"}
-              size="icon"
-              onClick={() => setViewMode("list")}
-              title="List view"
-            >
-              <List className="h-4 w-4" />
-            </Button>
-          </div>
-          <Button onClick={handleAddCategory}>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add Main Category
-          </Button>
+        <div>
+          <h3 className="text-sm font-medium">
+            Categories{" "}
+            <span className="text-muted-foreground font-normal">
+              ({parentCategories.length})
+            </span>
+          </h3>
+          <p className="text-muted-foreground text-xs">
+            Organize transactions with parent categories and subcategories.
+          </p>
         </div>
+        <Button size="sm" onClick={handleAddCategory}>
+          <PlusCircle className="mr-1.5 h-4 w-4" />
+          Add Category
+        </Button>
       </div>
 
-      {/* Main Categories Display Area */}
+      {/* Category list */}
       {parentCategories.length === 0 ? (
-        <EmptyState
-          title="No Main Categories Found"
-          description="Start by creating your first main category to organize transactions. Subcategories will be nested inside."
-          action={
-            <Button onClick={handleAddCategory}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Create First Category
-            </Button>
-          }
-        />
+        <div className="border-border/70 bg-muted/20 flex flex-col items-center justify-center rounded-xl border-2 border-dashed py-16 text-center">
+          <FolderOpen className="text-muted-foreground mb-3 h-8 w-8" />
+          <p className="text-sm font-medium">No categories yet</p>
+          <p className="text-muted-foreground mb-4 text-xs">
+            Create your first category to get started.
+          </p>
+          <Button size="sm" onClick={handleAddCategory}>
+            <PlusCircle className="mr-1.5 h-4 w-4" />
+            Create Category
+          </Button>
+        </div>
       ) : (
-        <div>
-          {viewMode === "cards" ? (
-            <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
-              {parentCategories.map((c: CategoryWithChildren) => (
-                <CategoryCard
-                  key={c.id}
-                  category={c}
-                  onAddSub={handleAddSub}
-                  onEditParent={(cat) => handleEditCategory(cat)}
-                  onEditSub={(sub) => handleEditSubcategory(sub)}
-                  onDelete={(cat) => prepareDelete(cat)}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {parentCategories.map((p) => (
-                <div
-                  key={p.id}
-                  className="border-border/50 rounded-lg border p-3"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-lg font-bold text-white"
-                        style={{ background: p.color ?? "#666" }}
-                      >
-                        {(() => {
-                          const IconEntry = ICONS.find(
-                            (i) => i.name === p.icon,
-                          );
-                          const IconComp = IconEntry?.Icon;
-                          return IconComp ? (
-                            <IconComp className="h-5 w-5" />
-                          ) : (
-                            p.name?.charAt(0)
-                          );
-                        })()}
-                      </div>
-                      <div>
-                        <div className="font-semibold">{p.name}</div>
-                        <div className="text-muted-foreground text-xs">
-                          {p.type}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleAddSub(p)}
-                        className="cursor-pointer"
-                      >
-                        <PlusCircle className="text-primary h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEditCategory(p)}
-                        className="cursor-pointer"
-                      >
-                        <Edit2 className="text-muted-foreground h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => prepareDelete(p)}
-                        className="text-destructive cursor-pointer"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* children tree */}
-                  <div className="mt-3 pl-12">
-                    {p.children && p.children.length > 0 ? (
-                      <div className="space-y-2">
-                        {p.children.map((sub: CategoryWithChildren) => (
-                          <div
-                            key={sub.id}
-                            className="flex items-center justify-between"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div
-                                className="flex h-8 w-8 items-center justify-center rounded-full text-white"
-                                style={{ background: sub.color ?? "#666" }}
-                              >
-                                {(() => {
-                                  const IconEntry = ICONS.find(
-                                    (i) => i.name === sub.icon,
-                                  );
-                                  const IconComp = IconEntry?.Icon;
-                                  return IconComp ? (
-                                    <IconComp className="h-4 w-4" />
-                                  ) : (
-                                    sub.name?.charAt(0)
-                                  );
-                                })()}
-                              </div>
-                              <div>
-                                <div className="font-medium">{sub.name}</div>
-                                <div className="text-muted-foreground text-xs">
-                                  Subcategory
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleEditSubcategory(sub)}
-                                className="cursor-pointer"
-                              >
-                                <Edit2 className="text-muted-foreground h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => prepareDelete(sub)}
-                                className="text-destructive cursor-pointer"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-muted-foreground text-sm">
-                        No subcategories
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+        <div className="space-y-3">
+          {parentCategories.map((c) => (
+            <ParentRow
+              key={c.id}
+              category={c}
+              onEditParent={handleEditCategory}
+              onEditSub={handleEditSubcategory}
+              onAddSub={handleAddSub}
+              onDelete={setDeleteCandidate}
+            />
+          ))}
         </div>
       )}
 
-      {/* Category/Subcategory Forms */}
+      {/* Forms */}
       <CategoryForm
         open={openCategory}
         onOpenChange={setOpenCategory}
         initialValues={categoryToEdit ?? undefined}
-        onSubmit={onCategorySaved}
+        onSubmit={() => {
+          setOpenCategory(false);
+          void refresh();
+        }}
       />
       <SubcategoryForm
         open={openSub}
         onOpenChange={setOpenSub}
         initialValues={subInitial ?? undefined}
-        onSubmit={onSubSaved}
+        onSubmit={() => {
+          setOpenSub(false);
+          void refresh();
+        }}
       />
 
-      {/* Delete Confirmation - use shared DeleteDialog component */}
+      {/* Delete confirmation */}
       <DeleteDialog
         open={!!deleteCandidate}
         onOpenChange={(open) => {
           if (!open) setDeleteCandidate(null);
         }}
-        title={"Confirm Deletion"}
+        title="Confirm Deletion"
         description={
           deleteCandidate
             ? deleteCandidate.parentCategoryId
-              ? `Are you sure you want to delete the subcategory "${deleteCandidate.name}"? This will remove it from its parent category. This action cannot be undone.`
-              : `Are you sure you want to delete the category "${deleteCandidate.name}"? This will also delete ${
-                  deleteCandidate.children &&
-                  deleteCandidate.children.length > 0
-                    ? countDescendants(deleteCandidate)
-                    : 0
-                } associated subcategories. This action cannot be undone.`
+              ? `Delete subcategory "${deleteCandidate.name}"? This action cannot be undone.`
+              : `Delete category "${deleteCandidate.name}"? This will permanently remove it along with all ${countDescendants(deleteCandidate)} of its subcategories. This action cannot be undone.`
             : ""
         }
         confirmText="Delete"
@@ -533,145 +442,10 @@ export default function CategoriesSettings() {
           setDeleteCandidate(null);
         }}
         successMessage={
-          deleteCandidate
-            ? deleteCandidate.parentCategoryId
-              ? `Subcategory "${deleteCandidate.name}" deleted.`
-              : `Category "${deleteCandidate.name}" deleted.`
-            : "Deleted."
+          deleteCandidate ? `"${deleteCandidate.name}" deleted.` : "Deleted."
         }
         errorMessage="Failed to delete category."
       />
     </div>
-  );
-}
-
-function CategoryCard({
-  category,
-  onAddSub,
-  onEditParent,
-  onEditSub,
-  onDelete,
-}: {
-  category: CategoryWithChildren;
-  onAddSub: (c: Category) => void;
-  onEditParent: (c: Category) => void;
-  onEditSub: (c: Category) => void;
-  onDelete: (c: CategoryWithChildren) => void;
-}) {
-  const [expanded, setExpanded] = useState(false);
-
-  const children = category.children ?? [];
-  const visibleChildren = expanded ? children : children.slice(0, 2);
-
-  return (
-    <Card className="rounded-xl shadow-lg transition-shadow duration-300 hover:shadow-xl">
-      <CardHeader className="flex flex-row items-start justify-between px-4 pt-0 pb-2">
-        <div className="flex items-start gap-3">
-          <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-lg font-bold text-white shadow-md"
-            style={{ background: category.color ?? "#666" }}
-          >
-            {(() => {
-              const IconEntry = ICONS.find((i) => i.name === category.icon);
-              const IconComp = IconEntry?.Icon;
-              return IconComp ? (
-                <IconComp className="h-5 w-5" />
-              ) : (
-                category.name?.charAt(0)
-              );
-            })()}
-          </div>
-          <div>
-            <CardTitle className="text-lg leading-tight font-bold">
-              {category.name}
-            </CardTitle>
-            <p className="text-muted-foreground mt-0 text-xs">
-              {category.type}
-            </p>
-          </div>
-        </div>
-        <div className="mt-1 flex items-center gap-2">
-          <Button
-            className="cursor-pointer"
-            variant="ghost"
-            size="icon"
-            onClick={() => onAddSub(category)}
-            title="Add Subcategory"
-          >
-            <PlusCircle className="text-primary hover:text-primary/80 h-5 w-5" />
-          </Button>
-          <Button
-            className="cursor-pointer"
-            variant="ghost"
-            size="icon"
-            onClick={() => onEditParent(category)}
-            title="Edit Main Category"
-          >
-            <Edit2 className="text-muted-foreground hover:text-foreground h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDelete(category)}
-            className="text-destructive hover:bg-destructive/10 cursor-pointer"
-            title="Delete Main Category"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      </CardHeader>
-
-      <CardContent className="p-3">
-        {children.length > 0 ? (
-          <div className="space-y-2 pt-0">
-            <div className="border-border/50 flex items-center justify-between border-b pb-1">
-              <p className="text-muted-foreground text-sm font-semibold">
-                Subcategories ({children.length})
-              </p>
-              {children.length > 2 && (
-                <Button
-                  className="cursor-pointer"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setExpanded((s) => !s)}
-                >
-                  {expanded ? "Show less" : `Show ${children.length - 2} more`}
-                </Button>
-              )}
-            </div>
-
-            <div className="space-y-2 pt-2">
-              {visibleChildren.map((sub: CategoryWithChildren) => (
-                <CategoryItem
-                  key={sub.id}
-                  category={sub}
-                  isSubcategory={true}
-                  onEdit={(c) => onEditSub(c)}
-                  onAddSub={noop}
-                  onDelete={(c) => onDelete(c)}
-                />
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-3 py-4">
-            <div className="bg-muted/30 rounded-full p-3">
-              <PlusCircle className="text-primary h-5 w-5" />
-            </div>
-            <div className="text-muted-foreground text-center text-sm">
-              No subcategories yet
-            </div>
-            <Button
-              className="cursor-pointer"
-              variant="outline"
-              size="sm"
-              onClick={() => onAddSub(category)}
-            >
-              Add subcategory
-            </Button>
-          </div>
-        )}
-      </CardContent>
-    </Card>
   );
 }

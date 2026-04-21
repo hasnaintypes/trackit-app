@@ -9,6 +9,9 @@ const ALLOWED_TEMPLATES = [
   "ai-insight.html",
   "verification.html",
   "password-reset.html",
+  "contact-admin-notification.html",
+  "contact-confirmation.html",
+  "waitlist-welcome.html",
 ] as const;
 
 const cache = new Map<string, string>();
@@ -25,7 +28,14 @@ export async function getTemplate(templateName: string): Promise<string> {
   const cached = cache.get(templateName);
   if (cached) return cached;
 
-  const templatePath = path.join(__dirname, "templates", templateName);
+  const templatePath = path.join(
+    process.cwd(),
+    "src",
+    "lib",
+    "email",
+    "templates",
+    templateName,
+  );
   const content = await readFile(templatePath, "utf-8");
   cache.set(templateName, content);
   return content;

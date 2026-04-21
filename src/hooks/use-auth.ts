@@ -14,7 +14,6 @@ interface SignUpPayload {
   password: string;
   image?: string;
   callbackURL?: string;
-  role?: string;
 }
 
 interface SignInPayload {
@@ -228,16 +227,145 @@ export function useAuth() {
     [],
   );
 
+  const signInWithGoogle = useCallback(
+    async (callbackURL?: string): Promise<void> => {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: callbackURL ?? "/overview",
+      });
+    },
+    [],
+  );
+
+  const enableTwoFactor = useCallback(async (password: string) => {
+    try {
+      const result = await authClient.twoFactor.enable({ password });
+      if (result.error) throw toError(result.error);
+      logger.info("2FA enabled");
+      return result.data;
+    } catch (err) {
+      const errorObj = toError(err);
+      setError(errorObj);
+      logger.error("Enable 2FA failed", {
+        error: err instanceof Error ? err.message : String(err),
+      });
+      throw errorObj;
+    }
+  }, []);
+
+  const disableTwoFactor = useCallback(
+    async (password: string) => {
+      try {
+        const result = await authClient.twoFactor.disable({ password });
+        if (result.error) throw toError(result.error);
+        logger.info("2FA disabled");
+        invalidateUserCache();
+      } catch (err) {
+        const errorObj = toError(err);
+        setError(errorObj);
+        logger.error("Disable 2FA failed", {
+          error: err instanceof Error ? err.message : String(err),
+        });
+        throw errorObj;
+      }
+    },
+    [invalidateUserCache],
+  );
+
+  const verifyTOTP = useCallback(
+    async (code: string, trustDevice?: boolean) => {
+      try {
+        const result = await authClient.twoFactor.verifyTotp({
+          code,
+          trustDevice,
+        });
+        if (result.error) throw toError(result.error);
+        logger.info("TOTP verified");
+        return result.data;
+      } catch (err) {
+        const errorObj = toError(err);
+        setError(errorObj);
+        logger.error("TOTP verification failed", {
+          error: err instanceof Error ? err.message : String(err),
+        });
+        throw errorObj;
+      }
+    },
+    [],
+  );
+
+  const verifyBackupCode = useCallback(
+    async (code: string, trustDevice?: boolean) => {
+      try {
+        const result = await authClient.twoFactor.verifyBackupCode({
+          code,
+          trustDevice,
+        });
+        if (result.error) throw toError(result.error);
+        logger.info("Backup code verified");
+        return result.data;
+      } catch (err) {
+        const errorObj = toError(err);
+        setError(errorObj);
+        logger.error("Backup code verification failed", {
+          error: err instanceof Error ? err.message : String(err),
+        });
+        throw errorObj;
+      }
+    },
+    [],
+  );
+
+  const generateBackupCodes = useCallback(async (password: string) => {
+    try {
+      const result = await authClient.twoFactor.generateBackupCodes({
+        password,
+      });
+      if (result.error) throw toError(result.error);
+      logger.info("Backup codes regenerated");
+      return result.data;
+    } catch (err) {
+      const errorObj = toError(err);
+      setError(errorObj);
+      logger.error("Generate backup codes failed", {
+        error: err instanceof Error ? err.message : String(err),
+      });
+      throw errorObj;
+    }
+  }, []);
+
+  const getTotpUri = useCallback(async (password: string) => {
+    try {
+      const result = await authClient.twoFactor.getTotpUri({ password });
+      if (result.error) throw toError(result.error);
+      return result.data;
+    } catch (err) {
+      const errorObj = toError(err);
+      setError(errorObj);
+      logger.error("Get TOTP URI failed", {
+        error: err instanceof Error ? err.message : String(err),
+      });
+      throw errorObj;
+    }
+  }, []);
+
   return {
     loading,
     error,
     signUp,
     signIn,
+    signInWithGoogle,
     signOut,
     sendVerificationEmail,
     requestPasswordReset,
     resetPassword,
     changePassword,
+    enableTwoFactor,
+    disableTwoFactor,
+    verifyTOTP,
+    verifyBackupCode,
+    generateBackupCodes,
+    getTotpUri,
     refetch: fetchUser,
   };
 }

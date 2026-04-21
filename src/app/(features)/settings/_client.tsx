@@ -4,18 +4,10 @@ import React, { Suspense, useCallback, useState } from "react";
 import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@ui/skeleton";
-import { Wallet, Palette, BarChart3, Layers } from "lucide-react";
+import { Settings2, Layers, Download } from "lucide-react";
 
 const sectionFallback = <Skeleton className="h-96 w-full rounded-xl" />;
 
-const AccountSettings = dynamic(
-  () => import("@/components/pages/(protected)/settings/account-settings"),
-  { loading: () => sectionFallback },
-);
-const AppearanceSettings = dynamic(
-  () => import("@/components/pages/(protected)/settings/appearance-settings"),
-  { loading: () => sectionFallback },
-);
 const CategoriesSettings = dynamic(
   () => import("@/components/pages/(protected)/settings/categories-settings"),
   { loading: () => sectionFallback },
@@ -24,18 +16,21 @@ const DisplaySettings = dynamic(
   () => import("@/components/pages/(protected)/settings/display-settings"),
   { loading: () => sectionFallback },
 );
+const ExportSettings = dynamic(
+  () => import("@/components/pages/(protected)/settings/export-settings"),
+  { loading: () => sectionFallback },
+);
 
 const sections = [
-  { id: "account", label: "Account", icon: Wallet },
-  { id: "appearance", label: "Appearance", icon: Palette },
+  { id: "preferences", label: "Preferences", icon: Settings2 },
   { id: "categories", label: "Categories", icon: Layers },
-  { id: "display", label: "Display", icon: BarChart3 },
+  { id: "export", label: "Export Data", icon: Download },
 ] as const;
 
 type SectionId = (typeof sections)[number]["id"];
 
 export default function SettingsPageClient() {
-  const [activeSection, setActiveSection] = useState<SectionId>("account");
+  const [activeSection, setActiveSection] = useState<SectionId>("preferences");
 
   const handleSectionChange = useCallback((id: SectionId) => {
     setActiveSection(id);
@@ -71,10 +66,9 @@ export default function SettingsPageClient() {
       {/* Content Area */}
       <div className="min-w-0 flex-1">
         <Suspense fallback={sectionFallback}>
-          {activeSection === "account" && <AccountSettings />}
-          {activeSection === "appearance" && <AppearanceSettings />}
+          {activeSection === "preferences" && <DisplaySettings />}
           {activeSection === "categories" && <CategoriesSettings />}
-          {activeSection === "display" && <DisplaySettings />}
+          {activeSection === "export" && <ExportSettings />}
         </Suspense>
       </div>
     </div>

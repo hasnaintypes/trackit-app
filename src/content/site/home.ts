@@ -67,9 +67,9 @@ export const featuresList: FeatureItem[] = [
   },
   {
     icon: LockIcon,
-    title: "Seamless Stripe Integration",
+    title: "Data Export & Integrations",
     description:
-      "Enjoy instant top-ups, peer-to-peer transfers, and subscription management powered by Stripe  securely and transparently.",
+      "Export your data to Google Sheets, Notion, and Excel. Import transactions via CSV and sync receipts with Google Drive — your data, your way.",
     cardBorderColor: "border-primary/40 hover:border-primary",
     avatarTextColor: "text-primary",
     avatarBgColor: "bg-primary/10",
@@ -77,7 +77,7 @@ export const featuresList: FeatureItem[] = [
 ];
 
 export const hero: HeroContent = {
-  badgeText: "Now Live  Trackit v1.0",
+  badgeText: "Now Live  Trackit v1.2",
   title: "Your Smartest Way to Manage Money, Together",
   description:
     "Trackit unifies personal and group finance in one intelligent dashboard. Track spending, split bills, set goals, and let AI guide your next move all in real time.",
@@ -98,7 +98,7 @@ export const contentSection: ContentSectionContent = {
     },
     {
       title: "Connected",
-      body: "Sync with tools you already use  from Google Sheets to Stripe and keep your finances always in sync.",
+      body: "Sync with tools you already use — Google Sheets, Notion, Excel, and more — to keep your finances always in sync.",
     },
   ],
 };
@@ -106,55 +106,61 @@ export const contentSection: ContentSectionContent = {
 export const integrations: IntegrationContent = {
   heading: "Connect Trackit with your favorite tools",
   description:
-    "Integrate with Plaid, Notion, Google Sheets, and Stripe to automate your workflow. Build custom extensions and automate reports with our API and webhooks.",
+    "Export to Google Sheets, sync with Notion, import from Excel, and get email reports through Gmail. Store receipts in Google Drive and track bills with Google Calendar.",
   cta: { href: "/sign-in", text: "Get Started Free" },
 };
 
 export const pricing = {
   plans: [
     {
-      name: "Starter",
-      price: 19,
+      name: "Free",
+      price: 0,
       description:
-        "Manage your personal budget and track spending with real-time AI insights.",
+        "Get started with personal finance tracking and basic budgeting.",
       features: [
-        "5 accounts included",
-        "Smart spend tracking",
-        "AI monthly summary",
-        "Email alerts & reports",
-        "Basic support access",
+        "2 bank accounts",
+        "Manual transaction entry",
+        "3 budget categories",
+        "Monthly spending overview",
+        "Email verification & security",
       ],
-      buttonText: "Start managing your budget",
+      buttonText: "Get Started Free",
     },
     {
       name: "Pro",
-      price: 29,
+      price: 9,
       isRecommended: true,
       description:
-        "Collaborate with friends and automate group expenses using smart analytics.",
+        "Unlock AI insights, group splits, and full automation for serious budgeters.",
       features: [
-        "10 accounts included",
-        "Group collaboration tools",
-        "AI spend prediction",
-        "Automated settlements",
-        "Priority chat support",
+        "Unlimited accounts",
+        "CSV bulk import & receipt OCR",
+        "AI categorization & insights",
+        "Unlimited budgets & alerts",
+        "Group expense splitting",
+        "Recurring transactions",
+        "Weekly & monthly reports",
+        "Priority support",
       ],
-      buttonText: "Upgrade to Trackit Pro",
+      buttonText: "Upgrade to Pro",
       isPopular: true,
     },
     {
-      name: "Enterprise",
-      price: 49,
+      name: "Team",
+      price: 19,
       description:
-        "Unlock full control with advanced AI, admin tools, and custom integrations.",
+        "Shared finance management for households, roommates, and small teams.",
       features: [
-        "Unlimited accounts access",
-        "Role-based permissions",
-        "Stripe billing reports",
-        "Custom webhook support",
-        "Dedicated success team",
+        "Everything in Pro",
+        "Up to 10 team members",
+        "Unlimited groups & contacts",
+        "Debt simplification",
+        "AI group insights & advice",
+        "Automated split reminders",
+        "Monthly group reports",
+        "Dedicated support",
       ],
-      buttonText: "Get Trackit Enterprise",
+      buttonText: "Get Trackit Team",
     },
   ] as Plan[],
 };

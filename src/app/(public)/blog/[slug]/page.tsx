@@ -1,6 +1,5 @@
 "use client";
 
-// no local state needed for comments; CommentSection manages local additions
 import { HeaderSection, CommentSection, ContentSection } from "@component/blog";
 import { useRouter, useParams } from "next/navigation";
 import { blog } from "@content/site/blog";
@@ -34,39 +33,59 @@ export default function Page() {
     }
   }
 
-  // Determine comments for this post via id-based mapping. Prefer mappings
-  // (commentsByPostId + commentsById) and fallback to legacy blog.comments.
   if (!found) {
     return (
-      <div className="mx-auto max-w-4xl px-6 py-16 md:py-20 lg:py-24">
-        <h2 className="text-2xl font-bold">Post not found</h2>
-        <p className="mt-4">
+      <div className="mx-auto max-w-3xl px-6 py-16 md:py-20 lg:py-24">
+        <h2 className="text-foreground text-2xl font-bold">Post not found</h2>
+        <p className="text-muted-foreground mt-4">
           We couldn&apos;t find the post you&apos;re looking for.
         </p>
         <div className="mt-6">
-          <button onClick={() => navigate.push("/blog")} className="btn">
+          <Button variant="outline" onClick={() => navigate.push("/blog")}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back to blog
-          </button>
+          </Button>
         </div>
       </div>
     );
   }
 
+  // Resolve comments for this post
+  const resolveComments = (): BlogComment[] => {
+    const postId = found?.id;
+    if (!postId) return blog.comments;
+    const commentsByPostId = (
+      blog as unknown as {
+        commentsByPostId?: Record<string, string[]>;
+      }
+    ).commentsByPostId;
+    const commentsById = (
+      blog as unknown as {
+        commentsById?: Record<string, BlogComment>;
+      }
+    ).commentsById;
+    const ids = commentsByPostId?.[postId];
+    if (!ids || !commentsById) return blog.comments;
+    return ids.map((id) => commentsById[id]).filter(Boolean) as BlogComment[];
+  };
+
   return (
-    <div className="bg-background min-h-screen">
-      <div className="mx-auto max-w-4xl px-6 py-16 md:py-20 lg:py-24">
-        <div className="mb-6">
+    <div className="bg-background">
+      <div className="mx-auto max-w-3xl px-6 pt-12 pb-24 md:pt-16 lg:pt-20">
+        {/* Back button */}
+        <div className="mb-8">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => navigate.push("/blog")}
-            className="flex items-center gap-2 hover:bg-[var(--card)] hover:text-[var(--card-foreground)]"
+            className="text-muted-foreground hover:text-foreground -ml-2 gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Back to blog</span>
+            Back to blog
           </Button>
         </div>
 
+        {/* Header */}
         <HeaderSection
           category={found.category ?? ""}
           title={found.title}
@@ -78,37 +97,19 @@ export default function Page() {
           onBack={() => navigate.push("/blog")}
         />
 
-        <div className="mt-12 md:mt-16">
+        {/* Content */}
+        <div className="mt-10 md:mt-14">
           <ContentSection
             content={found.content ?? []}
             coverImage={found.coverImage}
           />
         </div>
 
-        <div className="mt-12 md:mt-16">
-          {/* resolve by post id -> comment ids -> comment objects */}
-          <CommentSection
-            comments={((): BlogComment[] => {
-              const postId = found?.id;
-              if (!postId) return blog.comments;
-              const commentsByPostId = (
-                blog as unknown as {
-                  commentsByPostId?: Record<string, string[]>;
-                }
-              ).commentsByPostId;
-              const commentsById = (
-                blog as unknown as {
-                  commentsById?: Record<string, BlogComment>;
-                }
-              ).commentsById;
-              const ids = commentsByPostId?.[postId];
-              if (!ids || !commentsById) return blog.comments;
-              return ids
-                .map((id) => commentsById[id])
-                .filter(Boolean) as BlogComment[];
-            })()}
-          />
-        </div>
+        {/* Divider */}
+        <div className="border-border my-12 border-t md:my-16" />
+
+        {/* Comments */}
+        <CommentSection comments={resolveComments()} />
       </div>
     </div>
   );

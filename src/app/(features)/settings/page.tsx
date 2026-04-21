@@ -6,7 +6,6 @@ export const dynamic = "force-dynamic";
 export default async function SettingsPage() {
   void api.settings.getAll.prefetch();
   void api.category.list.prefetch();
-  void api.account.list.prefetch();
 
   return (
     <HydrateClient>

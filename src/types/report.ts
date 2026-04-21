@@ -29,4 +29,28 @@ export interface BudgetExceededData {
   period: string;
 }
 
-export type ReportData = MonthlySummaryData | BudgetExceededData;
+export interface WeeklyDigestData {
+  period: string;
+  weekStart: string;
+  weekEnd: string;
+  totalIncome: number;
+  totalExpenses: number;
+  netSavings: number;
+  transactionCount: number;
+  topCategories: Array<{
+    name: string;
+    amount: number;
+  }>;
+}
+
+export interface SpendingInsightsData {
+  period: string;
+  aiContent: string;
+  hasAnomalies: boolean;
+}
+
+export type ReportData =
+  | MonthlySummaryData
+  | BudgetExceededData
+  | WeeklyDigestData
+  | SpendingInsightsData;
