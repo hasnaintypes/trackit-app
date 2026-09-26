@@ -15,7 +15,15 @@ export const auth = betterAuth({
     admin(),
     nextCookies(),
     dash({ apiKey: env.BETTER_AUTH_API_KEY }),
-    sentinel({ apiKey: env.BETTER_AUTH_API_KEY }),
+    sentinel({
+      apiKey: env.BETTER_AUTH_API_KEY,
+      // Disabled: normalizes Gmail-style emails (strips dots/+tags) on every
+      // sign-in/sign-up/reset lookup and on user creation, but existing
+      // accounts stored before this was enabled (or created via OAuth) keep
+      // their literal email — causing a permanent lookup mismatch and
+      // effectively locking those users out. See auth debugging 2026-09-26.
+      security: { emailValidation: { enabled: false } },
+    }),
     twoFactor({
       issuer: "Trackit",
       skipVerificationOnEnable: false,
