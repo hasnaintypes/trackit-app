@@ -27,10 +27,10 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 10.15.0
 
       - name: Ensure pnpm is on PATH (fallback)
-        run: npm i -g pnpm@8 || true
+        run: npm i -g pnpm@10.15.0 || true
 
       # pnpm is installed above via pnpm/action-setup@v2
 
